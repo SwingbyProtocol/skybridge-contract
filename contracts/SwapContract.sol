@@ -5,7 +5,7 @@ import "./Ownable.sol";
 import "./SafeMath.sol";
 
 // Gas cost = 553591 => 820814 gas for deploying (0.03875137 => 0.05745698 ETH at 70Gwei)
-contract MultiSendWallet is Ownable {
+contract SwapContract is Ownable {
     using SafeMath for uint256;
 
     constructor(address _owner) public {
