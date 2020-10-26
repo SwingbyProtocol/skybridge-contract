@@ -5,7 +5,7 @@ import "./Context.sol";
 import "./SafeMath.sol";
 import "./Ownable.sol";
 
-contract BurnableToken is IBurnableToken, Context, Ownable {
+contract BurnableToken is Context, IBurnableToken, Ownable {
     using SafeMath for uint256;
 
     mapping(address => uint256) private _balances;
@@ -14,7 +14,6 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-
     bool private _mintable;
 
     /**
@@ -44,21 +43,21 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
     /**
      * @dev Returns the token decimals.
      */
-    function decimals() external override view returns (uint8) {
+    function decimals() public override view returns (uint8) {
         return _decimals;
     }
 
     /**
      * @dev Returns the token symbol.
      */
-    function symbol() external override view returns (string memory) {
+    function symbol() public override view returns (string memory) {
         return _symbol;
     }
 
     /**
      * @dev Returns the token name.
      */
-    function name() external override view returns (string memory) {
+    function name() public override view returns (string memory) {
         return _name;
     }
 
@@ -66,26 +65,21 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
      * @dev Returns the bep token owner.
      */
 
-    function getOwner() external override view returns (address) {
+    function getOwner() public override view returns (address) {
         return owner();
     }
 
     /**
      * @dev See {BEP20-totalSupply}.
      */
-    function totalSupply() external override view returns (uint256) {
+    function totalSupply() public override view returns (uint256) {
         return _totalSupply;
     }
 
     /**
      * @dev See {BEP20-balanceOf}.
      */
-    function balanceOf(address account)
-        external
-        override
-        view
-        returns (uint256)
-    {
+    function balanceOf(address account) public override view returns (uint256) {
         return _balances[account];
     }
 
@@ -98,7 +92,7 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
      * - the caller must have a balance of at least `amount`.
      */
     function transfer(address recipient, uint256 amount)
-        external
+        public
         override
         returns (bool)
     {
@@ -110,7 +104,7 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
      * @dev See {BEP20-allowance}.
      */
     function allowance(address owner, address spender)
-        external
+        public
         override
         view
         returns (uint256)
@@ -126,7 +120,7 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
      * - `spender` cannot be the zero address.
      */
     function approve(address spender, uint256 amount)
-        external
+        public
         override
         returns (bool)
     {
@@ -150,7 +144,7 @@ contract BurnableToken is IBurnableToken, Context, Ownable {
         address sender,
         address recipient,
         uint256 amount
-    ) external override returns (bool) {
+    ) public override returns (bool) {
         _transfer(sender, recipient, amount);
         _approve(
             sender,

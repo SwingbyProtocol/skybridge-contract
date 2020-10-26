@@ -11,7 +11,7 @@ contract FloatMinter is BurnableToken {
     using SafeMath for uint256;
     address public swap;
     Burner public burner;
-    mapping(address => mapping(address => uint256)) balances;
+    mapping(address => mapping(address => uint256)) private balances;
 
     event ApproveDeposit(
         address indexed token,

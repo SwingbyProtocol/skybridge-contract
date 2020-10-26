@@ -9,7 +9,7 @@ contract Burner {
         token = _token;
     }
 
-    function burn() public {
+    function burn() external {
         uint256 amount = IBurnableToken(token).balanceOf(address(this));
         IBurnableToken(token).burn(amount);
     }
