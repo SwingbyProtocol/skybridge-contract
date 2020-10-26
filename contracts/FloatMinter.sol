@@ -2,7 +2,6 @@ pragma solidity =0.7.0;
 
 import "./interfaces/IERC20.sol";
 import "./BurnableToken.sol";
-import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./Burner.sol";
 
