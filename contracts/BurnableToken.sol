@@ -1,11 +1,11 @@
 pragma solidity =0.7.0;
 
-import "./IERC20.sol";
+import "./interfaces/IBurnableToken.sol";
 import "./Context.sol";
 import "./SafeMath.sol";
 import "./Ownable.sol";
 
-contract ERC20Token is Context, IERC20, Ownable {
+contract BurnableToken is IBurnableToken, Context, Ownable {
     using SafeMath for uint256;
 
     mapping(address => uint256) private _balances;
@@ -225,7 +225,7 @@ contract ERC20Token is Context, IERC20, Ownable {
      * - `msg.sender` must be the token owner
      * - `_mintable` must be true
      */
-    function mint(uint256 amount) public onlyOwner returns (bool) {
+    function mint(uint256 amount) public override onlyOwner returns (bool) {
         require(_mintable, "this token is not mintable");
         _mint(_msgSender(), amount);
         return true;
@@ -234,7 +234,7 @@ contract ERC20Token is Context, IERC20, Ownable {
     /**
      * @dev Burn `amount` tokens and decreasing the total supply.
      */
-    function burn(uint256 amount) public returns (bool) {
+    function burn(uint256 amount) public override returns (bool) {
         _burn(_msgSender(), amount);
         return true;
     }
@@ -259,7 +259,8 @@ contract ERC20Token is Context, IERC20, Ownable {
         uint256 amount
     ) internal {
         require(sender != address(0), "BEP20: transfer from the zero address");
-        require(recipient != address(0), "BEP20: transfer to the zero address");
+        // Allowed to send out to address(0)
+        // require(recipient != address(0), "BEP20: transfer to the zero address");
 
         _balances[sender] = _balances[sender].sub(
             amount,

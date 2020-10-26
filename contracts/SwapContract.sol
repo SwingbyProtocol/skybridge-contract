@@ -3,20 +3,16 @@ pragma solidity =0.7.0;
 import "./IERC20.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
+import "./ISwapContract.sol";
 
-// Gas cost = 553591 => 820814 gas for deploying (0.03875137 => 0.05745698 ETH at 70Gwei)
-contract SwapContract is Ownable {
+contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
-
-    constructor(address _owner) public {
-        _transferOwnership(_owner);
-    }
 
     function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
         uint8 _inputDecimals
-    ) public onlyOwner returns (bool) {
+    ) public override onlyOwner returns (bool) {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             IERC20 token = IERC20(_token);
@@ -39,12 +35,14 @@ contract SwapContract is Ownable {
         address token,
         address[] memory _contributors,
         uint256[] memory _amounts
-    ) public onlyOwner returns (bool) {
+    ) public override onlyOwner returns (bool) {
         require(_contributors.length == _amounts.length, "length is mismatch");
         for (uint256 i = 0; i < _contributors.length; i++) {
             require(IERC20(token).transfer(_contributors[i], _amounts[i]));
         }
     }
+
+    function distributeNodeRewards() public override {}
 
     // The contract doesn't allow receiving Ether.
     fallback() external {
