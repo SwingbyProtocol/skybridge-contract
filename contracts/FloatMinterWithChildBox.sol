@@ -4,6 +4,7 @@ import "./interfaces/IERC20.sol";
 import "./BurnableToken.sol";
 import "./SafeMath.sol";
 import "./Burner.sol";
+import "./Forwarder.sol";
 
 // The TSS address should have ownership of this contract.
 contract FloatMinter is BurnableToken {
@@ -25,6 +26,22 @@ contract FloatMinter is BurnableToken {
         burner = new Burner(address(this));
     }
 
+    function deployNewForwarder(address payable _receiver)
+        public
+        onlyOwner
+        returns (address)
+    {
+        Forwarder f = new Forwarder(_receiver);
+        return address(f);
+    }
+
+    function forward(address _forwarder, address _token) public {
+        Forwarder f = Forwarder(_forwarder);
+        uint256 amount = f.forward(_token);
+        // forwarder doesn't know about sender....
+        //_approveDeposit();
+    }
+
     function changeSwap(address _swap) public onlyOwner {
         swap = _swap;
     }
@@ -33,25 +50,16 @@ contract FloatMinter is BurnableToken {
         _mint(_dist, _amount);
     }
 
-    function approveDeposit(
-        address _token,
-        address _user,
-        uint256 _amount
-    ) public onlyOwner {
-        _approveDeposit(_token, _user, _amount);
-        // Accepts WBTC/tBTC/renBTC tokens and send out to swap contract
-        IERC20(_token).transfer(swap, _amount);
-        // Send back BTC-LP tokens to user.
-        _mint(_user, _amount);
-    }
-
     function _approveDeposit(
         address _token,
         address _user,
-        uint256 _amount
+        uint256 _amount,
+        address _to
     ) internal {
-        // A registory for minted LP token records
-        balances[_token][_user] = balances[_token][_user].add(_amount);
+        // Accepts WBTC/tBTC/renBTC tokens and send out to swap contract
+        IERC20(_token).transfer(_to, _amount);
+        // Send back BTC-LP tokens to user.
+        _mint(_user, _amount);
     }
 
     // The contract doesn't allow receiving Ether.
