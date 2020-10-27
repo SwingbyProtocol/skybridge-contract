@@ -50,6 +50,7 @@ contract FloatMinter is BurnableToken {
         address _user,
         uint256 _amount
     ) internal {
+        // A registory for records
         balances[_token][_user] = balances[_token][_user].add(_amount);
     }
 

@@ -1,9 +1,9 @@
 pragma solidity =0.7.0;
 
-import "./IERC20.sol";
+import "./interfaces/IERC20.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
-import "./ISwapContract.sol";
+import "./interfaces/ISwapContract.sol";
 
 contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
