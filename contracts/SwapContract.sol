@@ -12,7 +12,7 @@ contract SwapContract is ISwapContract, Ownable {
     address private _lpToken;
     // Token address -> amount
     mapping(address => uint256) _collectedFeesOfToken;
-    mapping(address => uint256) _collectedFloatAmountOfToken;
+    mapping(address => uint256) _floatAmountOfToken;
     mapping(address => uint256) _currentExchangeRate;
 
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
@@ -74,17 +74,11 @@ contract SwapContract is ISwapContract, Ownable {
         IBurnableToken(_lpToken).mint(_dist, _amount);
     }
 
-    function getSupplyOfLPToken() public returns (uint256) {
-        return IBurnableToken(_lpToken).totalSupply();
-    }
-
     function addFloatForBTCToken(address _token, uint256 _amount) public {
         IERC20(_token).transferFrom(_msgSender(), address(this), _amount);
         // Update float amount
-        _collectedFloatAmountOfToken[_token] = _collectedFloatAmountOfToken[_token]
-            .add(_amount);
-
-        // Adding BTC liquidity does not change the LP exchange rate
+        _floatAmountOfToken[_token] = _floatAmountOfToken[_token].add(_amount);
+        // Update LP token price
         _updatePool(_token);
     }
 
@@ -97,12 +91,12 @@ contract SwapContract is ISwapContract, Ownable {
             _amountOfLPToken
         );
         IBurnableToken(_lpToken).burn(_amountOfLPToken);
-        // operates BTC-LP -> BTC stable tokens tranfer
-        // update exchange rate.
+        // Update LP token price
         uint256 newExchangeRate = _updatePool(_token);
         uint256 floatAmount = _amountOfLPToken.mul(newExchangeRate);
-        _collectedFloatAmountOfToken[_token] = _collectedFloatAmountOfToken[_token]
-            .sub(floatAmount);
+        _floatAmountOfToken[_token] = _floatAmountOfToken[_token].sub(
+            floatAmount
+        );
         IERC20(_token).transfer(_msgSender(), floatAmount);
     }
 
@@ -112,13 +106,11 @@ contract SwapContract is ISwapContract, Ownable {
     {
         // for reduce gas cost.
         uint256 collectedFess = _collectedFeesOfToken[_token];
-        uint256 collectedFloatAmount = _collectedFloatAmountOfToken[_token];
-        // for getting LP token supply
-        uint256 balanceOfLPToken = getSupplyOfLPToken();
-        uint256 newQuantityBTCTokens = collectedFloatAmount.add(collectedFess);
+        uint256 floatAmountOfToken = _floatAmountOfToken[_token];
+        uint256 newQuantityBTCTokens = floatAmountOfToken.add(collectedFess);
         // WIP: have to support multiple coins
-        // the problem is LP token supply represents all of btc token pairs
-        newExchangeRate = newQuantityBTCTokens.div(balanceOfLPToken);
+        // logic: rate = (fess + total float amount) / total float amount
+        newExchangeRate = newQuantityBTCTokens.div(floatAmountOfToken);
         _currentExchangeRate[_token] = newExchangeRate;
         return newExchangeRate;
     }
