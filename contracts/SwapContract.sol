@@ -66,7 +66,12 @@ contract SwapContract is ISwapContract, Ownable {
     ) public override onlyOwner returns (bool) {
         require(_contributors.length == _amounts.length, "length is mismatch");
         for (uint256 i = 0; i < _contributors.length; i++) {
-            require(IERC20(token).transfer(_contributors[i], _amounts[i]));
+            if (_contributors[i] == address(0)) {
+                // Burn BTC-LP tokens
+                _burnLPToken(_amounts[i]);
+            } else {
+                require(IERC20(token).transfer(_contributors[i], _amounts[i]));
+            }
         }
     }
 
@@ -76,6 +81,10 @@ contract SwapContract is ISwapContract, Ownable {
 
     function mintLPToken(address _dist, uint256 _amount) public onlyOwner {
         IBurnableToken(_lpToken).mint(_dist, _amount);
+    }
+
+    function _burnLPToken(uint256 _amount) internal {
+        IBurnableToken(_lpToken).burn(_amount);
     }
 
     function addFloatForBTCToken(address _token, uint256 _amount) public {
@@ -104,10 +113,6 @@ contract SwapContract is ISwapContract, Ownable {
         IERC20(_token).transfer(_msgSender(), floatAmount);
     }
 
-    function burnFromBurner() {
-        require(msg.sender == _burner);
-    }
-
     function _updatePool(address _token)
         internal
         returns (uint256 newExchangeRate)
@@ -117,8 +122,8 @@ contract SwapContract is ISwapContract, Ownable {
         uint256 floatAmountOfToken = _floatAmountOfToken[_token];
         uint256 newQuantityBTCTokens = floatAmountOfToken.add(collectedFess);
         // WIP: have to support multiple coins
-        // logic: rate = (fess + total float amount) / total float amount
-        newExchangeRate = newQuantityBTCTokens.div(floatAmountOfToken);
+        // logic: rate = (fess + total float amount) / total amount of LP token 
+        newExchangeRate = newQuantityBTCTokens.div(IBurnableToken(_lpToken).totalSupply());
         _currentExchangeRate[_token] = newExchangeRate;
         return newExchangeRate;
     }

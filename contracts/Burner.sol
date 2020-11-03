@@ -15,7 +15,6 @@ contract Burner {
     function burn() external {
         uint256 amount = IBurnableToken(token).balanceOf(address(this));
         IBurnableToken(token).burn(amount);
-        ISwapContract(swap).executeBurn(amount);
     }
 
     // The contract doesn't allow receiving Ether.
