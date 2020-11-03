@@ -24,13 +24,15 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         string memory symbol,
         uint8 decimals,
         uint256 amount,
-        bool mintable
+        bool mintable,
+        address owner
     ) internal {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
         _mintable = mintable;
-        _mint(owner(), amount);
+        _transferOwnership(owner);
+        _mint(owner, amount);
     }
 
     /**
@@ -219,9 +221,14 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
      * - `msg.sender` must be the token owner
      * - `_mintable` must be true
      */
-    function mint(uint256 amount) public override onlyOwner returns (bool) {
+    function mint(address target, uint256 amount)
+        public
+        override
+        onlyOwner
+        returns (bool)
+    {
         require(_mintable, "this token is not mintable");
-        _mint(_msgSender(), amount);
+        _mint(target, amount);
         return true;
     }
 
