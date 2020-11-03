@@ -90,7 +90,6 @@ contract SwapContract is ISwapContract, Ownable {
 
     function redeemFloatForBTCToken(address _token, uint256 _amountOfLPToken)
         public
-        onlyOwner
     {
         IBurnableToken(_lpToken).transferFrom(
             _msgSender(),
