@@ -2,14 +2,16 @@ pragma solidity =0.7.0;
 
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
+import "./interfaces/ISwapContract.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
-import "./interfaces/ISwapContract.sol";
+import "./Burner.sol";
 
 contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
 
     address private _lpToken;
+    Burner private _burner;
     // Token address -> amount
     mapping(address => uint256) _collectedFeesOfToken;
     mapping(address => uint256) _floatAmountOfToken;
@@ -17,7 +19,9 @@ contract SwapContract is ISwapContract, Ownable {
 
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
 
-    constructor() public {}
+    constructor(address _lptoken) public {
+        _burner = new Burner(_lptoken, address(this));
+    }
 
     /**
      * Transfer part
@@ -98,6 +102,10 @@ contract SwapContract is ISwapContract, Ownable {
             floatAmount
         );
         IERC20(_token).transfer(_msgSender(), floatAmount);
+    }
+
+    function burnFromBurner() {
+        require(msg.sender == _burner);
     }
 
     function _updatePool(address _token)
