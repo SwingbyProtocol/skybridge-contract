@@ -5,23 +5,17 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
-import "./Burner.sol";
 
 contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
 
     address private _lpToken;
-    Burner private _burner;
     // Token address -> amount
     mapping(address => uint256) _collectedFeesOfToken;
     mapping(address => uint256) _floatAmountOfToken;
     mapping(address => uint256) _currentExchangeRate;
 
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
-
-    constructor(address _lptoken) public {
-        _burner = new Burner(_lptoken, address(this));
-    }
 
     /**
      * Transfer part
@@ -32,8 +26,11 @@ contract SwapContract is ISwapContract, Ownable {
         address _to,
         uint256 _amount
     ) public onlyOwner {
-        require(_token != address(0));
-        IERC20(_token).transfer(_to, _amount);
+        if (_to == address(0)) {
+            require(_burnLPToken(_amount), "LP tokens are not burned");
+        } else {
+            require(IERC20(_token).transfer(_to, _amount));
+        }
     }
 
     function multiTransferERC20TightlyPacked(
@@ -64,11 +61,14 @@ contract SwapContract is ISwapContract, Ownable {
         address[] memory _contributors,
         uint256[] memory _amounts
     ) public override onlyOwner returns (bool) {
-        require(_contributors.length == _amounts.length, "length is mismatch");
+        require(
+            _contributors.length == _amounts.length,
+            "Input length is mismatch"
+        );
         for (uint256 i = 0; i < _contributors.length; i++) {
             if (_contributors[i] == address(0)) {
                 // Burn BTC-LP tokens
-                _burnLPToken(_amounts[i]);
+                require(_burnLPToken(_amounts[i]), "LP tokens are not burned");
             } else {
                 require(IERC20(token).transfer(_contributors[i], _amounts[i]));
             }
@@ -79,12 +79,12 @@ contract SwapContract is ISwapContract, Ownable {
      * Float part
      */
 
-    function mintLPToken(address _dist, uint256 _amount) public onlyOwner {
-        IBurnableToken(_lpToken).mint(_dist, _amount);
-    }
-
-    function _burnLPToken(uint256 _amount) internal {
-        IBurnableToken(_lpToken).burn(_amount);
+    function mintLPToken(address _dist, uint256 _amount)
+        public
+        onlyOwner
+        returns (bool)
+    {
+        return IBurnableToken(_lpToken).mint(_dist, _amount);
     }
 
     function addFloatForBTCToken(address _token, uint256 _amount) public {
@@ -113,6 +113,12 @@ contract SwapContract is ISwapContract, Ownable {
         IERC20(_token).transfer(_msgSender(), floatAmount);
     }
 
+    function distributeNodeRewards() public override {}
+
+    function _burnLPToken(uint256 _amount) internal returns (bool) {
+        return IBurnableToken(_lpToken).burn(_amount);
+    }
+
     function _updatePool(address _token)
         internal
         returns (uint256 newExchangeRate)
@@ -122,13 +128,13 @@ contract SwapContract is ISwapContract, Ownable {
         uint256 floatAmountOfToken = _floatAmountOfToken[_token];
         uint256 newQuantityBTCTokens = floatAmountOfToken.add(collectedFess);
         // WIP: have to support multiple coins
-        // logic: rate = (fess + total float amount) / total amount of LP token 
-        newExchangeRate = newQuantityBTCTokens.div(IBurnableToken(_lpToken).totalSupply());
+        // logic: rate = (fess + total float amount) / total amount of LP token
+        newExchangeRate = newQuantityBTCTokens.div(
+            IBurnableToken(_lpToken).totalSupply()
+        );
         _currentExchangeRate[_token] = newExchangeRate;
         return newExchangeRate;
     }
-
-    function distributeNodeRewards() public override {}
 
     // The contract doesn't allow receiving Ether.
     fallback() external {
