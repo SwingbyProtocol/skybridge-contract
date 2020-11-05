@@ -5,11 +5,9 @@ import "./interfaces/IBurnableToken.sol";
 
 contract Burner {
     address public token;
-    address public swap;
 
-    constructor(address _token, address _swap) public {
+    constructor(address _token) public {
         token = _token;
-        swap = _swap;
     }
 
     function burn() external {

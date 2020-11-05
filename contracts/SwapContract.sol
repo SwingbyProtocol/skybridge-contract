@@ -15,7 +15,7 @@ contract SwapContract is ISwapContract, Ownable {
     mapping(address => uint256) _collectedFeesOfToken;
     mapping(address => uint256) _floatAmountOfToken;
     mapping(address => uint256) _currentExchangeRate;
-    Burner private _burner;
+    Burner public _burner;
 
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
 
