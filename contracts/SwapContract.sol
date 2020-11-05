@@ -5,6 +5,7 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
+import "./Burner.sol";
 
 contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
@@ -14,8 +15,13 @@ contract SwapContract is ISwapContract, Ownable {
     mapping(address => uint256) _collectedFeesOfToken;
     mapping(address => uint256) _floatAmountOfToken;
     mapping(address => uint256) _currentExchangeRate;
+    Burner private _burner;
 
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
+
+    constructor(address _lpToken) public {
+        _burner = new Burner(_lpToken, address(this));
+    }
 
     /**
      * Transfer part
@@ -66,12 +72,7 @@ contract SwapContract is ISwapContract, Ownable {
             "Input length is mismatch"
         );
         for (uint256 i = 0; i < _contributors.length; i++) {
-            if (_contributors[i] == address(0)) {
-                // Burn BTC-LP tokens
-                require(_burnLPToken(_amounts[i]), "LP tokens are not burned");
-            } else {
-                require(IERC20(token).transfer(_contributors[i], _amounts[i]));
-            }
+            require(IERC20(token).transfer(_contributors[i], _amounts[i]));
         }
     }
 
@@ -106,7 +107,7 @@ contract SwapContract is ISwapContract, Ownable {
         IBurnableToken(_lpToken).burn(_amountOfLPToken);
         // Update LP token price
         uint256 newExchangeRate = _updatePool(_token);
-        uint256 floatAmount = _amountOfLPToken.mul(newExchangeRate);
+        uint256 floatAmount = _amountOfLPToken.mul(newExchangeRate).div(1e18);
         _floatAmountOfToken[_token] = _floatAmountOfToken[_token].sub(
             floatAmount
         );
@@ -129,9 +130,10 @@ contract SwapContract is ISwapContract, Ownable {
         uint256 newQuantityBTCTokens = floatAmountOfToken.add(collectedFess);
         // WIP: have to support multiple coins
         // logic: rate = (fess + total float amount) / total amount of LP token
-        newExchangeRate = newQuantityBTCTokens.div(
-            IBurnableToken(_lpToken).totalSupply()
-        );
+        uint256 totalActiveLPTokens = IBurnableToken(_lpToken)
+            .totalSupply()
+            .sub(IBurnableToken(_lpToken).balanceOf(address(_burner)));
+        newExchangeRate = newQuantityBTCTokens.div(totalActiveLPTokens);
         _currentExchangeRate[_token] = newExchangeRate;
         return newExchangeRate;
     }
