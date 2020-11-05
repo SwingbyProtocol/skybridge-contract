@@ -32,11 +32,7 @@ contract SwapContract is ISwapContract, Ownable {
         address _to,
         uint256 _amount
     ) public onlyOwner {
-        if (_to == address(0)) {
-            require(_burnLPToken(_amount), "LP tokens are not burned");
-        } else {
-            require(IERC20(_token).transfer(_to, _amount));
-        }
+        require(IERC20(_token).transfer(_to, _amount));
     }
 
     function multiTransferERC20TightlyPacked(
@@ -65,7 +61,8 @@ contract SwapContract is ISwapContract, Ownable {
     function multiTransferERC20(
         address token,
         address[] memory _contributors,
-        uint256[] memory _amounts
+        uint256[] memory _amounts,
+        uint256 _feesRatioForLP
     ) public override onlyOwner returns (bool) {
         require(
             _contributors.length == _amounts.length,

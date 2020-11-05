@@ -10,7 +10,8 @@ interface ISwapContract {
     function multiTransferERC20(
         address token,
         address[] memory _contributors,
-        uint256[] memory _amounts
+        uint256[] memory _amounts,
+        uint256 _feesRatioForLP
     ) external returns (bool);
 
     function distributeNodeRewards() external;
