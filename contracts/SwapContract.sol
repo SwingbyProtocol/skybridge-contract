@@ -20,7 +20,7 @@ contract SwapContract is ISwapContract, Ownable {
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
 
     constructor(address _lpToken) public {
-        _burner = new Burner(_lpToken, address(this));
+        _burner = new Burner(_lpToken);
     }
 
     /**
@@ -66,7 +66,7 @@ contract SwapContract is ISwapContract, Ownable {
     ) public override onlyOwner returns (bool) {
         require(
             _contributors.length == _amounts.length,
-            "Input length is mismatch"
+            "Length of inputs array is mismatch"
         );
         for (uint256 i = 0; i < _contributors.length; i++) {
             require(IERC20(token).transfer(_contributors[i], _amounts[i]));
@@ -86,6 +86,7 @@ contract SwapContract is ISwapContract, Ownable {
     }
 
     function addFloatForBTCToken(address _token, uint256 _amount) public {
+        // Transfer tokens to this contract from users.
         IERC20(_token).transferFrom(_msgSender(), address(this), _amount);
         // Update float amount
         _floatAmountOfToken[_token] = _floatAmountOfToken[_token].add(_amount);

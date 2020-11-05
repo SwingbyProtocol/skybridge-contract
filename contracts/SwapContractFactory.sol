@@ -5,8 +5,8 @@ import "./SwapContract.sol";
 contract SwapContractFactory {
     event Deployed(address wallet);
 
-    function deployNewWallet(address _owner) public returns (address) {
-        SwapContract wallet = new SwapContract();
+    function deployNewWallet(address _owner, address _lpToken) public returns (address) {
+        SwapContract wallet = new SwapContract(_lpToken);
         wallet.transferOwnership(_owner);
         emit Deployed(address(wallet));
         return address(wallet);
