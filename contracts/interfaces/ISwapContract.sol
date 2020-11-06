@@ -35,4 +35,10 @@ interface ISwapContract {
         returns (bool);
 
     function distributeNodeRewards(address _token) external returns (bool);
+
+    function transferOwnershipWithNewNodes(
+        address _newOwner,
+        address[] memory _nodeRewardsAddress,
+        uint256 _nodeRewardsRatio
+    ) external returns (bool);
 }

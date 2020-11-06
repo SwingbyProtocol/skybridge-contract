@@ -152,6 +152,18 @@ contract SwapContract is ISwapContract, Ownable {
         return true;
     }
 
+    function transferOwnershipWithNewNodes(
+        address _newOwner,
+        address[] memory _nodeRewardsAddress,
+        uint256 _nodeRewardsRatio
+    ) public onlyOwner returns (bool) {
+        _transferOwnership(_newOwner);
+        nodes = _nodeRewardsAddress;
+        // The ratio should be 100x of actual rate.
+        nodeRewardsRatio = _nodeRewardsRatio;
+        return true;
+    }
+
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
         internal
     {
