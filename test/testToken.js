@@ -18,11 +18,17 @@ describe('LPToken', function () {
 
         this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
 
-        console.log(accounts)
-
         this.erc20 = await LPToken.new();
 
         await this.erc20.mint(sender, this.mintValue)
+    });
+
+    it('reverts when minting tokens from not owner', async function () {
+        // Conditions that trigger a require statement can be precisely tested
+        await expectRevert(
+            this.erc20.mint(receiver, this.value, { from: receiver }),
+            'Ownable: caller is not the owner',
+        );
     });
 
     it('reverts when transferring tokens to the zero address', async function () {
@@ -50,7 +56,7 @@ describe('LPToken', function () {
         this.erc20.transfer(receiver, this.value, { from: sender });
 
         // BN assertions are automatically available via chai-bn (if using Chai)
-        expect(await this.erc20.balanceOf(receiver))
-            .to.be.bignumber.equal(this.value);
+        balanceOfSender = await this.erc20.balanceOf(receiver)
+        expect(balanceOfSender - this.value, "balance is not passed !").to.equal(0)
     });
-});
+})
