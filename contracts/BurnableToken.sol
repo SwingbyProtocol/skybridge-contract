@@ -70,21 +70,21 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     }
 
     /**
-     * @dev See {BEP20-totalSupply}.
+     * @dev See {ERC20-totalSupply}.
      */
     function totalSupply() public override view returns (uint256) {
         return _totalSupply;
     }
 
     /**
-     * @dev See {BEP20-balanceOf}.
+     * @dev See {ERC20-balanceOf}.
      */
     function balanceOf(address account) public override view returns (uint256) {
         return _balances[account];
     }
 
     /**
-     * @dev See {BEP20-transfer}.
+     * @dev See {ERC20-transfer}.
      *
      * Requirements:
      *
@@ -101,7 +101,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     }
 
     /**
-     * @dev See {BEP20-allowance}.
+     * @dev See {ERC20-allowance}.
      */
     function allowance(address owner, address spender)
         public
@@ -113,7 +113,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     }
 
     /**
-     * @dev See {BEP20-approve}.
+     * @dev See {ERC20-approve}.
      *
      * Requirements:
      *
@@ -129,10 +129,10 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     }
 
     /**
-     * @dev See {BEP20-transferFrom}.
+     * @dev See {ERC20-transferFrom}.
      *
      * Emits an {Approval} event indicating the updated allowance. This is not
-     * required by the EIP. See the note at the beginning of {BEP20};
+     * required by the EIP. See the note at the beginning of {ERC20};
      *
      * Requirements:
      * - `sender` and `recipient` cannot be the zero address.
@@ -161,7 +161,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
      * @dev Atomically increases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {BEP20-approve}.
+     * problems described in {ERC20-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -185,7 +185,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
      * @dev Atomically decreases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {BEP20-approve}.
+     * problems described in {ERC20-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -278,7 +278,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
      * - `to` cannot be the zero address.
      */
     function _mint(address account, uint256 amount) internal {
-        require(account != address(0), "BEP20: mint to the zero address");
+        require(account != address(0), "ERC20: mint to the zero address");
 
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
@@ -297,7 +297,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
      * - `account` must have at least `amount` tokens.
      */
     function _burn(address account, uint256 amount) internal {
-        require(account != address(0), "BEP20: burn from the zero address");
+        require(account != address(0), "ERC20: burn from the zero address");
 
         _balances[account] = _balances[account].sub(
             amount,
