@@ -33,9 +33,10 @@ contract SwapContract is ISwapContract, Ownable {
         address _to,
         uint256 _amount,
         uint256 _rewardsAmount
-    ) public onlyOwner {
+    ) public override onlyOwner returns (bool) {
         require(IERC20(_token).transfer(_to, _amount));
         _rewardsCollection(_token, _rewardsAmount);
+        return true;
     }
 
     function multiTransferERC20TightlyPacked(
@@ -61,6 +62,7 @@ contract SwapContract is ISwapContract, Ownable {
             require(token.transfer(to, amount));
         }
         _rewardsCollection(_token, _rewardsAmount);
+        return true;
     }
 
     function multiTransferERC20(
@@ -77,6 +79,7 @@ contract SwapContract is ISwapContract, Ownable {
             require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
         _rewardsCollection(_token, _rewardsAmount);
+        return true;
     }
 
     /**
@@ -91,17 +94,24 @@ contract SwapContract is ISwapContract, Ownable {
         return IBurnableToken(lpToken).mint(_dist, _amount);
     }
 
-    function addFloatForBTCToken(address _token, uint256 _amount) public {
+    function addFloatForBTCToken(address _token, uint256 _amount)
+        public
+        override
+        returns (bool)
+    {
         // Transfer tokens to this contract from users.
         IERC20(_token).transferFrom(_msgSender(), address(this), _amount);
         // Update float amount
         floatAmountOfToken[_token] = floatAmountOfToken[_token].add(_amount);
         // Update LP token price
         _updatePool(_token);
+        return true;
     }
 
     function redeemFloatForBTCToken(address _token, uint256 _amountOfLPToken)
         public
+        override
+        returns (bool)
     {
         IBurnableToken(lpToken).transferFrom(
             _msgSender(),
@@ -115,7 +125,8 @@ contract SwapContract is ISwapContract, Ownable {
         floatAmountOfToken[_token] = floatAmountOfToken[_token].sub(
             floatAmount
         );
-        IERC20(_token).transfer(_msgSender(), floatAmount);
+        require(IERC20(_token).transfer(_msgSender(), floatAmount));
+        return true;
     }
 
     function distributeNodeRewards(address _token)
@@ -125,6 +136,7 @@ contract SwapContract is ISwapContract, Ownable {
     {
         // Reduce Gas
         uint256 totalRewardsForNode = totalRewardsForNodes[_token];
+        require(totalRewardsForNode > 0, "totalRewardsForNode amount is 0");
         for (uint256 i = 0; i < nodes.length; i++) {
             require(
                 IERC20(_token).transfer(
@@ -135,6 +147,7 @@ contract SwapContract is ISwapContract, Ownable {
         }
         // Zerolize for storage, gas refunded.
         totalRewardsForNodes[_token] = 0;
+        return true;
     }
 
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
