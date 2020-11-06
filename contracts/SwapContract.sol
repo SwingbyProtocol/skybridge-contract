@@ -12,8 +12,8 @@ contract SwapContract is ISwapContract, Ownable {
 
     address private lpToken;
     // Token address -> amount
-    mapping(address => uint256) private totalRewardsForLPs; // 0x0 space is for node operators
-    mapping(address => uint256) private totalRewardsForNodes; // 0x0 space is for node operators
+    mapping(address => uint256) private totalRewardsForLPs;
+    mapping(address => uint256) private totalRewardsForNodes;
     mapping(address => uint256) private floatAmountOfToken;
     mapping(address => uint256) private currentExchangeRate;
     Burner public burner;
@@ -88,6 +88,7 @@ contract SwapContract is ISwapContract, Ownable {
 
     function mintLPToken(address _dist, uint256 _amount)
         public
+        override
         onlyOwner
         returns (bool)
     {

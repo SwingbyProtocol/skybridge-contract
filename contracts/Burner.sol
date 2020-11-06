@@ -1,18 +1,11 @@
 pragma solidity =0.7.0;
 
-import "./interfaces/ISwapContract.sol";
 import "./interfaces/IBurnableToken.sol";
 
 contract Burner {
-    address public token;
-
-    constructor(address _token) public {
-        token = _token;
-    }
-
-    function burn() external {
-        uint256 amount = IBurnableToken(token).balanceOf(address(this));
-        IBurnableToken(token).burn(amount);
+    function burn(address _token) external {
+        uint256 amount = IBurnableToken(_token).balanceOf(address(this));
+        IBurnableToken(_token).burn(amount);
     }
 
     // The contract doesn't allow receiving Ether.
