@@ -21,7 +21,8 @@ contract SwapContract is ISwapContract, Ownable {
     address[] public nodes;
 
     constructor(address _lpToken) public {
-        burner = new Burner(_lpToken);
+        burner = new Burner();
+        lpToken = _lpToken;
     }
 
     /**
