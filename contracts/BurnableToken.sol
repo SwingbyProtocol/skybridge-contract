@@ -257,8 +257,8 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         address recipient,
         uint256 amount
     ) internal {
-        require(sender != address(0), "BEP20: transfer from the zero address");
-        require(recipient != address(0), "BEP20: transfer to the zero address");
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
 
         _balances[sender] = _balances[sender].sub(
             amount,
