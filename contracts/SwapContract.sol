@@ -12,12 +12,13 @@ contract SwapContract is ISwapContract, Ownable {
 
     address private lpToken;
     // Token address -> amount
-    mapping(address => uint256) collectedFeesOfToken;
-    mapping(address => uint256) floatAmountOfToken;
-    mapping(address => uint256) currentExchangeRate;
+    mapping(address => uint256) private totalRewardsForLPs; // 0x0 space is for node operators
+    mapping(address => uint256) private totalRewardsForNodes; // 0x0 space is for node operators
+    mapping(address => uint256) private floatAmountOfToken;
+    mapping(address => uint256) private currentExchangeRate;
     Burner public burner;
-
-    event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
+    uint256 public nodeRewardsRatio;
+    address[] public nodes;
 
     constructor(address _lpToken) public {
         burner = new Burner(_lpToken);
@@ -30,15 +31,18 @@ contract SwapContract is ISwapContract, Ownable {
     function singleTransferERC20(
         address _token,
         address _to,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _rewardsAmount
     ) public onlyOwner {
         require(IERC20(_token).transfer(_to, _amount));
+        _rewardsCollection(_token, _rewardsAmount);
     }
 
     function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
-        uint8 _inputDecimals
+        uint8 _inputDecimals,
+        uint256 _rewardsAmount
     ) public override onlyOwner returns (bool) {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
@@ -56,21 +60,23 @@ contract SwapContract is ISwapContract, Ownable {
             }
             require(token.transfer(to, amount));
         }
+        _rewardsCollection(_token, _rewardsAmount);
     }
 
     function multiTransferERC20(
-        address token,
+        address _token,
         address[] memory _contributors,
         uint256[] memory _amounts,
-        uint256 _feesRatioForLP
+        uint256 _rewardsAmount
     ) public override onlyOwner returns (bool) {
         require(
             _contributors.length == _amounts.length,
             "Length of inputs array is mismatch"
         );
         for (uint256 i = 0; i < _contributors.length; i++) {
-            require(IERC20(token).transfer(_contributors[i], _amounts[i]));
+            require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
+        _rewardsCollection(_token, _rewardsAmount);
     }
 
     /**
@@ -112,10 +118,38 @@ contract SwapContract is ISwapContract, Ownable {
         IERC20(_token).transfer(_msgSender(), floatAmount);
     }
 
-    function distributeNodeRewards() public override {}
+    function distributeNodeRewards(address _token)
+        public
+        override
+        returns (bool)
+    {
+        // Reduce Gas
+        uint256 totalRewardsForNode = totalRewardsForNodes[_token];
+        for (uint256 i = 0; i < nodes.length; i++) {
+            require(
+                IERC20(_token).transfer(
+                    nodes[i],
+                    totalRewardsForNode / nodes.length
+                )
+            );
+        }
+        // Zerolize for storage, gas refunded.
+        totalRewardsForNodes[_token] = 0;
+    }
 
-    function _burnLPToken(uint256 _amount) internal returns (bool) {
-        return IBurnableToken(lpToken).burn(_amount);
+    function _rewardsCollection(address _token, uint256 _rewardsAmount)
+        internal
+    {
+        // Reduce Gas
+        uint256 totalRewardsForNode = totalRewardsForNodes[_token];
+        // Reduce Gas
+        uint256 totalRewardsForLP = totalRewardsForLPs[_token];
+        // Updates rewards for nodes and LPs
+        uint256 rewardsForNode = _rewardsAmount.mul(nodeRewardsRatio).div(100);
+        totalRewardsForNodes[_token] = totalRewardsForNode.add(rewardsForNode);
+        totalRewardsForLPs[_token] = totalRewardsForLP.add(
+            _rewardsAmount.sub(rewardsForNode)
+        );
     }
 
     function _updatePool(address _token)
@@ -123,17 +157,23 @@ contract SwapContract is ISwapContract, Ownable {
         returns (uint256 newExchangeRate)
     {
         // for reduce gas cost.
-        uint256 collectedFess = collectedFeesOfToken[_token];
+        uint256 totalReward = totalRewardsForLPs[_token];
         uint256 floatAmount = floatAmountOfToken[_token];
-        uint256 newQuantityBTCTokens = floatAmount.add(collectedFess);
+        uint256 newReservedBTCTokens = floatAmount.add(totalReward);
         // WIP: have to support multiple coins
-        // logic: rate = (fess + total float amount) / total amount of LP token
-        uint256 totalActiveLPTokens = IBurnableToken(lpToken)
-            .totalSupply()
-            .sub(IBurnableToken(lpToken).balanceOf(address(burner)));
-        newExchangeRate = newQuantityBTCTokens.div(totalActiveLPTokens);
+        // logic: rate = (fess + total float amount) / total active amount of LP token
+        uint256 totalActiveLPTokens = IBurnableToken(lpToken).totalSupply().sub(
+            IBurnableToken(lpToken).balanceOf(address(burner))
+        );
+        newExchangeRate = newReservedBTCTokens.mul(100).div(
+            totalActiveLPTokens
+        );
         currentExchangeRate[_token] = newExchangeRate;
         return newExchangeRate;
+    }
+
+    function _burnLPToken(uint256 _amount) internal returns (bool) {
+        return IBurnableToken(lpToken).burn(_amount);
     }
 
     // The contract doesn't allow receiving Ether.

@@ -6,6 +6,7 @@ const {
     expectEvent,  // Assertions for emitted events
     expectRevert, // Assertions for transactions that should fail
 } = require('@openzeppelin/test-helpers');
+const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
 
 const LPToken = contract.fromArtifact('LPToken');
 
@@ -56,7 +57,20 @@ describe('LPToken', function () {
         this.erc20.transfer(receiver, this.value, { from: sender });
 
         // BN assertions are automatically available via chai-bn (if using Chai)
-        balanceOfSender = await this.erc20.balanceOf(receiver)
-        expect(balanceOfSender - this.value, "balance is not passed !").to.equal(0)
+        balanceOfReceiver = await this.erc20.balanceOf(receiver)
+        expect(balanceOfReceiver - this.value).to.equal(0)
+    });
+
+    it('emits a Burn event on successful burning', async function () {
+        const burn = await this.erc20.burn(
+            this.mintValue, { from: sender }
+        );
+
+        // Event assertions can verify that the arguments are the expected ones
+        expectEvent(burn, 'Transfer', {
+            from: sender,
+            to: ZERO_ADDRESS,
+            value: this.mintValue,
+        });
     });
 })

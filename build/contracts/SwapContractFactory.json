@@ -55,15 +55,15 @@
     "absolutePath": "/Users/yusakusenga/go/src/github.com/SwingbyProtocol/skybridge-contract/contracts/SwapContractFactory.sol",
     "exportedSymbols": {
       "SwapContractFactory": [
-        1609
+        1601
       ]
     },
-    "id": 1610,
+    "id": 1602,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1561,
+        "id": 1553,
         "literals": [
           "solidity",
           "0.7",
@@ -75,10 +75,10 @@
       {
         "absolutePath": "/Users/yusakusenga/go/src/github.com/SwingbyProtocol/skybridge-contract/contracts/SwapContract.sol",
         "file": "./SwapContract.sol",
-        "id": 1562,
+        "id": 1554,
         "nodeType": "ImportDirective",
-        "scope": 1610,
-        "sourceUnit": 1560,
+        "scope": 1602,
+        "sourceUnit": 1552,
         "src": "24:28:9",
         "symbolAliases": [],
         "unitAlias": ""
@@ -87,14 +87,14 @@
         "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          1559
+          1551
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1609,
+        "id": 1601,
         "linearizedBaseContracts": [
-          1609
+          1601
         ],
         "name": "SwapContractFactory",
         "nodeType": "ContractDefinition",
@@ -102,22 +102,22 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 1566,
+            "id": 1558,
             "name": "Deployed",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1565,
+              "id": 1557,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1564,
+                  "id": 1556,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "wallet",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1566,
+                  "scope": 1558,
                   "src": "104:14:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -126,7 +126,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1563,
+                    "id": 1555,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "104:7:9",
@@ -146,39 +146,39 @@
           },
           {
             "body": {
-              "id": 1600,
+              "id": 1592,
               "nodeType": "Block",
               "src": "210:179:9",
               "statements": [
                 {
                   "assignments": [
-                    1576
+                    1568
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1576,
+                      "id": 1568,
                       "mutability": "mutable",
                       "name": "wallet",
                       "nodeType": "VariableDeclaration",
                       "overrides": null,
-                      "scope": 1600,
+                      "scope": 1592,
                       "src": "220:19:9",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SwapContract_$1559",
+                        "typeIdentifier": "t_contract$_SwapContract_$1551",
                         "typeString": "contract SwapContract"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1575,
+                        "id": 1567,
                         "name": "SwapContract",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1559,
+                        "referencedDeclaration": 1551,
                         "src": "220:12:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       },
@@ -186,17 +186,17 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1581,
+                  "id": 1573,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1579,
+                        "id": 1571,
                         "name": "_lpToken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1570,
+                        "referencedDeclaration": 1562,
                         "src": "259:8:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -211,7 +211,7 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 1578,
+                      "id": 1570,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -219,23 +219,23 @@
                       "nodeType": "NewExpression",
                       "src": "242:16:9",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_SwapContract_$1559_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_SwapContract_$1551_$",
                         "typeString": "function (address) returns (contract SwapContract)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1577,
+                        "id": 1569,
                         "name": "SwapContract",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1559,
+                        "referencedDeclaration": 1551,
                         "src": "246:12:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       }
                     },
-                    "id": 1580,
+                    "id": 1572,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -246,7 +246,7 @@
                     "src": "242:26:9",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SwapContract_$1559",
+                      "typeIdentifier": "t_contract$_SwapContract_$1551",
                       "typeString": "contract SwapContract"
                     }
                   },
@@ -259,11 +259,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1585,
+                        "id": 1577,
                         "name": "_owner",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1568,
+                        "referencedDeclaration": 1560,
                         "src": "303:6:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -280,32 +280,32 @@
                       ],
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1582,
+                        "id": 1574,
                         "name": "wallet",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1576,
+                        "referencedDeclaration": 1568,
                         "src": "278:6:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       },
-                      "id": 1584,
+                      "id": 1576,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "transferOwnership",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 866,
+                      "referencedDeclaration": 858,
                       "src": "278:24:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address) external"
                       }
                     },
-                    "id": 1586,
+                    "id": 1578,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -320,7 +320,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1587,
+                  "id": 1579,
                   "nodeType": "ExpressionStatement",
                   "src": "278:32:9"
                 },
@@ -333,14 +333,14 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 1591,
+                            "id": 1583,
                             "name": "wallet",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1576,
+                            "referencedDeclaration": 1568,
                             "src": "342:6:9",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_SwapContract_$1559",
+                              "typeIdentifier": "t_contract$_SwapContract_$1551",
                               "typeString": "contract SwapContract"
                             }
                           }
@@ -348,11 +348,11 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_SwapContract_$1559",
+                              "typeIdentifier": "t_contract$_SwapContract_$1551",
                               "typeString": "contract SwapContract"
                             }
                           ],
-                          "id": 1590,
+                          "id": 1582,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -364,7 +364,7 @@
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 1589,
+                            "id": 1581,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
                             "src": "334:7:9",
@@ -374,7 +374,7 @@
                             }
                           }
                         },
-                        "id": 1592,
+                        "id": 1584,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -397,18 +397,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 1588,
+                      "id": 1580,
                       "name": "Deployed",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1566,
+                      "referencedDeclaration": 1558,
                       "src": "325:8:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 1593,
+                    "id": 1585,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -423,7 +423,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1594,
+                  "id": 1586,
                   "nodeType": "EmitStatement",
                   "src": "320:30:9"
                 },
@@ -433,14 +433,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1597,
+                        "id": 1589,
                         "name": "wallet",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1576,
+                        "referencedDeclaration": 1568,
                         "src": "375:6:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       }
@@ -448,11 +448,11 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       ],
-                      "id": 1596,
+                      "id": 1588,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -464,7 +464,7 @@
                         "typeString": "type(address)"
                       },
                       "typeName": {
-                        "id": 1595,
+                        "id": 1587,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "367:7:9",
@@ -474,7 +474,7 @@
                         }
                       }
                     },
-                    "id": 1598,
+                    "id": 1590,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -489,8 +489,8 @@
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 1574,
-                  "id": 1599,
+                  "functionReturnParameters": 1566,
+                  "id": 1591,
                   "nodeType": "Return",
                   "src": "360:22:9"
                 }
@@ -498,7 +498,7 @@
             },
             "documentation": null,
             "functionSelector": "d8d77dbc",
-            "id": 1601,
+            "id": 1593,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -506,17 +506,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1571,
+              "id": 1563,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1568,
+                  "id": 1560,
                   "mutability": "mutable",
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1601,
+                  "scope": 1593,
                   "src": "151:14:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -525,7 +525,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1567,
+                    "id": 1559,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "151:7:9",
@@ -540,12 +540,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1570,
+                  "id": 1562,
                   "mutability": "mutable",
                   "name": "_lpToken",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1601,
+                  "scope": 1593,
                   "src": "167:16:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -554,7 +554,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1569,
+                    "id": 1561,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "167:7:9",
@@ -571,17 +571,17 @@
               "src": "150:34:9"
             },
             "returnParameters": {
-              "id": 1574,
+              "id": 1566,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1573,
+                  "id": 1565,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1601,
+                  "scope": 1593,
                   "src": "201:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -590,7 +590,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1572,
+                    "id": 1564,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "201:7:9",
@@ -606,7 +606,7 @@
               ],
               "src": "200:9:9"
             },
-            "scope": 1609,
+            "scope": 1601,
             "src": "126:263:9",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -614,7 +614,7 @@
           },
           {
             "body": {
-              "id": 1607,
+              "id": 1599,
               "nodeType": "Block",
               "src": "466:25:9",
               "statements": [
@@ -624,7 +624,7 @@
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 1604,
+                      "id": 1596,
                       "name": "revert",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -638,7 +638,7 @@
                         "typeString": "function () pure"
                       }
                     },
-                    "id": 1605,
+                    "id": 1597,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -653,14 +653,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1606,
+                  "id": 1598,
                   "nodeType": "ExpressionStatement",
                   "src": "476:8:9"
                 }
               ]
             },
             "documentation": null,
-            "id": 1608,
+            "id": 1600,
             "implemented": true,
             "kind": "fallback",
             "modifiers": [],
@@ -668,25 +668,25 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1602,
+              "id": 1594,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "454:2:9"
             },
             "returnParameters": {
-              "id": 1603,
+              "id": 1595,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "466:0:9"
             },
-            "scope": 1609,
+            "scope": 1601,
             "src": "446:45:9",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1610,
+        "scope": 1602,
         "src": "54:439:9"
       }
     ],
@@ -696,15 +696,15 @@
     "absolutePath": "/Users/yusakusenga/go/src/github.com/SwingbyProtocol/skybridge-contract/contracts/SwapContractFactory.sol",
     "exportedSymbols": {
       "SwapContractFactory": [
-        1609
+        1601
       ]
     },
-    "id": 1610,
+    "id": 1602,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1561,
+        "id": 1553,
         "literals": [
           "solidity",
           "0.7",
@@ -716,10 +716,10 @@
       {
         "absolutePath": "/Users/yusakusenga/go/src/github.com/SwingbyProtocol/skybridge-contract/contracts/SwapContract.sol",
         "file": "./SwapContract.sol",
-        "id": 1562,
+        "id": 1554,
         "nodeType": "ImportDirective",
-        "scope": 1610,
-        "sourceUnit": 1560,
+        "scope": 1602,
+        "sourceUnit": 1552,
         "src": "24:28:9",
         "symbolAliases": [],
         "unitAlias": ""
@@ -728,14 +728,14 @@
         "abstract": false,
         "baseContracts": [],
         "contractDependencies": [
-          1559
+          1551
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1609,
+        "id": 1601,
         "linearizedBaseContracts": [
-          1609
+          1601
         ],
         "name": "SwapContractFactory",
         "nodeType": "ContractDefinition",
@@ -743,22 +743,22 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 1566,
+            "id": 1558,
             "name": "Deployed",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1565,
+              "id": 1557,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1564,
+                  "id": 1556,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "wallet",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1566,
+                  "scope": 1558,
                   "src": "104:14:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -767,7 +767,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1563,
+                    "id": 1555,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "104:7:9",
@@ -787,39 +787,39 @@
           },
           {
             "body": {
-              "id": 1600,
+              "id": 1592,
               "nodeType": "Block",
               "src": "210:179:9",
               "statements": [
                 {
                   "assignments": [
-                    1576
+                    1568
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 1576,
+                      "id": 1568,
                       "mutability": "mutable",
                       "name": "wallet",
                       "nodeType": "VariableDeclaration",
                       "overrides": null,
-                      "scope": 1600,
+                      "scope": 1592,
                       "src": "220:19:9",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_SwapContract_$1559",
+                        "typeIdentifier": "t_contract$_SwapContract_$1551",
                         "typeString": "contract SwapContract"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1575,
+                        "id": 1567,
                         "name": "SwapContract",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1559,
+                        "referencedDeclaration": 1551,
                         "src": "220:12:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       },
@@ -827,17 +827,17 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 1581,
+                  "id": 1573,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1579,
+                        "id": 1571,
                         "name": "_lpToken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1570,
+                        "referencedDeclaration": 1562,
                         "src": "259:8:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -852,7 +852,7 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 1578,
+                      "id": 1570,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -860,23 +860,23 @@
                       "nodeType": "NewExpression",
                       "src": "242:16:9",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_SwapContract_$1559_$",
+                        "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_SwapContract_$1551_$",
                         "typeString": "function (address) returns (contract SwapContract)"
                       },
                       "typeName": {
                         "contractScope": null,
-                        "id": 1577,
+                        "id": 1569,
                         "name": "SwapContract",
                         "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 1559,
+                        "referencedDeclaration": 1551,
                         "src": "246:12:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       }
                     },
-                    "id": 1580,
+                    "id": 1572,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -887,7 +887,7 @@
                     "src": "242:26:9",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_SwapContract_$1559",
+                      "typeIdentifier": "t_contract$_SwapContract_$1551",
                       "typeString": "contract SwapContract"
                     }
                   },
@@ -900,11 +900,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1585,
+                        "id": 1577,
                         "name": "_owner",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1568,
+                        "referencedDeclaration": 1560,
                         "src": "303:6:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -921,32 +921,32 @@
                       ],
                       "expression": {
                         "argumentTypes": null,
-                        "id": 1582,
+                        "id": 1574,
                         "name": "wallet",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1576,
+                        "referencedDeclaration": 1568,
                         "src": "278:6:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       },
-                      "id": 1584,
+                      "id": 1576,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
                       "memberName": "transferOwnership",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 866,
+                      "referencedDeclaration": 858,
                       "src": "278:24:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address) external"
                       }
                     },
-                    "id": 1586,
+                    "id": 1578,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -961,7 +961,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1587,
+                  "id": 1579,
                   "nodeType": "ExpressionStatement",
                   "src": "278:32:9"
                 },
@@ -974,14 +974,14 @@
                         "arguments": [
                           {
                             "argumentTypes": null,
-                            "id": 1591,
+                            "id": 1583,
                             "name": "wallet",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1576,
+                            "referencedDeclaration": 1568,
                             "src": "342:6:9",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_SwapContract_$1559",
+                              "typeIdentifier": "t_contract$_SwapContract_$1551",
                               "typeString": "contract SwapContract"
                             }
                           }
@@ -989,11 +989,11 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_SwapContract_$1559",
+                              "typeIdentifier": "t_contract$_SwapContract_$1551",
                               "typeString": "contract SwapContract"
                             }
                           ],
-                          "id": 1590,
+                          "id": 1582,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -1005,7 +1005,7 @@
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 1589,
+                            "id": 1581,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
                             "src": "334:7:9",
@@ -1015,7 +1015,7 @@
                             }
                           }
                         },
-                        "id": 1592,
+                        "id": 1584,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1038,18 +1038,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 1588,
+                      "id": 1580,
                       "name": "Deployed",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1566,
+                      "referencedDeclaration": 1558,
                       "src": "325:8:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 1593,
+                    "id": 1585,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1064,7 +1064,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1594,
+                  "id": 1586,
                   "nodeType": "EmitStatement",
                   "src": "320:30:9"
                 },
@@ -1074,14 +1074,14 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1597,
+                        "id": 1589,
                         "name": "wallet",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1576,
+                        "referencedDeclaration": 1568,
                         "src": "375:6:9",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       }
@@ -1089,11 +1089,11 @@
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_contract$_SwapContract_$1559",
+                          "typeIdentifier": "t_contract$_SwapContract_$1551",
                           "typeString": "contract SwapContract"
                         }
                       ],
-                      "id": 1596,
+                      "id": 1588,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1105,7 +1105,7 @@
                         "typeString": "type(address)"
                       },
                       "typeName": {
-                        "id": 1595,
+                        "id": 1587,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "367:7:9",
@@ -1115,7 +1115,7 @@
                         }
                       }
                     },
-                    "id": 1598,
+                    "id": 1590,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1130,8 +1130,8 @@
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 1574,
-                  "id": 1599,
+                  "functionReturnParameters": 1566,
+                  "id": 1591,
                   "nodeType": "Return",
                   "src": "360:22:9"
                 }
@@ -1139,7 +1139,7 @@
             },
             "documentation": null,
             "functionSelector": "d8d77dbc",
-            "id": 1601,
+            "id": 1593,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1147,17 +1147,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1571,
+              "id": 1563,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1568,
+                  "id": 1560,
                   "mutability": "mutable",
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1601,
+                  "scope": 1593,
                   "src": "151:14:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1166,7 +1166,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1567,
+                    "id": 1559,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "151:7:9",
@@ -1181,12 +1181,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1570,
+                  "id": 1562,
                   "mutability": "mutable",
                   "name": "_lpToken",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1601,
+                  "scope": 1593,
                   "src": "167:16:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1195,7 +1195,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1569,
+                    "id": 1561,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "167:7:9",
@@ -1212,17 +1212,17 @@
               "src": "150:34:9"
             },
             "returnParameters": {
-              "id": 1574,
+              "id": 1566,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1573,
+                  "id": 1565,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 1601,
+                  "scope": 1593,
                   "src": "201:7:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1231,7 +1231,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1572,
+                    "id": 1564,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "201:7:9",
@@ -1247,7 +1247,7 @@
               ],
               "src": "200:9:9"
             },
-            "scope": 1609,
+            "scope": 1601,
             "src": "126:263:9",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1255,7 +1255,7 @@
           },
           {
             "body": {
-              "id": 1607,
+              "id": 1599,
               "nodeType": "Block",
               "src": "466:25:9",
               "statements": [
@@ -1265,7 +1265,7 @@
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 1604,
+                      "id": 1596,
                       "name": "revert",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1279,7 +1279,7 @@
                         "typeString": "function () pure"
                       }
                     },
-                    "id": 1605,
+                    "id": 1597,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1294,14 +1294,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1606,
+                  "id": 1598,
                   "nodeType": "ExpressionStatement",
                   "src": "476:8:9"
                 }
               ]
             },
             "documentation": null,
-            "id": 1608,
+            "id": 1600,
             "implemented": true,
             "kind": "fallback",
             "modifiers": [],
@@ -1309,25 +1309,25 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 1602,
+              "id": 1594,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "454:2:9"
             },
             "returnParameters": {
-              "id": 1603,
+              "id": 1595,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "466:0:9"
             },
-            "scope": 1609,
+            "scope": 1601,
             "src": "446:45:9",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1610,
+        "scope": 1602,
         "src": "54:439:9"
       }
     ],
@@ -1339,7 +1339,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-11-06T09:19:25.043Z",
+  "updatedAt": "2020-11-06T09:57:13.886Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
