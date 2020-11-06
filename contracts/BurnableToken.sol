@@ -24,15 +24,13 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         string memory symbol,
         uint8 decimals,
         uint256 amount,
-        bool mintable,
-        address owner
+        bool mintable
     ) internal {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
         _mintable = mintable;
-        _transferOwnership(owner);
-        _mint(owner, amount);
+        _mint(owner(), amount);
     }
 
     /**
@@ -153,7 +151,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
             _msgSender(),
             _allowances[sender][_msgSender()].sub(
                 amount,
-                "BEP20: transfer amount exceeds allowance"
+                "ERC20: transfer amount exceeds allowance"
             )
         );
         return true;
@@ -206,7 +204,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
             spender,
             _allowances[_msgSender()][spender].sub(
                 subtractedValue,
-                "BEP20: decreased allowance below zero"
+                "ERC20: decreased allowance below zero"
             )
         );
         return true;
@@ -264,7 +262,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
 
         _balances[sender] = _balances[sender].sub(
             amount,
-            "BEP20: transfer amount exceeds balance"
+            "ERC20: transfer amount exceeds balance"
         );
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
@@ -303,7 +301,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
 
         _balances[account] = _balances[account].sub(
             amount,
-            "BEP20: burn amount exceeds balance"
+            "ERC20: burn amount exceeds balance"
         );
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
@@ -327,8 +325,8 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         address spender,
         uint256 amount
     ) internal {
-        require(owner != address(0), "BEP20: approve from the zero address");
-        require(spender != address(0), "BEP20: approve to the zero address");
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
 
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
@@ -347,7 +345,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
             _msgSender(),
             _allowances[account][_msgSender()].sub(
                 amount,
-                "BEP20: burn amount exceeds allowance"
+                "ERC20: burn amount exceeds allowance"
             )
         );
     }

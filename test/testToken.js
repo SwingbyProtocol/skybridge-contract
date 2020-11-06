@@ -16,7 +16,13 @@ describe('LPToken', function () {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
+        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
+
+        console.log(accounts)
+
         this.erc20 = await LPToken.new();
+
+        await this.erc20.mint(sender, this.mintValue)
     });
 
     it('reverts when transferring tokens to the zero address', async function () {

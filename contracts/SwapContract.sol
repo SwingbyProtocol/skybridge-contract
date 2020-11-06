@@ -10,17 +10,17 @@ import "./Burner.sol";
 contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
 
-    address private _lpToken;
+    address private lpToken;
     // Token address -> amount
-    mapping(address => uint256) _collectedFeesOfToken;
-    mapping(address => uint256) _floatAmountOfToken;
-    mapping(address => uint256) _currentExchangeRate;
-    Burner public _burner;
+    mapping(address => uint256) collectedFeesOfToken;
+    mapping(address => uint256) floatAmountOfToken;
+    mapping(address => uint256) currentExchangeRate;
+    Burner public burner;
 
     event RedeemWithBurnLPtoken(address indexed sender, uint256 amount);
 
     constructor(address _lpToken) public {
-        _burner = new Burner(_lpToken);
+        burner = new Burner(_lpToken);
     }
 
     /**
@@ -82,14 +82,14 @@ contract SwapContract is ISwapContract, Ownable {
         onlyOwner
         returns (bool)
     {
-        return IBurnableToken(_lpToken).mint(_dist, _amount);
+        return IBurnableToken(lpToken).mint(_dist, _amount);
     }
 
     function addFloatForBTCToken(address _token, uint256 _amount) public {
         // Transfer tokens to this contract from users.
         IERC20(_token).transferFrom(_msgSender(), address(this), _amount);
         // Update float amount
-        _floatAmountOfToken[_token] = _floatAmountOfToken[_token].add(_amount);
+        floatAmountOfToken[_token] = floatAmountOfToken[_token].add(_amount);
         // Update LP token price
         _updatePool(_token);
     }
@@ -97,16 +97,16 @@ contract SwapContract is ISwapContract, Ownable {
     function redeemFloatForBTCToken(address _token, uint256 _amountOfLPToken)
         public
     {
-        IBurnableToken(_lpToken).transferFrom(
+        IBurnableToken(lpToken).transferFrom(
             _msgSender(),
             address(this),
             _amountOfLPToken
         );
-        IBurnableToken(_lpToken).burn(_amountOfLPToken);
+        IBurnableToken(lpToken).burn(_amountOfLPToken);
         // Update LP token price
         uint256 newExchangeRate = _updatePool(_token);
         uint256 floatAmount = _amountOfLPToken.mul(newExchangeRate).div(1e18);
-        _floatAmountOfToken[_token] = _floatAmountOfToken[_token].sub(
+        floatAmountOfToken[_token] = floatAmountOfToken[_token].sub(
             floatAmount
         );
         IERC20(_token).transfer(_msgSender(), floatAmount);
@@ -115,7 +115,7 @@ contract SwapContract is ISwapContract, Ownable {
     function distributeNodeRewards() public override {}
 
     function _burnLPToken(uint256 _amount) internal returns (bool) {
-        return IBurnableToken(_lpToken).burn(_amount);
+        return IBurnableToken(lpToken).burn(_amount);
     }
 
     function _updatePool(address _token)
@@ -123,16 +123,16 @@ contract SwapContract is ISwapContract, Ownable {
         returns (uint256 newExchangeRate)
     {
         // for reduce gas cost.
-        uint256 collectedFess = _collectedFeesOfToken[_token];
-        uint256 floatAmountOfToken = _floatAmountOfToken[_token];
-        uint256 newQuantityBTCTokens = floatAmountOfToken.add(collectedFess);
+        uint256 collectedFess = collectedFeesOfToken[_token];
+        uint256 floatAmount = floatAmountOfToken[_token];
+        uint256 newQuantityBTCTokens = floatAmount.add(collectedFess);
         // WIP: have to support multiple coins
         // logic: rate = (fess + total float amount) / total amount of LP token
-        uint256 totalActiveLPTokens = IBurnableToken(_lpToken)
+        uint256 totalActiveLPTokens = IBurnableToken(lpToken)
             .totalSupply()
-            .sub(IBurnableToken(_lpToken).balanceOf(address(_burner)));
+            .sub(IBurnableToken(lpToken).balanceOf(address(burner)));
         newExchangeRate = newQuantityBTCTokens.div(totalActiveLPTokens);
-        _currentExchangeRate[_token] = newExchangeRate;
+        currentExchangeRate[_token] = newExchangeRate;
         return newExchangeRate;
     }
 
