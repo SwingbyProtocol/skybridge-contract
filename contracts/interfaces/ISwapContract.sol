@@ -39,6 +39,7 @@ interface ISwapContract {
     function transferOwnershipWithNewNodes(
         address _newOwner,
         address[] memory _nodeRewardsAddress,
+        uint256[] memory _stakedAmounts,
         uint256 _nodeRewardsRatio
     ) external returns (bool);
 }
