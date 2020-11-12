@@ -36,7 +36,7 @@ interface ISwapContract {
 
     function distributeNodeRewards(address _token) external returns (bool);
 
-    function transferOwnershipWithNewNodes(
+    function churn(
         address _newOwner,
         address[] memory _nodeRewardsAddress,
         uint256[] memory _stakedAmounts,
