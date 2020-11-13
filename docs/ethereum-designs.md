@@ -54,7 +54,7 @@
 - `singleSend(address, token, amount, rewards_amount)`, _onlyOwner_
 - `multiSend([]addresses, token, []amounts, rewards_amount)`, _onlyOwner_
 - `distributeNodeRewards()`
-- `churn(new_tss_addr, []node_addrs, []node_stake_amts, churned_in_count, node_rewards_ratio = 0.66)`, _onlyOwner_
+- `churn(new_tss_addr, []node_addrs, []node_stake_amts, churned_in_count, rewards_rate, node_rewards_ratio = 0.66)`, _onlyOwner_
 
 ### Float Contract
 
