@@ -8,7 +8,7 @@ const {
 } = require('@openzeppelin/test-helpers');
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
 
-const SwapFactory = contract.fromArtifact('SwapFactory');
+const SwapContractFactory = contract.fromArtifact('SwapContractFactory');
 
 describe('SwapFactory', function () {
     const [sender, receiver] = accounts;
@@ -19,6 +19,6 @@ describe('SwapFactory', function () {
 
         this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
 
-        this.factory = await SwapFactory.new();
+        this.factory = await SwapContractFactory.new();
     });
 })

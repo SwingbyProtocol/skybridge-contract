@@ -19,8 +19,9 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => uint256) private floatAmountOfToken;
     mapping(address => uint256) private currentExchangeRate;
     Burner public burner;
-    uint256 public nodeRewardsRatio;
-    Node[] public nodes;
+    uint8 churned_in_count;
+    uint8 public nodeRewardsRatio;
+    bytes32[] public nodes;
 
     struct Node {
         address addr;
@@ -175,15 +176,14 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 totalStaked = 0;
         require(totalRewardsForNode > 0, "totalRewardsForNode amount is 0");
         for (uint256 i = 0; i < nodes.length; i++) {
-            totalStaked = totalStaked.add(nodes[i].staked);
+            //totalStaked = totalStaked.add(nodes[i].staked);
         }
         for (uint256 i = 0; i < nodes.length; i++) {
-            require(
-                IERC20(_token).transfer(
-                    nodes[i].addr,
-                    totalRewardsForNode.mul(nodes[i].staked / totalStaked)
-                )
-            );
+            //require();
+            // IERC20(_token).transfer(
+            //     nodes[i].addr,
+            //     totalRewardsForNode.mul(nodes[i].staked / totalStaked)
+            // )
         }
         // Zerolize for storage, gas refunded.
         totalRewardsForNodes[_token] = 0;
@@ -192,17 +192,13 @@ contract SwapContract is Ownable, ISwapContract {
 
     function churn(
         address _newOwner,
-        address[] memory _nodeRewardsAddress,
-        uint256[] memory _stakedAmounts,
-        uint256 _nodeRewardsRatio
+        bytes32[] memory _nodeRewardsAddressAndAmounts,
+        uint8 _churnedInCount,
+        uint8 _rewards_rate,
+        uint8 _nodeRewardsRatio
     ) public override onlyOwner returns (bool) {
         _transferOwnership(_newOwner);
-        delete (nodes);
-        for (uint256 i = 0; i < _nodeRewardsAddress.length; i++) {
-            nodes.push(
-                Node({addr: _nodeRewardsAddress[i], staked: _stakedAmounts[i]})
-            );
-        }
+        nodes = _nodeRewardsAddressAndAmounts;
         // The ratio should be 100x of actual rate.
         nodeRewardsRatio = _nodeRewardsRatio;
         return true;
