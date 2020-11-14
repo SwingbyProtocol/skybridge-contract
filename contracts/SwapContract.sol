@@ -176,14 +176,16 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 totalStaked = 0;
         require(totalRewardsForNode > 0, "totalRewardsForNode amount is 0");
         for (uint256 i = 0; i < nodes.length; i++) {
-            //totalStaked = totalStaked.add(nodes[i].staked);
+            uint256 staked = uint256(uint96(bytes12(nodes[i])));
+            totalStaked = totalStaked.add(staked);
         }
         for (uint256 i = 0; i < nodes.length; i++) {
-            //require();
-            // IERC20(_token).transfer(
-            //     nodes[i].addr,
-            //     totalRewardsForNode.mul(nodes[i].staked / totalStaked)
-            // )
+            address to = address(uint160(uint256(nodes[i])));
+            uint256 staked = uint256(uint96(bytes12(nodes[i])));
+            IERC20(_token).transfer(
+                to,
+                totalRewardsForNode.mul(staked).div(totalStaked)
+            );
         }
         // Zerolize for storage, gas refunded.
         totalRewardsForNodes[_token] = 0;
@@ -194,7 +196,7 @@ contract SwapContract is Ownable, ISwapContract {
         address _newOwner,
         bytes32[] memory _nodeRewardsAddressAndAmounts,
         uint8 _churnedInCount,
-        uint8 _rewards_rate,
+        uint8 _rewardsRate,
         uint8 _nodeRewardsRatio
     ) public override onlyOwner returns (bool) {
         _transferOwnership(_newOwner);
