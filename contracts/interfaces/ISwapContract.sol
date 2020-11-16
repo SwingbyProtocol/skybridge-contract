@@ -40,7 +40,6 @@ interface ISwapContract {
         address _newOwner,
         bytes32[] memory _nodeRewardsAddressAndAmounts,
         uint8 _churnedInCount,
-        uint8 _rewards_rate,
         uint8 _nodeRewardsRatio
     ) external returns (bool);
 }
