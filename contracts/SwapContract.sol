@@ -18,6 +18,7 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => uint256) private totalRewardsForNodes;
     mapping(address => uint256) private floatAmountOfToken;
     mapping(address => uint256) private currentExchangeRate;
+    mapping(address => mapping(bytes32 => bytes32)) private txs;
     Burner public burner;
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
@@ -97,33 +98,53 @@ contract SwapContract is Ownable, ISwapContract {
      * Float part
      */
 
-    function mintLPToken(address _dist, uint256 _amountOfBTC)
-        public
-        override
-        onlyOwner
-        returns (bool)
-    {
-        // BTC float increased.
-        floatAmountOfToken[address(0)] = floatAmountOfToken[address(0)].add(
-            _amountOfBTC
-        );
-        // LP token price per BTC/WBTC changed.
-        uint256 newPrice = _updatePool(address(0), WBTC_ADDR);
-        // Mint LP tokens based on current LP price to users.
-        IBurnableToken(lpToken).mint(
-            _dist,
-            _amountOfBTC.mul(1e8).div(newPrice)
-        );
+    function recordIncomingFloat(
+        address _token,
+        bytes32 _addressesAndAmounts,
+        bytes32 _txid
+    ) public override onlyOwner returns (bool) {
+        txs[_token][_txid] = _addressesAndAmounts;
         return true;
     }
 
-    function addFloatForBTCToken(address _token, uint256 _amount)
+    function issueLPTokensForFloat(bytes32 _txid) public {
+        bytes32 payload;
+        if (txs[address(0)][_txid] == 0x0) {
+            payload = txs[address(0)][_txid];
+        }
+        if (txs[WBTC_ADDR][_txid] == 0x0) {
+            payload = txs[WBTC_ADDR][_txid];
+        }
+        address to = address(uint160(uint256(payload)));
+        uint256 amount = uint256(uint96(bytes12(payload)));
+        // LP token price per BTC/WBTC changed.
+        uint256 newPrice = _updatePool(address(0), WBTC_ADDR);
+        // Mint LP tokens based on current LP price to users.
+        IBurnableToken(lpToken).mint(to, amount.mul(1e8).div(newPrice));
+    }
+
+    function recordOutcomingFloat(
+        address _token,
+        bytes32 _addressesAndAmounts,
+        bytes32 _txid
+    ) public override returns (bool) {
+        // _token should be WBTC
+        txs[_token][_txid] = _addressesAndAmounts;
+        return true;
+    }
+
+    function burnLPTokensForFloat(bytes32 _txid)
         public
         override
         returns (bool)
     {
-        // _token should be WBTC
-        require(_token == WBTC_ADDR);
+        bytes32 payload;
+        if (txs[address(0)][_txid] == 0x0) {
+            payload = txs[address(0)][_txid];
+        }
+        if (txs[WBTC_ADDR][_txid] == 0x0) {
+            payload = txs[WBTC_ADDR][_txid];
+        }
         // Transfer tokens to this contract from users.
         IERC20(_token).transferFrom(_msgSender(), address(this), _amount);
         // Record float amount
@@ -132,27 +153,6 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 rate = getCurrentPriceLP(_token);
         // Mint LP tokens which is based on current LP price to users.
         IBurnableToken(lpToken).mint(_msgSender(), _amount.mul(1e8).div(rate));
-
-        return true;
-    }
-
-    // function redeemFloatForBTC(uint256 _amountOfLPToken) public {
-    //     IBurnableToken(lpToken).transferFrom(
-    //         _msgSender(),
-    //         address(this),
-    //         _amountOfLPToken
-    //     );
-    //     IBurnableToken(lpToken).burn(_amountOfLPToken);
-    //     // Changed LP token price per WBTC
-    //     _updatePool(address(0), WBTC_ADDR);
-    //     // Transfer BTC from TSS address.
-    // }
-
-    function redeemFloatForBTCToken(address _token, uint256 _amountOfLPToken)
-        public
-        override
-        returns (bool)
-    {
         IBurnableToken(lpToken).transferFrom(
             _msgSender(),
             address(this),
