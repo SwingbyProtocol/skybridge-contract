@@ -22,19 +22,29 @@ interface ISwapContract {
         uint256 _rewardsAmount
     ) external returns (bool);
 
-    function mintLPToken(address _dist, uint256 _amount)
-        external
-        returns (bool);
+    function collectSwapFeesForBTC(
+        address _feeToken,
+        uint256 _rewardsAmount,
+        bytes32 _txid
+    ) external returns (bool);
 
-    function addFloatForBTCToken(address _token, uint256 _amount)
-        external
-        returns (bool);
+    function recordIncomingFloat(
+        address _token,
+        bytes32 _addressesAndAmountOfBTC,
+        bytes32 _txid
+    ) external returns (bool);
 
-    function redeemFloatForBTCToken(address _token, uint256 _amountOfLPToken)
-        external
-        returns (bool);
+    function issueLPTokensForFloat(bytes32 _txid) external returns (bool);
 
-    function distributeNodeRewards(address _token) external returns (bool);
+    function recordOutcomingFloat(
+        address _token,
+        bytes32 _addressesAndAmountOfLPtoken,
+        bytes32 _txid
+    ) external returns (bool);
+
+    function burnLPTokensForFloat(bytes32 _txid) external returns (bool);
+
+    function distributeNodeRewards() external returns (bool);
 
     function churn(
         address _newOwner,

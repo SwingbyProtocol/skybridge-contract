@@ -11,29 +11,28 @@ contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
     address public WBTC_ADDR = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    bytes32[] public nodes;
+    uint8 public churnedInCount;
+    uint8 public nodeRewardsRatio;
 
+    uint256 private priceDecimals = 10**8;
+    uint256 private currentExchangeRate = priceDecimals;
     address private lpToken;
+    uint256 private lpDecimals;
+
+    Burner private burner;
     // Token address -> amount
     mapping(address => uint256) private totalRewardsForLPs;
     mapping(address => uint256) private totalRewardsForNodes;
     mapping(address => uint256) private floatAmountOfToken;
-    mapping(address => uint256) private currentExchangeRate;
     mapping(address => mapping(bytes32 => bytes32)) private txs;
-    Burner public burner;
-    uint8 public churnedInCount;
-    uint8 public nodeRewardsRatio;
-    bytes32[] public nodes;
-
-    struct Node {
-        address addr;
-        uint256 staked;
-    }
+    mapping(bytes32 => bool) private used;
 
     constructor(address _lpToken) public {
         burner = new Burner();
         lpToken = _lpToken;
         // Set initial price of LP token per BTC/WBTC.
-        currentExchangeRate[address(0)] = 1e8;
+        lpDecimals = 10**IERC20(lpToken).decimals();
     }
 
     /**
@@ -94,42 +93,66 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    function collectSwapFeesForBTC(
+        address _feeToken,
+        uint256 _rewardsAmount,
+        bytes32 _txid
+    ) public override onlyOwner returns (bool) {
+        require(!used[_txid], "txid is already used");
+        // _feeToken should be address(0) == BTC
+        _rewardsCollection(_feeToken, _rewardsAmount);
+        // Add txid to used list.
+        used[_txid] = true;
+        return true;
+    }
+
     /**
      * Float part
      */
 
     function recordIncomingFloat(
         address _token,
-        bytes32 _addressesAndAmounts,
+        bytes32 _addressesAndAmountOfFloat,
         bytes32 _txid
     ) public override onlyOwner returns (bool) {
-        txs[_token][_txid] = _addressesAndAmounts;
+        require(txs[_token][_txid] == 0x0);
+        txs[_token][_txid] = _addressesAndAmountOfFloat;
         return true;
     }
 
-    function issueLPTokensForFloat(bytes32 _txid) public {
-        bytes32 payload;
-        if (txs[address(0)][_txid] == 0x0) {
-            payload = txs[address(0)][_txid];
-        }
-        if (txs[WBTC_ADDR][_txid] == 0x0) {
-            payload = txs[WBTC_ADDR][_txid];
-        }
-        address to = address(uint160(uint256(payload)));
-        uint256 amount = uint256(uint96(bytes12(payload)));
-        // LP token price per BTC/WBTC changed.
-        uint256 newPrice = _updatePool(address(0), WBTC_ADDR);
-        // Mint LP tokens based on current LP price to users.
-        IBurnableToken(lpToken).mint(to, amount.mul(1e8).div(newPrice));
+    function issueLPTokensForFloat(bytes32 _txid)
+        public
+        override
+        returns (bool)
+    {
+        require(!isTxUsed(_txid), "The txid is already used");
+        (address token, bytes32 transaction) = _loadTx(_txid);
+        require(transaction != 0x0, "The transaction is not found");
+
+        address to = address(uint160(uint256(transaction)));
+        uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
+        // LP token price per BTC/WBTC changed
+        uint256 nowPrice = _updatePool(address(0), WBTC_ADDR);
+        // Calculate amount of LP token
+        uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
+        // Mint LP tokens
+        IBurnableToken(lpToken).mint(to, amountOfLP);
+        // Add float amount
+        floatAmountOfToken[token] = floatAmountOfToken[token].add(
+            amountOfFloat
+        );
+        used[_txid] = true;
+        return true;
     }
 
     function recordOutcomingFloat(
         address _token,
-        bytes32 _addressesAndAmounts,
+        bytes32 _addressesAndAmountOfLPtoken,
         bytes32 _txid
     ) public override returns (bool) {
-        // _token should be WBTC
-        txs[_token][_txid] = _addressesAndAmounts;
+        require(txs[_token][_txid] == 0x0);
+        // _token should be address(0) or WBTC_ADDR, txid should be unique
+        txs[_token][_txid] = _addressesAndAmountOfLPtoken;
         return true;
     }
 
@@ -138,59 +161,58 @@ contract SwapContract is Ownable, ISwapContract {
         override
         returns (bool)
     {
-        bytes32 payload;
-        if (txs[address(0)][_txid] == 0x0) {
-            payload = txs[address(0)][_txid];
+        require(!isTxUsed(_txid), "The txid is already used");
+        //  _token should be address(0) or WBTC_ADDR
+        (address token, bytes32 transaction) = _loadTx(_txid);
+        require(transaction != 0x0, "The transaction is not found");
+        address to = address(uint160(uint256(transaction)));
+        uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
+        uint256 nowPrice = _updatePool(address(0), WBTC_ADDR);
+        // Burn LP tokens
+        IBurnableToken(lpToken).burn(amountOfLP);
+        // Calculate amount of BTC/WBTC
+        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
+        // WBTC transfer if tokne address is WBTC
+        if (token == WBTC_ADDR) {
+            require(IERC20(token).transfer(to, amountOfFloat));
         }
-        if (txs[WBTC_ADDR][_txid] == 0x0) {
-            payload = txs[WBTC_ADDR][_txid];
-        }
-        // Transfer tokens to this contract from users.
-        IERC20(_token).transferFrom(_msgSender(), address(this), _amount);
-        // Record float amount
-        floatAmountOfToken[_token] = floatAmountOfToken[_token].add(_amount);
-        // Get exchange rate for BTC <> LP, And for reduece gas
-        uint256 rate = getCurrentPriceLP(_token);
-        // Mint LP tokens which is based on current LP price to users.
-        IBurnableToken(lpToken).mint(_msgSender(), _amount.mul(1e8).div(rate));
-        IBurnableToken(lpToken).transferFrom(
-            _msgSender(),
-            address(this),
-            _amountOfLPToken
+        // Remove float amount
+        floatAmountOfToken[token] = floatAmountOfToken[token].sub(
+            amountOfFloat
         );
-        IBurnableToken(lpToken).burn(_amountOfLPToken);
-        // Get exchange rate for BTC/LP, And for reduece gas
-        uint256 rate = getCurrentPriceLP(_token);
-        IERC20(_token).transferFrom(
-            _msgSender(),
-            address(this),
-            _amountOfLPToken.div(rate)
-        );
+        used[_txid] = true;
         return true;
     }
 
-    function distributeNodeRewards(address _token)
-        public
-        override
-        returns (bool)
-    {
+    function distributeNodeRewards() public override returns (bool) {
         // Reduce Gas
-        uint256 totalRewardsForNode = totalRewardsForNodes[_token];
+        uint256 totalRewardsForNode = totalRewardsForNodes[WBTC_ADDR];
+        require(
+            totalRewardsForNode > 0,
+            "totalRewardsForNode amount is not positive"
+        );
         uint256 totalStaked = 0;
-        require(totalRewardsForNode > 0, "totalRewardsForNode amount is 0");
         for (uint256 i = 0; i < nodes.length; i++) {
             totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
         }
+        // decimals of totalRewardsForNode  == 8, decimals of currentPrice == 8
+        uint256 totalLPTokens = totalRewardsForNode.mul(priceDecimals).div(
+            getCurrentPriceLP()
+        );
         for (uint256 i = 0; i < nodes.length; i++) {
-            IERC20(_token).transfer(
+            IBurnableToken(lpToken).mint(
                 address(uint160(uint256(nodes[i]))),
-                totalRewardsForNode.mul(uint256(uint96(bytes12(nodes[i])))).div(
+                totalLPTokens.mul(uint256(uint96(bytes12(nodes[i])))).div(
                     totalStaked
                 )
             );
         }
-        // Zerolize for storage, gas refunded.
-        totalRewardsForNodes[_token] = 0;
+        // Inject WBTC amount to float?
+        // floatAmountOfToken[WBTC_ADDR] = floatAmountOfToken[WBTC_ADDR].add(
+        //     totalRewardsForNode
+        // );
+        // Reset storage for WBTC fees.
+        totalRewardsForNodes[WBTC_ADDR] = 0;
         return true;
     }
 
@@ -213,7 +235,6 @@ contract SwapContract is Ownable, ISwapContract {
     {
         // Reduce Gas
         uint256 totalRewardsForNode = totalRewardsForNodes[_token];
-        // Reduce Gas
         uint256 totalRewardsForLP = totalRewardsForLPs[_token];
         // Updates rewards for nodes and LPs
         uint256 rewardsForNode = _rewardsAmount.mul(nodeRewardsRatio).div(100);
@@ -224,7 +245,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     function _updatePool(address _tokenA, address _tokenB)
         internal
-        returns (uint256 newExchangeRate)
+        returns (uint256)
     {
         // Reduce gas cost.
         uint256 floatAmountOfTokenA = floatAmountOfToken[_tokenA];
@@ -237,17 +258,30 @@ contract SwapContract is Ownable, ISwapContract {
             .add(totalRewardOfTokenA)
             .add(totalRewardOfTokenB);
 
-        // Logic: LPP = (float amount of BTC + float amount of WBTC + LP fees) / (LP supply - LP burned)
-        uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply().sub(burned);
-        // LP decimals == 18 so,
-        newExchangeRate = totalReserved.mul(1e8).div(totalLPs);
-        currentExchangeRate[_tokenB] = newExchangeRate;
-        return newExchangeRate;
+        // Logic: LPP = (float amount of BTC + float amount of WBTC + LP fees) / (LP supply)
+        //uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
+        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
+        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
+        currentExchangeRate = totalReserved.mul(lpDecimals).div(totalLPs);
+        return currentExchangeRate;
     }
 
-    function getCurrentPriceLP(address _token) internal view returns (uint256) {
-        return currentExchangeRate[_token];
+    function getCurrentPriceLP() internal view returns (uint256) {
+        return currentExchangeRate;
+    }
+
+    function isTxUsed(bytes32 _txid) public view returns (bool) {
+        return used[_txid];
+    }
+
+    function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
+        if (txs[address(0)][_txid] != 0x0) {
+            return (address(0), txs[address(0)][_txid]);
+        }
+        if (txs[WBTC_ADDR][_txid] != 0x0) {
+            return (WBTC_ADDR, txs[WBTC_ADDR][_txid]);
+        }
+        return (address(0x0), 0x0);
     }
 
     // The contract doesn't allow receiving Ether.
