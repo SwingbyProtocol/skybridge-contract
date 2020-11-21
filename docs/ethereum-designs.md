@@ -51,13 +51,13 @@
 - `payable` (erc20)
 - `addFloat(symbol)` - `payable`, called by Float Contract, _onlyOwner_
 - `redeemFloat(symbol)` - payable, receives BTC ‘LP’ token
-- `singleSend(address, token, amount, rewardsAmount)`, _onlyOwner_
-- `multiSend([]addresses, token, []amounts, rewardsAmount)`, _onlyOwner_
+- `singleSend(address, token, amount, rewards_amount)`, _onlyOwner_
+- `multiSend([]addresses, token, []amounts, rewards_amount)`, _onlyOwner_
 - `distributeNodeRewards()`
-- `changeOwner(newTssAddress, []node_addrs, []node_stake_amts, nodeRewardsRatio = 0.66)`, _onlyOwner_
+- `churn(new_tss_addr, []node_addrs, []node_stake_amts, churned_in_count, rewards_rate, node_rewards_ratio = 0.66)`, _onlyOwner_
 
 ### Float Contract
 
 - `payable` (erc20) - mints BTC ‘LP’ token and transfers WBTC to Swap Contract
-- `changeOwner(newTssAddress)`, _onlyOwner_
+- `changeOwner(new_tss_address)`, _onlyOwner_
 - `mintLPToken(amount, destination)`, _onlyOwner_
