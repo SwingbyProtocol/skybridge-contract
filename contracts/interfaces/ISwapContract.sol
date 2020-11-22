@@ -52,4 +52,8 @@ interface ISwapContract {
         uint8 _churnedInCount,
         uint8 _nodeRewardsRatio
     ) external returns (bool);
+
+    function isTxUsed(bytes32 _txid) external view returns (bool);
+
+    function getCurrentPriceLP() external view returns (uint256);
 }

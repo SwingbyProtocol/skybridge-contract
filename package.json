@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
   "dependencies": {
+    "@chainsafe/truffle-plugin-abigen": "0.0.2",
     "@openzeppelin/test-helpers": "^0.5.9"
   }
 }

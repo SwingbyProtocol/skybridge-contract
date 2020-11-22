@@ -29,7 +29,7 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(bytes32 => bool) private used;
 
     constructor(address _lpToken) public {
-        burner = new Burner();
+        //burner = new Burner();
         lpToken = _lpToken;
         // Set initial price of LP token per BTC/WBTC.
         lpDecimals = 10**IERC20(lpToken).decimals();
@@ -230,6 +230,14 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    function isTxUsed(bytes32 _txid) public override view returns (bool) {
+        return used[_txid];
+    }
+
+    function getCurrentPriceLP() public override view returns (uint256) {
+        return currentExchangeRate;
+    }
+
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
         internal
     {
@@ -264,14 +272,6 @@ contract SwapContract is Ownable, ISwapContract {
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         currentExchangeRate = totalReserved.mul(lpDecimals).div(totalLPs);
         return currentExchangeRate;
-    }
-
-    function getCurrentPriceLP() internal view returns (uint256) {
-        return currentExchangeRate;
-    }
-
-    function isTxUsed(bytes32 _txid) public view returns (bool) {
-        return used[_txid];
     }
 
     function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {

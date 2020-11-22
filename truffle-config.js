@@ -93,4 +93,7 @@ module.exports = {
       // }
     },
   },
+  plugins: [
+    "@chainsafe/truffle-plugin-abigen"
+  ]
 };
