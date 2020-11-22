@@ -291,35 +291,41 @@ function _updatePool(address _tokenA, address _tokenB)
 - Reward currency is `LP Token`. 
 - The reward amount is based on collected balance of WBTC fees and current price of `LP token`.
 
-#### `distributeNodeRewards(address _token)` -- external [onlyOwner?]
+#### `distributeNodeRewards()` -- external [onlyOwner]
 ```
-    function distributeNodeRewards(address _token)
-        public
-        override
-        returns (bool)
-    {
+    function distributeNodeRewards() public override returns (bool) {
         // Reduce Gas
-        uint256 totalRewardsForNode = totalRewardsForNodes[_token];
+        uint256 totalRewardsForNode = totalRewardsForNodes[WBTC_ADDR];
+        require(
+            totalRewardsForNode > 0,
+            "totalRewardsForNode amount is not positive"
+        );
         uint256 totalStaked = 0;
-        require(totalRewardsForNode > 0, "totalRewardsForNode amount is 0");
         for (uint256 i = 0; i < nodes.length; i++) {
             totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
         }
+        // decimals of totalRewardsForNode  == 8, decimals of currentPrice == 8
+        uint256 totalLPTokens = totalRewardsForNode.mul(priceDecimals).div(
+            getCurrentPriceLP()
+        );
         for (uint256 i = 0; i < nodes.length; i++) {
-            IERC20(lptoken).transfer(
+            IBurnableToken(lpToken).mint(
                 address(uint160(uint256(nodes[i]))),
-                totalRewardsForNode.mul(uint256(uint96(bytes12(nodes[i])))).div(
+                totalLPTokens.mul(uint256(uint96(bytes12(nodes[i])))).div(
                     totalStaked
                 )
             );
         }
-        // Zerolize for storage, gas refunded.
-        totalRewardsForNodes[_token] = 0;
+        // Inject WBTC amount to float?
+        // floatAmountOfToken[WBTC_ADDR] = floatAmountOfToken[WBTC_ADDR].add(
+        //     totalRewardsForNode
+        // );
+        // Reset storage for WBTC fees.
+        totalRewardsForNodes[WBTC_ADDR] = 0;
         return true;
     }
 ```
 ##### params
-- `address _token` -- This param represents target `ERC20` token address. it is should be `WBTC` address
 
 ##### note
 - This method is `external` function
