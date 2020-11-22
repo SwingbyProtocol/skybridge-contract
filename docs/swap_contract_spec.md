@@ -229,9 +229,9 @@ Deposited tokens are used for "reserve" of the skybridge mechanism.
 - The calculation logic collects total WBTC fees for LP 
 #### `function _updatePool(address _tokenA, address _tokenB)` -- [internal]
 ```
-function _updatePool(address _tokenA, address _tokenB)
+    function _updatePool(address _tokenA, address _tokenB)
         internal
-        returns (uint256 newExchangeRate)
+        returns (uint256)
     {
         // Reduce gas cost.
         uint256 floatAmountOfTokenA = floatAmountOfToken[_tokenA];
@@ -244,13 +244,12 @@ function _updatePool(address _tokenA, address _tokenB)
             .add(totalRewardOfTokenA)
             .add(totalRewardOfTokenB);
 
-        // Logic: LPP = (float amount of BTC + float amount of WBTC + LP fees) / (LP supply - LP burned)
-        uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply().sub(burned);
-        // LP decimals == 18 so,
-        newExchangeRate = totalReserved.mul(1e8).div(totalLPs);
-        currentExchangeRate[_tokenB] = newExchangeRate;
-        return newExchangeRate;
+        // Logic: LPP = (float amount of BTC + float amount of WBTC + LP fees) / (LP supply)
+        //uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
+        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
+        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
+        currentExchangeRate = totalReserved.mul(lpDecimals).div(totalLPs);
+        return currentExchangeRate;
     }
 ```
 ##### params
