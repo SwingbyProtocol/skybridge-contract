@@ -57,10 +57,12 @@ contract SwapContract is Ownable, ISwapContract {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             IERC20 token = IERC20(_token);
-            address to = address(uint160(uint256(_addressesAndAmounts[i])));
-            uint256 amount;
-            amount = uint256(uint96(bytes12(_addressesAndAmounts[i])));
-            require(token.transfer(to, amount));
+            require(
+                token.transfer(
+                    address(uint160(uint256(_addressesAndAmounts[i]))),
+                    uint256(uint96(bytes12(_addressesAndAmounts[i])))
+                )
+            );
         }
         _rewardsCollection(_token, _rewardsAmount);
         return true;

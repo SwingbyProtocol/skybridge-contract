@@ -59,7 +59,6 @@ function multiTransferERC20(
    function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
-        uint8 _inputDecimals,
         uint256 _rewardsAmount
     ) public override onlyOwner returns (bool)
 ```
@@ -77,12 +76,11 @@ Above`3` Swap functions have _`_rewardsCollection()`_ method.
 - That method allows to collect rewards which is collected per single swap action on the way of BTC to WBTC swap.
 #### `function _rewardsCollection(address _token, uint256 _rewardsAmount)` -- internal
 ```
- function _rewardsCollection(address _token, uint256 _rewardsAmount)
+    function _rewardsCollection(address _token, uint256 _rewardsAmount)
         internal
     {
         // Reduce Gas
         uint256 totalRewardsForNode = totalRewardsForNodes[_token];
-        // Reduce Gas
         uint256 totalRewardsForLP = totalRewardsForLPs[_token];
         // Updates rewards for nodes and LPs
         uint256 rewardsForNode = _rewardsAmount.mul(nodeRewardsRatio).div(100);
