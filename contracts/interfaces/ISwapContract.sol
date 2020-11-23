@@ -11,7 +11,6 @@ interface ISwapContract {
     function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
-        uint8 _inputDecimals,
         uint256 _rewardsAmount
     ) external returns (bool);
 

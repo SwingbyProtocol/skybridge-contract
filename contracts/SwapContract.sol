@@ -5,13 +5,13 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
-import "./Burner.sol";
 
 contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
     address public WBTC_ADDR = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     bytes32[] public nodes;
+
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
 
@@ -20,7 +20,6 @@ contract SwapContract is Ownable, ISwapContract {
     address private lpToken;
     uint256 private lpDecimals;
 
-    Burner private burner;
     // Token address -> amount
     mapping(address => uint256) private totalRewardsForLPs;
     mapping(address => uint256) private totalRewardsForNodes;
@@ -53,23 +52,14 @@ contract SwapContract is Ownable, ISwapContract {
     function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
-        uint8 _inputDecimals,
         uint256 _rewardsAmount
     ) public override onlyOwner returns (bool) {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             IERC20 token = IERC20(_token);
             address to = address(uint160(uint256(_addressesAndAmounts[i])));
-            uint8 boost = token.decimals() - _inputDecimals;
-            require(boost >= 0, "boost should be >= 0");
             uint256 amount;
-            if (boost == uint8(0)) {
-                amount = uint256(uint96(bytes12(_addressesAndAmounts[i])));
-            } else {
-                amount = uint256(uint96(bytes12(_addressesAndAmounts[i]))).mul(
-                    10**uint256(boost)
-                );
-            }
+            amount = uint256(uint96(bytes12(_addressesAndAmounts[i])));
             require(token.transfer(to, amount));
         }
         _rewardsCollection(_token, _rewardsAmount);
@@ -267,7 +257,7 @@ contract SwapContract is Ownable, ISwapContract {
             .add(totalRewardOfTokenB);
 
         // Logic: LPP = (float amount of BTC + float amount of WBTC + LP fees) / (LP supply)
-        //uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
+        // uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         currentExchangeRate = totalReserved.mul(lpDecimals).div(totalLPs);
