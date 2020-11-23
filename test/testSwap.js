@@ -4,6 +4,7 @@ const { ZERO_ADDRESS } = constants;
 
 const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
+const WBTC_ADDR = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
 
 contract('SwapContract', function (accounts) {
     const [sender, receiver] = accounts;
@@ -52,22 +53,65 @@ contract('SwapContract', function (accounts) {
         expect(await newToken.balanceOf(receiver)).to.bignumber.equal(amount3)
     })
 
+    it('deposit BTC float', async function () {
+        let flaotAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
+        // Send from TSS address
+        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(flaotAmountOfBTC.toString('hex') + sender.slice(2), 64)
+        let txid = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
+        // BTC == address(0)
+        let token = ZERO_ADDRESS
+        await this.swap.recordIncomingFloat(token, addressesAndAmountOfFloat, txid)
+    })
+
+    it('deposit WBTC float', async function () {
+        const newToken = await LPToken.new()
+        // swap contract receives 500000000 tokens 
+        let amount1 = new BN(5000).mul(new BN(10).pow(new BN(8)))
+        await newToken.mint(sender, amount1)
+        let flaotAmountOfWBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
+        await newToken.transfer(this.swap.address, flaotAmountOfWBTC, {
+            from: sender
+        })
+        // Send from TSS address
+        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(flaotAmountOfWBTC.toString('hex') + sender.slice(2), 64)
+        let txid = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
+        // WBTC address
+        let token = WBTC_ADDR
+        await this.swap.recordIncomingFloat(token, addressesAndAmountOfFloat, txid)
+    })
+
+    it('withdraw BTC float', async function () {
+        let amountofLPToken = new BN(1).mul(new BN(10).pow(new BN(8)))
+        // Send from TSS address
+        let addressesAndAmountOfLPToken = "0x" + web3.utils.padLeft(amountofLPToken.toString('hex') + sender.slice(2), 64)
+        let txid = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
+        // BTC == address(0)
+        let token = ZERO_ADDRESS
+        await this.swap.recordOutcomingFloat(token, addressesAndAmountOfLPToken, txid)
+    })
+
+
     it('updates churn address and stakes', async function () {
-        addrs = []
-        nodeRewardsRatio = 66
+        let payload = []
+        let churnedInCount = 25
+        let nodeRewardsRatio = 66
         for (i = 0; i < 100; i++) {
-            addrs.push("0x0d9630bd2a4edf6c4bf88d0c85538ebea6e6285c751b256242e7e9a4d40599b7")
+            let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
+            let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + sender.slice(2), 64)
+            payload.push(addressesAndAmountStaked)
         }
-        const tx1 = await this.swap.churn(receiver, addrs, nodeRewardsRatio, {
+        const tx1 = await this.swap.churn(receiver, payload, churnedInCount, nodeRewardsRatio, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
         console.log(tx1.receipt.gasUsed)
-        addrs = []
+        payload = []
         for (i = 0; i < 100; i++) {
-            addrs.push("0x3bf37ed365c59d059dd784c6a22c086215966a4c18dc5b20f3210670763d430d")
+            let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
+            let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + receiver.slice(2), 64)
+            payload.push(addressesAndAmountStaked)
         }
-        const tx2 = await this.swap.churn(receiver, addrs, nodeRewardsRatio + 1, {
+        const tx2 = await this.swap.churn(receiver, payload, churnedInCount + 1, nodeRewardsRatio + 1, {
             value: 0,
             gasPrice: 2 * 10 ** 6,
             from: receiver
