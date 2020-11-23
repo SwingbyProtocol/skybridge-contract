@@ -22,6 +22,7 @@
   "dependencies": {
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
     "@openzeppelin/contracts": "^3.3.0-rc.1",
-    "@openzeppelin/test-helpers": "^0.5.9"
+    "@openzeppelin/test-helpers": "^0.5.9",
+    "chai": "^4.2.0"
   }
 }
