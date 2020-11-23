@@ -109,14 +109,6 @@ The swap case of WBTC to BTC is not handle in smart contract logic. Therefore, t
 - This method is `external` function.
 - This method is only called by `TSS address`
 
----
-
-**_This method is not implemented yet_**
-
-
----
-
-
 ## 2. Float and LP token management.
 
 ### 2.1 Float logic 101
@@ -136,19 +128,22 @@ Deposited tokens are used for "reserve" of the skybridge mechanism.
 - After confired a _"float minting request"_, `txid` will be added into "used" txid list on the `SwapContract`. And the `LP tokens` are minted to LP.
 - The `TSS address` has to query to know that txid already used for minting LP tokens, A Getter method -- _`isTxidUsed(txid)`_ will returns `true`. if the result of this method is still `false`, it is the means that incoming tx will be refunded.
 
-#### `function recordIncomingFloat(address _token, address _to, uint256 _amountOfFloat, bytes32 _txid)` -- external [onlyOwner]
+#### `function recordIncomingFloat(address _token, bytes32 _addressesAndAmountOfFloat, bytes32 _txid)` -- external [onlyOwner]
 - This method allows to register a _"float minting request"_. before confirm minting of LP tokens to LP, the `TSS address` has to check whether the deposit tx is correct. 
 ```
-    function recordIncomingFloat(address _token, address _to, uint256 _amountOfFloat, bytes32 _txid)
-        public
-        override
-        onlyOwner
-        returns (bool)
+    function recordIncomingFloat(
+        address _token,
+        bytes32 _addressesAndAmountOfFloat,
+        bytes32 _txid
+    ) public override onlyOwner returns (bool) {
+        require(txs[_token][_txid] == 0x0);
+        txs[_token][_txid] = _addressesAndAmountOfFloat;
+        return true;
+    }
 ```
 ##### params
 - `_token` -- This param represents a float target. e.g. BTC == address(0), WBTC == WBTC token address.
-- `_to` -- This param represents LP user.
-- `_amountOfFloat` -- This param represents a total amount of BTC/WBTC depositted by a tx sent from LP.
+- `_addressesAndAmounts` -- This param represents an array of convined `bytes32` values (top `12bytes` for total amount of BTC/WBTC float by a tx sent from LP, `20bytes` for target address)
 - `_txid` -- This param represents deposit txid, that is also used as _unique_ id to identify the tx.
 ##### note
 - This method is `external` function.
@@ -182,19 +177,23 @@ Deposited tokens are used for "reserve" of the skybridge mechanism.
 - After confired a _"float redeem request"_, `txid` will be added into "used" txid list on the `SwapContract`. And the `LP tokens` are burned.
 - The `TSS address` has to query to know that txid already used for redeeming LP tokens, A Getter method -- _`isTxidUsed(txid)`_ will returns `true`. if the result of this method is still `false`, it is the means that incoming tx will be refunded.
 
-#### `function recordOutcomingFloat(address _token, address _to, uint256 _amountOfLPtoken, bytes32 _txid)` -- external [onlyOwner]
+#### `function recordOutcomingFloat(address _token, bytes32 _addressesAndAmountOfLPtoken, bytes32 _txid)` -- external [onlyOwner]
 - This method allows to register a _"float redeem request"_. before confirm burning LP tokens, the `TSS address` has to check whether the deposit tx is correct. 
 ```
-    function recordOutcomingFloat(address _token, address _to, uint256 _amountOfLPtoken, bytes32 _txid)
-        public
-        override
-        onlyOwner
-        returns (bool)
+    function recordOutcomingFloat(
+        address _token,
+        bytes32 _addressesAndAmountOfLPtoken,
+        bytes32 _txid
+    ) public override returns (bool) {
+        require(txs[_token][_txid] == 0x0);
+        // _token should be address(0) or WBTC_ADDR, txid should be unique
+        txs[_token][_txid] = _addressesAndAmountOfLPtoken;
+        return true;
+    }
 ```
 ##### params
 - `_token` – This param represents a float target. e.g. BTC == address(0), WBTC == WBTC token address.
-- `_to` – This param represents LP user.
-- `_amountOfLPtoken` – This param represents a total amount of BTC/WBTC depositted by a tx sent from LP.
+- `_addressesAndAmountOfLPtoken` -- This param represents an array of convined `bytes32` values (top `12bytes` for total amount of LP tokens by a tx sent from LP, `20bytes` for target address)
 - `_txid` – This param represents deposit txid, that is also used as unique id to identify the tx.
 
 ##### note
