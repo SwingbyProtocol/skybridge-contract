@@ -1,10 +1,10 @@
-pragma solidity =0.7.0;
+pragma solidity =0.7.5;
 
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
-import "./Ownable.sol";
-import "./SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
@@ -212,7 +212,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint8 _churnedInCount,
         uint8 _nodeRewardsRatio
     ) public override onlyOwner returns (bool) {
-        _transferOwnership(_newOwner);
+        transferOwnership(_newOwner);
         nodes = _nodeRewardsAddressAndAmounts;
         churnedInCount = _churnedInCount;
         // The ratio should be 100x of actual rate.

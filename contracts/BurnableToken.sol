@@ -1,68 +1,68 @@
-pragma solidity =0.7.0;
+pragma solidity =0.7.5;
 
 import "./interfaces/IBurnableToken.sol";
-import "./Context.sol";
-import "./SafeMath.sol";
-import "./Ownable.sol";
+import "@openzeppelin/contracts/GSN/Context.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract BurnableToken is Context, IBurnableToken, Ownable {
     using SafeMath for uint256;
 
-    mapping(address => uint256) private _balances;
-    mapping(address => mapping(address => uint256)) private _allowances;
-    uint256 private _totalSupply;
-    string private _name;
-    string private _symbol;
-    uint8 private _decimals;
-    bool private _mintable;
+    mapping(address => uint256) private balances;
+    mapping(address => mapping(address => uint256)) private allowances;
+    uint256 private tokenTotalSupply;
+    string private tokenName;
+    string private tokenSymbol;
+    uint8 private tokenDecimals;
+    bool private isMintable;
 
     /**
      * @dev sets initials supply and the owner
      */
     function _initialize(
-        string memory name,
-        string memory symbol,
-        uint8 decimals,
-        uint256 amount,
-        bool mintable
+        string memory _name,
+        string memory _symbol,
+        uint8 _decimals,
+        uint256 _amount,
+        bool _mintable
     ) internal {
-        _name = name;
-        _symbol = symbol;
-        _decimals = decimals;
-        _mintable = mintable;
-        _mint(owner(), amount);
+        tokenName = _name;
+        tokenSymbol = _symbol;
+        tokenDecimals = _decimals;
+        isMintable = _mintable;
+        _mint(owner(), _amount);
     }
 
     /**
      * @dev Returns if the token is mintable or not
      */
     function mintable() external view returns (bool) {
-        return _mintable;
+        return isMintable;
     }
 
     /**
      * @dev Returns the token decimals.
      */
     function decimals() public override view returns (uint8) {
-        return _decimals;
+        return tokenDecimals;
     }
 
     /**
      * @dev Returns the token symbol.
      */
     function symbol() public override view returns (string memory) {
-        return _symbol;
+        return tokenSymbol;
     }
 
     /**
      * @dev Returns the token name.
      */
     function name() public override view returns (string memory) {
-        return _name;
+        return tokenName;
     }
 
     /**
-     * @dev Returns the bep token owner.
+     * @dev Returns the bep token owner. (This is a BEP-20 token specific.)
      */
 
     function getOwner() public override view returns (address) {
@@ -73,14 +73,14 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
      * @dev See {ERC20-totalSupply}.
      */
     function totalSupply() public override view returns (uint256) {
-        return _totalSupply;
+        return tokenTotalSupply;
     }
 
     /**
      * @dev See {ERC20-balanceOf}.
      */
     function balanceOf(address account) public override view returns (uint256) {
-        return _balances[account];
+        return balances[account];
     }
 
     /**
@@ -109,7 +109,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         view
         returns (uint256)
     {
-        return _allowances[owner][spender];
+        return allowances[owner][spender];
     }
 
     /**
@@ -149,7 +149,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         _approve(
             sender,
             _msgSender(),
-            _allowances[sender][_msgSender()].sub(
+            allowances[sender][_msgSender()].sub(
                 amount,
                 "ERC20: transfer amount exceeds allowance"
             )
@@ -176,7 +176,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         _approve(
             _msgSender(),
             spender,
-            _allowances[_msgSender()][spender].add(addedValue)
+            allowances[_msgSender()][spender].add(addedValue)
         );
         return true;
     }
@@ -202,7 +202,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         _approve(
             _msgSender(),
             spender,
-            _allowances[_msgSender()][spender].sub(
+            allowances[_msgSender()][spender].sub(
                 subtractedValue,
                 "ERC20: decreased allowance below zero"
             )
@@ -225,7 +225,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         onlyOwner
         returns (bool)
     {
-        require(_mintable, "this token is not mintable");
+        require(isMintable, "This token is not mintable");
         _mint(target, amount);
         return true;
     }
@@ -260,11 +260,11 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        _balances[sender] = _balances[sender].sub(
+        balances[sender] = balances[sender].sub(
             amount,
             "ERC20: transfer amount exceeds balance"
         );
-        _balances[recipient] = _balances[recipient].add(amount);
+        balances[recipient] = balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
 
@@ -280,8 +280,8 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
 
-        _totalSupply = _totalSupply.add(amount);
-        _balances[account] = _balances[account].add(amount);
+        tokenTotalSupply = tokenTotalSupply.add(amount);
+        balances[account] = balances[account].add(amount);
         emit Transfer(address(0), account, amount);
     }
 
@@ -299,11 +299,11 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     function _burn(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: burn from the zero address");
 
-        _balances[account] = _balances[account].sub(
+        balances[account] = balances[account].sub(
             amount,
             "ERC20: burn amount exceeds balance"
         );
-        _totalSupply = _totalSupply.sub(amount);
+        tokenTotalSupply = tokenTotalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
 
@@ -328,7 +328,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
-        _allowances[owner][spender] = amount;
+        allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
     }
 
@@ -343,7 +343,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
         _approve(
             account,
             _msgSender(),
-            _allowances[account][_msgSender()].sub(
+            allowances[account][_msgSender()].sub(
                 amount,
                 "ERC20: burn amount exceeds allowance"
             )
