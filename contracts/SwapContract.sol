@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
-    address public WBTC_ADDR = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address public WBTC_ADDR;
     bytes32[] public nodes;
 
     uint8 public churnedInCount;
@@ -27,11 +27,13 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => mapping(bytes32 => bytes32)) private txs;
     mapping(bytes32 => bool) private used;
 
-    constructor(address _lpToken) public {
+    constructor(address _lpToken, address _wbtc) public {
         //burner = new Burner();
         lpToken = _lpToken;
         // Set initial price of LP token per BTC/WBTC.
         lpDecimals = 10**IERC20(lpToken).decimals();
+        // Set WBTC address
+        WBTC_ADDR = _wbtc;
     }
 
     /**
@@ -262,7 +264,9 @@ contract SwapContract is Ownable, ISwapContract {
         // uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
-        currentExchangeRate = totalReserved.mul(lpDecimals).div(totalLPs);
+        currentExchangeRate = totalLPs == 0
+            ? currentExchangeRate
+            : totalReserved.mul(lpDecimals).div(totalLPs);
         return currentExchangeRate;
     }
 
