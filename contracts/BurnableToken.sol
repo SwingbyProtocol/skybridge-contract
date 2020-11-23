@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-contract BurnableToken is Context, IBurnableToken, Ownable {
+contract BurnableToken is Context, Ownable, IBurnableToken {
     using SafeMath for uint256;
 
     mapping(address => uint256) private balances;
@@ -36,7 +36,7 @@ contract BurnableToken is Context, IBurnableToken, Ownable {
     /**
      * @dev Returns if the token is mintable or not
      */
-    function mintable() external view returns (bool) {
+    function mintable() public override view returns (bool) {
         return isMintable;
     }
 
