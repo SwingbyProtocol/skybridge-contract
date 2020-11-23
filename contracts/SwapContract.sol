@@ -56,12 +56,12 @@ contract SwapContract is Ownable, ISwapContract {
     ) public override onlyOwner returns (bool) {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
-            IERC20 token = IERC20(_token);
             require(
-                token.transfer(
+                IERC20(_token).transfer(
                     address(uint160(uint256(_addressesAndAmounts[i]))),
                     uint256(uint96(bytes12(_addressesAndAmounts[i])))
-                )
+                ),
+                "Batch transfer error"
             );
         }
         _rewardsCollection(_token, _rewardsAmount);
