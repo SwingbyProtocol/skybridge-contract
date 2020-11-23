@@ -15,8 +15,8 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
 
-    uint256 private priceDecimals = 10**8;
-    uint256 private currentExchangeRate = priceDecimals;
+    uint256 private priceDecimals;
+    uint256 private currentExchangeRate;
     address private lpToken;
     uint256 private lpDecimals;
 
@@ -34,6 +34,12 @@ contract SwapContract is Ownable, ISwapContract {
         lpDecimals = 10**IERC20(lpToken).decimals();
         // Set WBTC address
         WBTC_ADDR = _wbtc;
+        // Set nodeRewardsRatio
+        nodeRewardsRatio = 66;
+        // set priceDecimals
+        priceDecimals = 10**8;
+        // SEt currentExchangeRate
+        currentExchangeRate = priceDecimals;
     }
 
     /**
@@ -250,24 +256,29 @@ contract SwapContract is Ownable, ISwapContract {
         returns (uint256)
     {
         // Reduce gas cost.
-        uint256 floatAmountOfTokenA = floatAmountOfToken[_tokenA];
-        uint256 floatAmountOfTokenB = floatAmountOfToken[_tokenB];
-        uint256 totalRewardOfTokenA = totalRewardsForLPs[_tokenA];
-        uint256 totalRewardOfTokenB = totalRewardsForLPs[_tokenB];
-
-        uint256 totalReserved = floatAmountOfTokenA
-            .add(floatAmountOfTokenB)
-            .add(totalRewardOfTokenA)
-            .add(totalRewardOfTokenB);
-
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            _tokenA,
+            _tokenB
+        );
         // Logic: LPP = (float amount of BTC + float amount of WBTC + LP fees) / (LP supply)
         // uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         currentExchangeRate = totalLPs == 0
             ? currentExchangeRate
-            : totalReserved.mul(lpDecimals).div(totalLPs);
+            : (reserveA.add(reserveB)).mul(lpDecimals).div(totalLPs);
         return currentExchangeRate;
+    }
+
+    function getFloatReserve(address _tokenA, address _tokenB)
+        public
+        view
+        returns (uint256 reserveA, uint256 reserveB)
+    {
+        (reserveA, reserveB) = (
+            floatAmountOfToken[_tokenA].add(totalRewardsForLPs[_tokenA]),
+            floatAmountOfToken[_tokenB].add(totalRewardsForLPs[_tokenB])
+        );
     }
 
     function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
