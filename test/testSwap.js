@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = constants;
 const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
 
-describe('SwapContract', function (accounts) {
+contract('SwapContract', function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
@@ -48,8 +48,8 @@ describe('SwapContract', function (accounts) {
         ]
         await this.swap.multiTransferERC20TightlyPacked(newToken.address, txs, rewardsAmount)
         expect(await newToken.balanceOf(this.swap.address)).to.bignumber.equal(new BN("0"))
-        expect(await newToken.balanceOf(sender)).to.equal(amount2)
-        expect(await newToken.balanceOf(receiver)).to.equal(amount3)
+        expect(await newToken.balanceOf(sender)).to.bignumber.equal(amount2)
+        expect(await newToken.balanceOf(receiver)).to.bignumber.equal(amount3)
     })
 
     it('updates churn address and stakes', async function () {

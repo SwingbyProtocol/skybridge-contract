@@ -4,7 +4,7 @@ const { ZERO_ADDRESS } = constants;
 
 const SwapContractFactory = artifacts.require('SwapContractFactory');
 
-describe('SwapFactory', function (accounts) {
+contract('SwapFactory', function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
