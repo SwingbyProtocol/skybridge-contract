@@ -1,4 +1,4 @@
-# Swap Contract Specification 
+# Swap Contract Specification
 ## Swap contract sources
 This documnet describe the details of 
 - _Swap_contract_ -- (https://github.com/SwingbyProtocol/skybridge-contract/blob/dev/contracts/SwapContract.sol)
@@ -331,8 +331,10 @@ Deposited tokens are used for "reserve" of the skybridge mechanism.
 #### `function isTxidUsed(bytes32 _txid) returns (bool)` -- external 
 - This method returns whether the txid is used or not.
 
-#### `function getCurrentPriceLP(address _token)  returns (uint256)` -- external
+#### `function getCurrentPriceLP(address _token) returns (uint256)` -- external
 - This method returns current price of LP token.
+#### `function getFloatReserve(address _tokenA, address _tokenB) returns (uint256, uint256) -- external
+- This method returns current reserve size (float size + collected fees)
 
 ## Refference
 - [LP exchange rate logic](https://hackmd.io/@9AlaYtTSSgq4TJ4TPi-gfQ/ryns4XFOw)

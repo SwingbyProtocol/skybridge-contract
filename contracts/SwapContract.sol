@@ -242,8 +242,11 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
+    
+
     function getFloatReserve(address _tokenA, address _tokenB)
         public
+        override
         view
         returns (uint256 reserveA, uint256 reserveB)
     {

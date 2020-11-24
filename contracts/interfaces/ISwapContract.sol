@@ -1,6 +1,5 @@
 pragma solidity =0.7.5;
 
-
 interface ISwapContract {
     function singleTransferERC20(
         address _token,
@@ -56,4 +55,8 @@ interface ISwapContract {
     function isTxUsed(bytes32 _txid) external view returns (bool);
 
     function getCurrentPriceLP() external view returns (uint256);
+
+    function getFloatReserve(address _tokenA, address _tokenB)
+        external
+        returns (uint256 reserveA, uint256 reserveB);
 }
