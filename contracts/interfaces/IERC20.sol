@@ -1,4 +1,4 @@
-pragma solidity =0.7.0;
+pragma solidity =0.7.5;
 
 interface IERC20 {
     /**
@@ -22,7 +22,7 @@ interface IERC20 {
     function name() external view returns (string memory);
 
     /**
-     * @dev Returns the bep token owner.
+     * @dev Returns the bep token owner. (This is a BEP-20 token specific.)
      */
     function getOwner() external view returns (address);
 

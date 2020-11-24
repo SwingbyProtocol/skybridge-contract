@@ -1,33 +1,42 @@
-const { accounts, contract } = require('@openzeppelin/test-environment');
+const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { expect } = require('chai');
+const { ZERO_ADDRESS } = constants;
 
-const {
-    BN,           // Big Number support
-    constants,    // Common constants, like the zero address and largest integers
-    expectEvent,  // Assertions for emitted events
-    expectRevert, // Assertions for transactions that should fail
-} = require('@openzeppelin/test-helpers');
-const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants');
+const LPToken = artifacts.require('LPToken');
 
-const LPToken = contract.fromArtifact('LPToken');
-
-describe('LPToken', function () {
-    const [sender, receiver] = accounts;
+contract('LPToken', function (accounts) {
+    const [sender, receiver] = accounts
+    const name = 'BTC-LP token test';
+    const symbol = 'BTC-LP test';
 
     beforeEach(async function () {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
+        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(8)))
 
-        this.erc20 = await LPToken.new();
+        this.token = await LPToken.new();
 
-        await this.erc20.mint(sender, this.mintValue)
+        await this.token.mint(sender, this.mintValue)
+    });
+
+    it('has a name', async function () {
+        expect(await this.token.name()).to.equal(name);
+    });
+
+    it('has a symbol', async function () {
+        expect(await this.token.symbol()).to.equal(symbol);
+    });
+
+    it('has 8 decimals', async function () {
+        decimals = await this.token.decimals()
+        expect(decimals.toString()).to.equal("8");
     });
 
     it('reverts when minting tokens from not owner', async function () {
         // Conditions that trigger a require statement can be precisely tested
         await expectRevert(
-            this.erc20.mint(receiver, this.value, { from: receiver }),
+            this.token.mint(receiver, this.value, { from: receiver }),
             'Ownable: caller is not the owner',
         );
     });
@@ -35,13 +44,13 @@ describe('LPToken', function () {
     it('reverts when transferring tokens to the zero address', async function () {
         // Conditions that trigger a require statement can be precisely tested
         await expectRevert(
-            this.erc20.transfer(constants.ZERO_ADDRESS, this.value, { from: sender }),
+            this.token.transfer(constants.ZERO_ADDRESS, this.value, { from: sender }),
             'ERC20: transfer to the zero address',
         );
     });
 
     it('emits a Transfer event on successful transfers', async function () {
-        const receipt = await this.erc20.transfer(
+        const receipt = await this.token.transfer(
             receiver, this.value, { from: sender }
         );
 
@@ -54,15 +63,15 @@ describe('LPToken', function () {
     });
 
     it('updates balances on successful transfers', async function () {
-        this.erc20.transfer(receiver, this.value, { from: sender });
+        this.token.transfer(receiver, this.value, { from: sender });
 
         // BN assertions are automatically available via chai-bn (if using Chai)
-        balanceOfReceiver = await this.erc20.balanceOf(receiver)
-        expect(balanceOfReceiver - this.value).to.equal(0)
+        balanceOfReceiver = await this.token.balanceOf(receiver)
+        expect(balanceOfReceiver.sub(this.value)).to.bignumber.equal('0')
     });
 
     it('emits a Burn event on successful burning', async function () {
-        const burn = await this.erc20.burn(
+        const burn = await this.token.burn(
             this.mintValue, { from: sender }
         );
 

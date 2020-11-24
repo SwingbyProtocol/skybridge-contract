@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "truffle test"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
   "dependencies": {
-    "@openzeppelin/test-helpers": "^0.5.9"
+    "@chainsafe/truffle-plugin-abigen": "0.0.2",
+    "@openzeppelin/contracts": "^3.3.0-rc.1",
+    "@openzeppelin/test-helpers": "^0.5.9",
+    "chai": "^4.2.0"
   }
 }
