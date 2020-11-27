@@ -54,6 +54,16 @@ contract('SwapContract', function (accounts) {
         expect(await this.wbtcTest.balanceOf(receiver)).to.bignumber.equal(amount3)
     })
 
+    it('test collectSwapFeesForBTC', async function () {
+        let rewardsAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
+        let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
+        let feeCollect = await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, rewardsAmount, txid1)
+        let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
+        let feeCollec2 = await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, rewardsAmount, txid2)
+
+        //console.log(feeCollect.receipt.gasUsed, feeCollec2.receipt.gasUsed)
+    })
+
     it('deposit BTC float', async function () {
         let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
         // Send from TSS address

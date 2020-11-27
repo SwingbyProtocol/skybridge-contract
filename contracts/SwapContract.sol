@@ -93,6 +93,10 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /**
+     * @dev gas usage 88888 gas (initial), 58888 gas (update)
+     */
+
     function collectSwapFeesForBTC(
         address _feeToken,
         uint256 _rewardsAmount,
