@@ -110,6 +110,9 @@ contract SwapContract is Ownable, ISwapContract {
      * Float part
      */
 
+    /**
+     * @dev gas usage 44910 gas
+     */
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
@@ -120,6 +123,9 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /**
+     * @dev gas usage 131162 gas
+     */
     function issueLPTokensForFloat(bytes32 _txid)
         public
         override
@@ -145,6 +151,9 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /**
+     * @dev gas uasge 43628 gas
+     */
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
@@ -156,6 +165,9 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /**
+     * @dev gas uasge 82241 gas
+     */
     function burnLPTokensForFloat(bytes32 _txid)
         public
         override
@@ -220,6 +232,10 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /**
+     * @dev gas usage 2115532 gas (initial), 592132 gas (updated)
+     */
+
     function churn(
         address _newOwner,
         bytes32[] memory _nodeRewardsAddressAndAmounts,
@@ -241,8 +257,6 @@ contract SwapContract is Ownable, ISwapContract {
     function getCurrentPriceLP() public override view returns (uint256) {
         return currentExchangeRate;
     }
-
-    
 
     function getFloatReserve(address _tokenA, address _tokenB)
         public

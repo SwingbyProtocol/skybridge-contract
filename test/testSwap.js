@@ -134,25 +134,28 @@ contract('SwapContract', function (accounts) {
     it('deposit WBTC float after fees are collected', async function () {
         let mint5000 = new BN(5000).mul(new BN(10).pow(new BN(8)))
         // swap contract receives 5000 tokens 
-        let floatAmountOfWBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
         await this.wbtcTest.mint(this.swap.address, mint5000)
+        // 0.00001
+        let floatAmountOfWBTC = new BN("1").mul(new BN(10).pow(new BN(5)))
 
         // Send from TSS address
         let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
         let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
         // BTC == address(0)
-        await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, txid1)
+        const record = await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, txid1)
         // Mint LP token
-        await this.swap.issueLPTokensForFloat(txid1)
+        const issue = await this.swap.issueLPTokensForFloat(txid1)
+
+        //console.log(record.receipt.gasUsed, issue.receipt.gasUsed)
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC)
 
         /**
          * Swap BTC -> 1WBTC executed, fees are 0.1WBTC
          */
-        let senbackTokens1 = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
-        // fees are collected. (0.1 WBTC)
-        let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(7))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [senbackTokens1], rewardsAmount)
+        let swapTx = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
+        // fees are collected. (0.00000001 WBTC)
+        let rewardsAmount = "0x" + web3.utils.padLeft(new BN(1).mul(new BN(10).pow(new BN(0))).toString('hex'), 64)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [swapTx], rewardsAmount)
         // Second deposit tx
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, txid2)
@@ -164,7 +167,7 @@ contract('SwapContract', function (accounts) {
         const mintedLPs = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price)
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.add(mintedLPs))
 
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [senbackTokens1], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [swapTx], rewardsAmount)
         // Third deposit tx
         let txid3 = "0xbceaa7c52bcb637ddbb7dab980ec8e015f259b3aa4f8b4c4115fd1bcb4a5779c"
         await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, txid3)
@@ -340,8 +343,10 @@ contract('SwapContract', function (accounts) {
         await this.lpToken.transfer(this.swap.address, AmountOfLPtoken)
         // burn LP Token tx
         let txid4 = "0x000000000000000000033d05abcee8adbd9897cdcf184e135191dc06b095534b"
-        await this.swap.recordOutcomingFloat(this.WBTC_ADDR, AmountOfLPtoken, txid4)
-        await this.swap.burnLPTokensForFloat(txid4)
+        const record = await this.swap.recordOutcomingFloat(this.WBTC_ADDR, AmountOfLPtoken, txid4)
+        const burn = await this.swap.burnLPTokensForFloat(txid4)
+
+        //console.log(record.receipt.gasUsed, burn.receipt.gasUsed)
 
         const AmountOfLPtoken2 = "0x" + web3.utils.padLeft(mintedLP1.toString('hex'), 64)
         await this.lpToken.transfer(this.swap.address, AmountOfLPtoken2)
