@@ -27,6 +27,24 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => mapping(bytes32 => bytes32)) private txs;
     mapping(bytes32 => bool) private used;
 
+    event RewardsCollection(address token, uint256 rewardsAmount);
+
+    event RecordIncomingFloat(
+        address token,
+        bytes32 addressesAndAmountOfFloat,
+        bytes32 txid
+    );
+
+    event IssueLPTokensForFloat(address to, uint256 amountOfLP, bytes32 txid);
+
+    event RecordOutcomingFloat(
+        address token,
+        bytes32 addressesAndAmountOfLPtoken,
+        bytes32 txid
+    );
+
+    event BurnLPTokensForFloat(address token, uint256 amountOfFloat, bytes32 txid);
+
     constructor(address _lpToken, address _wbtc) public {
         //burner = new Burner();
         lpToken = _lpToken;
@@ -124,6 +142,7 @@ contract SwapContract is Ownable, ISwapContract {
     ) public override onlyOwner returns (bool) {
         require(txs[_token][_txid] == 0x0);
         txs[_token][_txid] = _addressesAndAmountOfFloat;
+        emit RecordIncomingFloat(_token, _addressesAndAmountOfFloat, _txid);
         return true;
     }
 
@@ -152,6 +171,7 @@ contract SwapContract is Ownable, ISwapContract {
             amountOfFloat
         );
         used[_txid] = true;
+        emit IssueLPTokensForFloat(to, amountOfLP, _txid);
         return true;
     }
 
@@ -166,6 +186,7 @@ contract SwapContract is Ownable, ISwapContract {
         require(txs[_token][_txid] == 0x0);
         // _token should be address(0) or WBTC_ADDR, txid should be unique
         txs[_token][_txid] = _addressesAndAmountOfLPtoken;
+        emit RecordOutcomingFloat(_token, _addressesAndAmountOfLPtoken, _txid);
         return true;
     }
 
@@ -201,6 +222,7 @@ contract SwapContract is Ownable, ISwapContract {
             amountOfFloat
         );
         used[_txid] = true;
+        emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
         return true;
     }
 
@@ -285,6 +307,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 rewardsForLP = _rewardsAmount.sub(rewardsForNode);
         totalRewardsForNodes[_token] = totalRewardsForNode.add(rewardsForNode);
         totalRewardsForLPs[_token] = totalRewardsForLP.add(rewardsForLP);
+        emit RewardsCollection(_token, _rewardsAmount);
     }
 
     function _updatePool(address _tokenA, address _tokenB)
