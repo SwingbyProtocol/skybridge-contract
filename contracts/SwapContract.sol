@@ -10,6 +10,7 @@ contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
     address public WBTC_ADDR;
+    uint256 public DEFAULT_INDEX = 2**256 - 1;
     bytes32[] public nodes;
 
     uint8 public churnedInCount;
@@ -49,9 +50,7 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
-    event DistributeNodeRewards(
-        uint256 totalRewardsForNode
-    );
+    event DistributeNodeRewards(uint256 totalRewardsForNode);
 
     constructor(address _lpToken, address _wbtc) public {
         //burner = new Burner();
@@ -273,12 +272,34 @@ contract SwapContract is Ownable, ISwapContract {
 
     function churn(
         address _newOwner,
-        bytes32[] memory _nodeRewardsAddressAndAmounts,
+        bytes32[] memory _newRewardsAddressAndAmounts,
+        address[] memory _removedRewardsAddresses,
         uint8 _churnedInCount,
         uint8 _nodeRewardsRatio
     ) public override onlyOwner returns (bool) {
         transferOwnership(_newOwner);
-        nodes = _nodeRewardsAddressAndAmounts;
+        // Update active node list
+        for (uint256 i = 0; i < _newRewardsAddressAndAmounts.length; i++) {
+            (address newNode, ) = _splitToStakes(
+                _newRewardsAddressAndAmounts[i]
+            );
+            uint256 index = _checkMatch(newNode);
+            if (index != DEFAULT_INDEX) {
+                // Update stakes
+                nodes[index] = _newRewardsAddressAndAmounts[i];
+            } else {
+                // Add stakes
+                nodes.push(_newRewardsAddressAndAmounts[i]);
+            }
+        }
+        // Remove all removed list
+        for (uint256 i = 0; i < _removedRewardsAddresses.length; i++) {
+            uint256 index = _checkMatch(_removedRewardsAddresses[i]);
+            if (index != DEFAULT_INDEX) {
+                delete (nodes[index]);
+            }
+        }
+
         churnedInCount = _churnedInCount;
         // The ratio should be 100x of actual rate.
         nodeRewardsRatio = _nodeRewardsRatio;
@@ -345,6 +366,29 @@ contract SwapContract is Ownable, ISwapContract {
             return (WBTC_ADDR, txs[WBTC_ADDR][_txid]);
         }
         return (address(0x0), 0x0);
+    }
+
+    function _checkMatch(address _node) internal view returns (uint256 index) {
+        index = DEFAULT_INDEX;
+        for (uint256 i = 0; i < nodes.length; i++) {
+            (address node, ) = _splitToStakes(nodes[i]);
+            if (node == _node) {
+                index = i;
+                return index;
+            }
+        }
+        return index;
+    }
+
+    function _splitToStakes(bytes32 _data)
+        internal
+        view
+        returns (address, uint256)
+    {
+        return (
+            address(uint160(uint256(_data))),
+            uint256(uint96(bytes12(_data)))
+        );
     }
 
     // The contract doesn't allow receiving Ether.

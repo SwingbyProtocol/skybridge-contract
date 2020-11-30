@@ -47,7 +47,8 @@ interface ISwapContract {
 
     function churn(
         address _newOwner,
-        bytes32[] memory _nodeRewardsAddressAndAmounts,
+        bytes32[] memory _newRewardsAddressAndAmounts,
+        address[] memory _removedRewardsAddresses,
         uint8 _churnedInCount,
         uint8 _nodeRewardsRatio
     ) external returns (bool);
