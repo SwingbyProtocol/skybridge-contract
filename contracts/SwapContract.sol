@@ -43,7 +43,15 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
-    event BurnLPTokensForFloat(address token, uint256 amountOfFloat, bytes32 txid);
+    event BurnLPTokensForFloat(
+        address token,
+        uint256 amountOfFloat,
+        bytes32 txid
+    );
+
+    event DistributeNodeRewards(
+        uint256 totalRewardsForNode
+    );
 
     constructor(address _lpToken, address _wbtc) public {
         //burner = new Burner();
@@ -255,6 +263,7 @@ contract SwapContract is Ownable, ISwapContract {
         // );
         // Reset storage for WBTC fees.
         totalRewardsForNodes[WBTC_ADDR] = 0;
+        emit DistributeNodeRewards(totalRewardsForNode);
         return true;
     }
 
