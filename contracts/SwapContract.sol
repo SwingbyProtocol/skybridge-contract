@@ -272,31 +272,25 @@ contract SwapContract is Ownable, ISwapContract {
 
     function churn(
         address _newOwner,
-        bytes32[] memory _newRewardsAddressAndAmounts,
-        address[] memory _removedRewardsAddresses,
+        bytes32[] memory _rewardAddressAndAmounts,
+        bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _nodeRewardsRatio
     ) public override onlyOwner returns (bool) {
         transferOwnership(_newOwner);
         // Update active node list
-        for (uint256 i = 0; i < _newRewardsAddressAndAmounts.length; i++) {
-            (address newNode, ) = _splitToStakes(
-                _newRewardsAddressAndAmounts[i]
-            );
+        for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
+            (address newNode, ) = _splitToStakes(_rewardAddressAndAmounts[i]);
             uint256 index = _checkMatch(newNode);
-            if (index != DEFAULT_INDEX) {
+            if (index != DEFAULT_INDEX && !_isRemoved[i]) {
                 // Update stakes
-                nodes[index] = _newRewardsAddressAndAmounts[i];
+                nodes[index] = _rewardAddressAndAmounts[i];
+            } else if (index != DEFAULT_INDEX && _isRemoved[i]) {
+                // Removed stakes
+                delete (nodes[index]);
             } else {
                 // Add stakes
-                nodes.push(_newRewardsAddressAndAmounts[i]);
-            }
-        }
-        // Remove all removed list
-        for (uint256 i = 0; i < _removedRewardsAddresses.length; i++) {
-            uint256 index = _checkMatch(_removedRewardsAddresses[i]);
-            if (index != DEFAULT_INDEX) {
-                delete (nodes[index]);
+                nodes.push(_rewardAddressAndAmounts[i]);
             }
         }
 
@@ -368,21 +362,19 @@ contract SwapContract is Ownable, ISwapContract {
         return (address(0x0), 0x0);
     }
 
-    function _checkMatch(address _node) internal view returns (uint256 index) {
-        index = DEFAULT_INDEX;
+    function _checkMatch(address _node) internal view returns (uint256) {
         for (uint256 i = 0; i < nodes.length; i++) {
             (address node, ) = _splitToStakes(nodes[i]);
             if (node == _node) {
-                index = i;
-                return index;
+                return i;
             }
         }
-        return index;
+        return DEFAULT_INDEX;
     }
 
     function _splitToStakes(bytes32 _data)
         internal
-        view
+        pure
         returns (address, uint256)
     {
         return (
