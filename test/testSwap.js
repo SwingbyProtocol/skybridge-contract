@@ -371,26 +371,30 @@ contract('SwapContract', function (accounts) {
     })
 
     it('updates churn address and stakes', async function () {
-        let payload = []
+        let rewardAddressAndAmounts = []
+        let isRemoved = []
         let churnedInCount = 25
         let nodeRewardsRatio = 66
         for (i = 0; i < 100; i++) {
             let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
             let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + sender.slice(2), 64)
-            payload.push(addressesAndAmountStaked)
+            rewardAddressAndAmounts.push(addressesAndAmountStaked)
+            isRemoved.push(false)
         }
-        const tx1 = await this.swap.churn(receiver, payload, churnedInCount, nodeRewardsRatio, {
+        const tx1 = await this.swap.churn(receiver, payload, isRemoved, churnedInCount, nodeRewardsRatio, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
         console.log(tx1.receipt.gasUsed)
-        payload = []
+        rewardAddressAndAmounts = []
+        isRemoved = []
         for (i = 0; i < 100; i++) {
             let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
             let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + receiver.slice(2), 64)
-            payload.push(addressesAndAmountStaked)
+            rewardAddressAndAmounts.push(addressesAndAmountStaked)
+            isRemoved.push(false)
         }
-        const tx2 = await this.swap.churn(receiver, payload, churnedInCount + 1, nodeRewardsRatio + 1, {
+        const tx2 = await this.swap.churn(receiver, rewardAddressAndAmounts, isRemoved, churnedInCount + 1, nodeRewardsRatio + 1, {
             value: 0,
             gasPrice: 2 * 10 ** 6,
             from: receiver

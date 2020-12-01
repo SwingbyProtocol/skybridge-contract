@@ -15,6 +15,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
+    uint8 public depositFeeRatio;
 
     uint256 private priceDecimals;
     uint256 private currentExchangeRate;
@@ -27,6 +28,10 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => uint256) private floatAmountOfToken;
     mapping(address => mapping(bytes32 => bytes32)) private txs;
     mapping(bytes32 => bool) private used;
+
+    /**
+     * Events
+     */
 
     event RewardsCollection(address token, uint256 rewardsAmount);
 
@@ -53,7 +58,7 @@ contract SwapContract is Ownable, ISwapContract {
     event DistributeNodeRewards(uint256 totalRewardsForNode);
 
     constructor(address _lpToken, address _wbtc) public {
-        //burner = new Burner();
+        // burner = new Burner();
         lpToken = _lpToken;
         // Set initial price of LP token per BTC/WBTC.
         lpDecimals = 10**IERC20(lpToken).decimals();
@@ -61,9 +66,9 @@ contract SwapContract is Ownable, ISwapContract {
         WBTC_ADDR = _wbtc;
         // Set nodeRewardsRatio
         nodeRewardsRatio = 66;
-        // set priceDecimals
+        // Set priceDecimals
         priceDecimals = 10**8;
-        // SEt currentExchangeRate
+        // Set currentExchangeRate
         currentExchangeRate = priceDecimals;
     }
 
@@ -156,6 +161,7 @@ contract SwapContract is Ownable, ISwapContract {
     /**
      * @dev gas usage 131162 gas
      */
+
     function issueLPTokensForFloat(bytes32 _txid)
         public
         override
