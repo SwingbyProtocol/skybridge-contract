@@ -15,7 +15,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
-    uint8 public depositFeeRatio;
+    uint8 public depositFeesBPS;
 
     uint256 private priceDecimals;
     uint256 private currentExchangeRate;
@@ -66,6 +66,8 @@ contract SwapContract is Ownable, ISwapContract {
         WBTC_ADDR = _wbtc;
         // Set nodeRewardsRatio
         nodeRewardsRatio = 66;
+        // Set depositFeesRatio
+        depositFeesBPS = 30;
         // Set priceDecimals
         priceDecimals = 10**8;
         // Set currentExchangeRate
@@ -182,6 +184,10 @@ contract SwapContract is Ownable, ISwapContract {
         // Add float amount
         floatAmountOfToken[token] = floatAmountOfToken[token].add(
             amountOfFloat
+        );
+        // Add deposit fees 0.0030 (30 bps)
+        totalRewardsForNodes[token] = totalRewardsForNodes[token].add(
+            amountOfFloat.mul(depositFeesBPS).div(10000)
         );
         used[_txid] = true;
         emit IssueLPTokensForFloat(to, amountOfLP, _txid);
