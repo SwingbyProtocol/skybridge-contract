@@ -164,7 +164,7 @@ contract SwapContract is Ownable, ISwapContract {
      * @dev gas usage 131162 gas
      */
 
-    function issueLPTokensForFloat(bytes32 _txid)
+    function issueLPTokensForFloat(bytes32 _txid) 
         public
         override
         returns (bool)
@@ -172,23 +172,27 @@ contract SwapContract is Ownable, ISwapContract {
         require(!isTxUsed(_txid), "The txid is already used");
         (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
-
         address to = address(uint160(uint256(transaction)));
         uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
+        uint256 depositFees = amountOfFloat.mul(depositFeesBPS).div(10000);
         // LP token price per BTC/WBTC changed
         uint256 nowPrice = _updatePool(address(0), WBTC_ADDR);
         // Calculate amount of LP token
-        uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
+        uint256 amountOfLP = amountOfFloat
+            .sub(depositFees)
+            .mul(priceDecimals)
+            .div(nowPrice);
         // Mint LP tokens
         IBurnableToken(lpToken).mint(to, amountOfLP);
-        // Add float amount
-        floatAmountOfToken[token] = floatAmountOfToken[token].add(
-            amountOfFloat
-        );
         // Add deposit fees 0.0030 (30 bps)
         totalRewardsForNodes[token] = totalRewardsForNodes[token].add(
-            amountOfFloat.mul(depositFeesBPS).div(10000)
+            depositFees
         );
+        // Add float amount
+        floatAmountOfToken[token] = floatAmountOfToken[token].add(
+            amountOfFloat.sub(depositFees)
+        );
+
         used[_txid] = true;
         emit IssueLPTokensForFloat(to, amountOfLP, _txid);
         return true;
