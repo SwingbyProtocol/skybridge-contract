@@ -189,10 +189,10 @@ contract SwapContract is Ownable, ISwapContract {
                 ? 0
                 : amountOfLP.mul(depositFeesBPS).div(10000);
         }
-        // Mint LP tokens
-        IBurnableToken(lpToken).mint(address(this), amountOfLP);
         // Send LP tokens to LP
-        IBurnableToken(lpToken).transfer(to, amountOfLP.sub(depositFees));
+        IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
+        // Update deposit fees
+        totalLPTokensForNode = totalLPTokensForNode.add(depositFees);
         // Add float amount
         _addFloat(token, amountOfFloat);
         used[_txid] = true;
@@ -330,6 +330,21 @@ contract SwapContract is Ownable, ISwapContract {
         return isTrue;
     }
 
+    /**
+     * @dev returns reserves - deposit fees.
+     */
+    function getFloatReserve(address _tokenA, address _tokenB)
+        public
+        override
+        view
+        returns (uint256 reserveA, uint256 reserveB)
+    {
+        (reserveA, reserveB) = (
+            floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
+            floatAmountOf[_tokenB].add(totalRewards[_tokenB])
+        );
+    }
+
     function _updateFloatPool(address _tokenA, address _tokenB)
         internal
         returns (uint256)
@@ -347,21 +362,6 @@ contract SwapContract is Ownable, ISwapContract {
                 totalLPs.sub(totalLPTokensForNode)
             );
         return currentExchangeRate;
-    }
-
-    /**
-     * @dev returns reserves - deposit fees.
-     */
-    function getFloatReserve(address _tokenA, address _tokenB)
-        public
-        override
-        view
-        returns (uint256 reserveA, uint256 reserveB)
-    {
-        (reserveA, reserveB) = (
-            floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
-            floatAmountOf[_tokenB].add(totalRewards[_tokenB])
-        );
     }
 
     function _addFloat(address _token, uint256 _amount) internal {
