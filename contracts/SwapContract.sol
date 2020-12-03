@@ -177,7 +177,16 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
-        uint256 depositFees = amountOfFloat.mul(amountOfLP).div(10000);
+        uint256 depositFees;
+        if (isBTCOptimal()) {
+            depositFees = token == WBTC_ADDR
+                ? 0
+                : amountOfFloat.mul(amountOfLP).div(10000);
+        } else {
+            depositFees = token == address(0)
+                ? 0
+                : amountOfFloat.mul(amountOfLP).div(10000);
+        }
         // Mint LP tokens
         IBurnableToken(lpToken).mint(address(this), amountOfLP);
         // Send LP tokens to LP
@@ -223,7 +232,7 @@ contract SwapContract is Ownable, ISwapContract {
         require(IBurnableToken(lpToken).burn(amountOfLP));
         // Calculate amountOfLP
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
-        // Calculate amountOfFloat 
+        // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
         // WBTC transfer if token address is WBTC
         if (token == WBTC_ADDR) {
@@ -307,14 +316,15 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
-    function getBalanceOfBTC() public view returns (uint256) {
+    function isBTCOptimal() public view returns (bool isTrue) {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
             WBTC_ADDR
         );
         // BTC bal == BTC float + WBTC float - WBTC bal
-        uint256 balBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
-        return reserveA.add(reserveB).sub(balBTC);
+        uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
+        isTrue = reserveA.add(reserveB).sub(balWBTC) > balWBTC ? true : false;
+        return isTrue;
     }
 
     function _updateFloatPool(address _tokenA, address _tokenB)
@@ -365,7 +375,14 @@ contract SwapContract is Ownable, ISwapContract {
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
         internal
     {
-        totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
+        uint256 amountForLP = _rewardsAmount.mul(nodeRewardsRatio).div(100);
+        totalRewards[_token] = totalRewards[_token].add(amountForLP);
+        // Mint LP tokens
+        uint256 amountLPForNode = _rewardsAmount
+            .sub(amountForLP)
+            .mul(priceDecimals)
+            .div(getCurrentPriceLP());
+        require(IBurnableToken(lpToken).mint(address(this), amountLPForNode));
     }
 
     function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
