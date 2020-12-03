@@ -23,9 +23,8 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private lpDecimals;
 
     // Token address -> amount
-    mapping(address => uint256) private totalRewardsForLPs;
-    mapping(address => uint256) private totalRewardsForNodes;
-    mapping(address => uint256) private floatAmountOfToken;
+    mapping(address => uint256) private totalRewards;
+    mapping(address => uint256) private floatAmountOf;
     mapping(address => mapping(bytes32 => bytes32)) private txs;
     mapping(bytes32 => bool) private used;
 
@@ -66,7 +65,7 @@ contract SwapContract is Ownable, ISwapContract {
         WBTC_ADDR = _wbtc;
         // Set nodeRewardsRatio
         nodeRewardsRatio = 66;
-        // Set depositFeesRatio
+        // Set depositFeesBPS
         depositFeesBPS = 30;
         // Set priceDecimals
         priceDecimals = 10**8;
@@ -164,7 +163,7 @@ contract SwapContract is Ownable, ISwapContract {
      * @dev gas usage 131162 gas
      */
 
-    function issueLPTokensForFloat(bytes32 _txid) 
+    function issueLPTokensForFloat(bytes32 _txid)
         public
         override
         returns (bool)
@@ -176,23 +175,13 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
         uint256 depositFees = amountOfFloat.mul(depositFeesBPS).div(10000);
         // LP token price per BTC/WBTC changed
-        uint256 nowPrice = _updatePool(address(0), WBTC_ADDR);
+        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amount of LP token
-        uint256 amountOfLP = amountOfFloat
-            .sub(depositFees)
-            .mul(priceDecimals)
-            .div(nowPrice);
+        uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         // Mint LP tokens
         IBurnableToken(lpToken).mint(to, amountOfLP);
-        // Add deposit fees 0.0030 (30 bps)
-        totalRewardsForNodes[token] = totalRewardsForNodes[token].add(
-            depositFees
-        );
         // Add float amount
-        floatAmountOfToken[token] = floatAmountOfToken[token].add(
-            amountOfFloat.sub(depositFees)
-        );
-
+        _addFloat(token, amountOfFloat);
         used[_txid] = true;
         emit IssueLPTokensForFloat(to, amountOfLP, _txid);
         return true;
@@ -227,7 +216,7 @@ contract SwapContract is Ownable, ISwapContract {
         require(transaction != 0x0, "The transaction is not found");
         address to = address(uint160(uint256(transaction)));
         uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
-        uint256 nowPrice = _updatePool(address(0), WBTC_ADDR);
+        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Burn LP tokens
         require(IBurnableToken(lpToken).burn(amountOfLP));
         // Calculate amount of BTC/WBTC
@@ -238,49 +227,47 @@ contract SwapContract is Ownable, ISwapContract {
         }
         // Remove float amount
         require(
-            floatAmountOfToken[token] >= amountOfFloat,
+            floatAmountOf[token] >= amountOfFloat,
             "floatAmount is not enough"
         );
-        floatAmountOfToken[token] = floatAmountOfToken[token].sub(
-            amountOfFloat
-        );
+        floatAmountOf[token] = floatAmountOf[token].sub(amountOfFloat);
         used[_txid] = true;
         emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
         return true;
     }
 
-    function distributeNodeRewards() public override returns (bool) {
-        // Reduce Gas
-        uint256 totalRewardsForNode = totalRewardsForNodes[WBTC_ADDR];
-        require(
-            totalRewardsForNode > 0,
-            "totalRewardsForNode amount is not positive"
-        );
-        uint256 totalStaked = 0;
-        for (uint256 i = 0; i < nodes.length; i++) {
-            totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
-        }
-        // decimals of totalRewardsForNode  == 8, decimals of currentPrice == 8
-        uint256 totalLPTokens = totalRewardsForNode.mul(priceDecimals).div(
-            getCurrentPriceLP()
-        );
-        for (uint256 i = 0; i < nodes.length; i++) {
-            IBurnableToken(lpToken).mint(
-                address(uint160(uint256(nodes[i]))),
-                totalLPTokens.mul(uint256(uint96(bytes12(nodes[i])))).div(
-                    totalStaked
-                )
-            );
-        }
-        // Inject WBTC amount to float?
-        // floatAmountOfToken[WBTC_ADDR] = floatAmountOfToken[WBTC_ADDR].add(
-        //     totalRewardsForNode
-        // );
-        // Reset storage for WBTC fees.
-        totalRewardsForNodes[WBTC_ADDR] = 0;
-        emit DistributeNodeRewards(totalRewardsForNode);
-        return true;
-    }
+    //function distributeNodeRewards() public override returns (bool) {
+    //     // Reduce Gas
+    //     uint256 totalRewardsForNode = totalRewardsForNodes[WBTC_ADDR];
+    //     require(
+    //         totalRewardsForNode > 0,
+    //         "totalRewardsForNode amount is not positive"
+    //     );
+    //     uint256 totalStaked = 0;
+    //     for (uint256 i = 0; i < nodes.length; i++) {
+    //         totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
+    //     }
+    //     // decimals of totalRewardsForNode  == 8, decimals of currentPrice == 8
+    //     uint256 totalLPTokens = totalRewardsForNode.mul(priceDecimals).div(
+    //         getCurrentPriceLP()
+    //     );
+    //     for (uint256 i = 0; i < nodes.length; i++) {
+    //         IBurnableToken(lpToken).mint(
+    //             address(uint160(uint256(nodes[i]))),
+    //             totalLPTokens.mul(uint256(uint96(bytes12(nodes[i])))).div(
+    //                 totalStaked
+    //             )
+    //         );
+    //     }
+    //     // Inject WBTC amount to float?
+    //     // floatAmountOfToken[WBTC_ADDR] = floatAmountOfToken[WBTC_ADDR].add(
+    //     //     totalRewardsForNode
+    //     // );
+    //     // Reset storage for WBTC fees.
+    //     totalRewardsForNodes[WBTC_ADDR] = 0;
+    //     emit DistributeNodeRewards(totalRewardsForNode);
+    //     return true;
+    // }
 
     /**
      * @dev gas usage 2115532 gas (initial), 592132 gas (updated)
@@ -324,33 +311,7 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
-    function getFloatReserve(address _tokenA, address _tokenB)
-        public
-        override
-        view
-        returns (uint256 reserveA, uint256 reserveB)
-    {
-        (reserveA, reserveB) = (
-            floatAmountOfToken[_tokenA].add(totalRewardsForLPs[_tokenA]),
-            floatAmountOfToken[_tokenB].add(totalRewardsForLPs[_tokenB])
-        );
-    }
-
-    function _rewardsCollection(address _token, uint256 _rewardsAmount)
-        internal
-    {
-        // Reduce Gas
-        uint256 totalRewardsForNode = totalRewardsForNodes[_token];
-        uint256 totalRewardsForLP = totalRewardsForLPs[_token];
-        // Updates rewards for nodes and LPs
-        uint256 rewardsForNode = _rewardsAmount.mul(nodeRewardsRatio).div(100);
-        uint256 rewardsForLP = _rewardsAmount.sub(rewardsForNode);
-        totalRewardsForNodes[_token] = totalRewardsForNode.add(rewardsForNode);
-        totalRewardsForLPs[_token] = totalRewardsForLP.add(rewardsForLP);
-        emit RewardsCollection(_token, _rewardsAmount);
-    }
-
-    function _updatePool(address _tokenA, address _tokenB)
+    function _updateFloatPool(address _tokenA, address _tokenB)
         internal
         returns (uint256)
     {
@@ -359,7 +320,6 @@ contract SwapContract is Ownable, ISwapContract {
             _tokenA,
             _tokenB
         );
-        // uint256 burned = IBurnableToken(lpToken).balanceOf(address(burner));
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         currentExchangeRate = totalLPs == 0
@@ -367,6 +327,53 @@ contract SwapContract is Ownable, ISwapContract {
             : (reserveA.add(reserveB)).mul(lpDecimals).div(totalLPs);
         return currentExchangeRate;
     }
+
+    /**
+     * @dev returns reserves - deposit fees.
+     */
+    function getFloatReserve(address _tokenA, address _tokenB)
+        public
+        override
+        view
+        returns (uint256 reserveA, uint256 reserveB)
+    {
+        (uint256 depositFeesA, uint256 depositFeesB) = (
+            floatAmountOf[_tokenA].mul(depositFeesBPS).div(10000),
+            floatAmountOf[_tokenB].mul(depositFeesBPS).div(10000)
+        );
+        (reserveA, reserveB) = (
+            floatAmountOf[_tokenA].add(totalRewards[_tokenA]).sub(depositFeesA),
+            floatAmountOf[_tokenB].add(totalRewards[_tokenB]).sub(depositFeesB)
+        );
+    }
+
+    function _addFloat(address _token, uint256 _amount) internal {
+        floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
+    }
+
+    function _removeFloat(address _token, uint256 _amount) internal {
+        floatAmountOf[_token] = floatAmountOf[_token].sub(_amount);
+    }
+
+    function _rewardsCollection(address _token, uint256 _rewardsAmount)
+        internal
+    {
+        totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
+    }
+
+    // function _rewardsCollection(address _token, uint256 _rewardsAmount)
+    //     internal
+    // {
+    //     // Reduce Gas
+    //     uint256 totalRewardsForNode = totalRewardsForNodes[_token];
+    //     uint256 totalRewardsForLP = totalRewardsForLPs[_token];
+    //     // Updates rewards for nodes and LPs
+    //     uint256 rewardsForNode = _rewardsAmount.mul(nodeRewardsRatio).div(100);
+    //     uint256 rewardsForLP = _rewardsAmount.sub(rewardsForNode);
+    //     totalRewardsForNodes[_token] = totalRewardsForNode.add(rewardsForNode);
+    //     totalRewardsForLPs[_token] = totalRewardsForLP.add(rewardsForLP);
+    //     emit RewardsCollection(_token, _rewardsAmount);
+    // }
 
     function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
         if (txs[address(0)][_txid] != 0x0) {
