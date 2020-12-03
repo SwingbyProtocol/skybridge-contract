@@ -22,6 +22,8 @@ contract SwapContract is Ownable, ISwapContract {
     address private lpToken;
     uint256 private lpDecimals;
 
+    uint256 private totalLPTokensForNode;
+
     // Token address -> amount
     mapping(address => uint256) private totalRewards;
     mapping(address => uint256) private floatAmountOf;
@@ -181,16 +183,16 @@ contract SwapContract is Ownable, ISwapContract {
         if (isBTCOptimal()) {
             depositFees = token == WBTC_ADDR
                 ? 0
-                : amountOfFloat.mul(amountOfLP).div(10000);
+                : amountOfLP.mul(depositFeesBPS).div(10000);
         } else {
             depositFees = token == address(0)
                 ? 0
-                : amountOfFloat.mul(amountOfLP).div(10000);
+                : amountOfLP.mul(depositFeesBPS).div(10000);
         }
         // Mint LP tokens
         IBurnableToken(lpToken).mint(address(this), amountOfLP);
         // Send LP tokens to LP
-        IBurnableToken(lpToken).transfer(to, amountOfLP - depositFees);
+        IBurnableToken(lpToken).transfer(to, amountOfLP.sub(depositFees));
         // Add float amount
         _addFloat(token, amountOfFloat);
         used[_txid] = true;
@@ -228,21 +230,22 @@ contract SwapContract is Ownable, ISwapContract {
         require(transaction != 0x0, "The transaction is not found");
         address to = address(uint160(uint256(transaction)));
         uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
-        // Burn LP tokens
-        require(IBurnableToken(lpToken).burn(amountOfLP));
         // Calculate amountOfLP
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
-        // WBTC transfer if token address is WBTC
-        if (token == WBTC_ADDR) {
-            require(IERC20(token).transfer(to, amountOfFloat));
-        }
-        // Remove float amount
+
         require(
             floatAmountOf[token] >= amountOfFloat,
             "Pool balance insufficient."
         );
+        // WBTC transfer if token address is WBTC
+        if (token == WBTC_ADDR) {
+            require(IERC20(token).transfer(to, amountOfFloat));
+        }
+        // Burn LP tokens
+        require(IBurnableToken(lpToken).burn(amountOfLP));
+        // Remove float amount
         _removeFloat(token, amountOfFloat);
         used[_txid] = true;
         emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
@@ -251,9 +254,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     function distributeNodeRewards() public override returns (bool) {
         // Reduce Gas
-        uint256 totalRewardLPsForNode = IBurnableToken(lpToken).balanceOf(
-            address(this)
-        );
+        uint256 totalRewardLPsForNode = totalLPTokensForNode;
         require(
             totalRewardLPsForNode > 0,
             "totalRewardLPsForNode is not positive"
@@ -263,13 +264,14 @@ contract SwapContract is Ownable, ISwapContract {
             totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
         }
         for (uint256 i = 0; i < nodes.length; i++) {
-            IBurnableToken(lpToken).transfer(
+            IBurnableToken(lpToken).mint(
                 address(uint160(uint256(nodes[i]))),
                 totalRewardLPsForNode
                     .mul(uint256(uint96(bytes12(nodes[i]))))
                     .div(totalStaked)
             );
         }
+        totalLPTokensForNode = 0;
         emit DistributeNodeRewards(totalRewardLPsForNode);
         return true;
     }
@@ -323,6 +325,7 @@ contract SwapContract is Ownable, ISwapContract {
         );
         // BTC bal == BTC float + WBTC float - WBTC bal
         uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
+        require(reserveA.add(reserveB) >= balWBTC, "balWBTC amount invalid");
         isTrue = reserveA.add(reserveB).sub(balWBTC) > balWBTC ? true : false;
         return isTrue;
     }
@@ -337,14 +340,11 @@ contract SwapContract is Ownable, ISwapContract {
             _tokenB
         );
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
-        uint256 depositFeesLPs = IBurnableToken(lpToken).balanceOf(
-            address(this)
-        );
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         currentExchangeRate = totalLPs == 0
             ? currentExchangeRate
             : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.sub(depositFeesLPs)
+                totalLPs.sub(totalLPTokensForNode)
             );
         return currentExchangeRate;
     }
@@ -382,7 +382,7 @@ contract SwapContract is Ownable, ISwapContract {
             .sub(amountForLP)
             .mul(priceDecimals)
             .div(getCurrentPriceLP());
-        require(IBurnableToken(lpToken).mint(address(this), amountLPForNode));
+        totalLPTokensForNode = totalLPTokensForNode.add(amountLPForNode);
     }
 
     function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
