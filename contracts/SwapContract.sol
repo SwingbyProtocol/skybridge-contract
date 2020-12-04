@@ -23,7 +23,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     uint256 private nextMintLPTokensForNode;
 
-    bytes32[] public nodeList;
+    bytes32[] private nodes;
     mapping(address => uint256) private nodeIndex;
 
     // Token address -> amount
@@ -260,19 +260,19 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 rewardLPsForNode = nextMintLPTokensForNode;
         require(rewardLPsForNode > 0, "totalRewardLPsForNode is not positive");
         uint256 totalStaked = 0;
-        for (uint256 i = 0; i < nodeList.length; i++) {
-            totalStaked = totalStaked.add(
-                uint256(uint96(bytes12(nodeList[i])))
-            );
-        }
-        for (uint256 i = 0; i < nodeList.length; i++) {
-            IBurnableToken(lpToken).mint(
-                address(uint160(uint256(nodeList[i]))),
-                rewardLPsForNode.mul(uint256(uint96(bytes12(nodeList[i])))).div(
-                    totalStaked
-                )
-            );
-        }
+        // for (uint256 i = 0; i < nodeList.length; i++) {
+        //     totalStaked = totalStaked.add(
+        //         uint256(uint96(bytes12(nodeList[i])))
+        //     );
+        // }
+        // for (uint256 i = 0; i < nodeList.length; i++) {
+        //     IBurnableToken(lpToken).mint(
+        //         address(uint160(uint256(nodeList[i]))),
+        //         rewardLPsForNode.mul(uint256(uint96(bytes12(nodeList[i])))).div(
+        //             totalStaked
+        //         )
+        //     );
+        // }
         nextMintLPTokensForNode = 0;
         emit DistributeNodeRewards(nextMintLPTokensForNode);
         return true;
@@ -293,19 +293,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
             (address newNode, ) = _splitToStakes(_rewardAddressAndAmounts[i]);
-            uint256 index = nodeIndex[newNode];
-            if (_isRemoved[i] && index != 0) {
-                // Remove stakes
-                delete (nodeList[index]);
-                delete (nodeIndex[newNode]);
-            } else if (!_isRemoved[i] && index == 0) {
-                // Add stakes
-                nodeIndex[newNode] = nodeList.length.add(1);
-                nodeList[nodeList.length.add(1)] = _rewardAddressAndAmounts[i];
-            } else if (!_isRemoved[i] && index != 0) {
-                // Update stakes
-                nodeList[index] = _rewardAddressAndAmounts[i];
-            }
+            _addNode(newNode, _rewardAddressAndAmounts[i], _isRemoved[i]);
         }
 
         churnedInCount = _churnedInCount;
@@ -385,6 +373,7 @@ contract SwapContract is Ownable, ISwapContract {
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
         internal
     {
+        // Add all fees into pool
         totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
         uint256 amountForLP = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Future mint LP tokens 66% of fees
@@ -392,6 +381,7 @@ contract SwapContract is Ownable, ISwapContract {
             .sub(amountForLP)
             .mul(priceDecimals)
             .div(getCurrentPriceLP());
+        // Add minted LP tokens for Nodes
         nextMintLPTokensForNode = nextMintLPTokensForNode.add(amountLPForNode);
     }
 
@@ -403,6 +393,39 @@ contract SwapContract is Ownable, ISwapContract {
             return (WBTC_ADDR, txs[WBTC_ADDR][_txid]);
         }
         return (address(0x0), 0x0);
+    }
+
+    function _addNode(
+        address _addr,
+        bytes32 _data,
+        bool _remove
+    ) internal returns (bool) {
+        if (_remove) {
+            nodeIndex[_addr] = 2**256 - 1;
+            return true;
+        }
+        uint256 index = nodeIndex[_addr]; // 0 => not exist, != 0 => exist, 2 ^ 256 -1 => removed.
+        if (index == 0) {
+            nodes.push(_data);
+            nodeIndex[_addr] = nodes.length - 1;
+        } else {
+            nodes[index] = _data;
+        }
+        return true;
+    }
+
+    function loadNodes() public returns (bytes32[] memory) {
+        bytes32[] memory _nodes;
+        uint256 count = 0;
+        for (uint256 i = 0; i < nodes.length; i++) {
+            (address newNode, ) = _splitToStakes(nodes[i]);
+            uint256 index = nodeIndex[newNode];
+            if (index != 2**256 - 1) {
+                _nodes[count] = nodes[i];
+                count++;
+            }
+        }
+        return _nodes;
     }
 
     function _splitToStakes(bytes32 _data)
