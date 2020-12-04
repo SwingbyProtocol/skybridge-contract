@@ -66,7 +66,6 @@ contract('SwapContract', function (accounts) {
 
     it('deposit BTC float', async function () {
         let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
-        let depositFees = floatAmountOfBTC.mul(new BN(30)).div(new BN(10000))
         // Send from TSS address
         let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
@@ -74,12 +73,21 @@ contract('SwapContract', function (accounts) {
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid1)
         // Mint LP token
         await this.swap.issueLPTokensForFloat(txid1)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC)
+        const price = await this.swap.getCurrentPriceLP()
+        const mintedLPs = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price)
+        const depositFees = mintedLPs.mul(new BN(30)).div(new BN(10000))
+
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(mintedLPs.sub(depositFees))
+
         // Second tx
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid2)
         await this.swap.issueLPTokensForFloat(txid2)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC.add(floatAmountOfBTC.sub(depositFees)))
+
+        const price2 = await this.swap.getCurrentPriceLP()
+        const mintedLPs2 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price2)
+        const depositFees2 = mintedLPs.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(mintedLPs.sub(depositFees).add(mintedLPs2).sub(depositFees2))
     })
 
     it('deposit BTC float after fees are collected', async function () {
@@ -91,7 +99,12 @@ contract('SwapContract', function (accounts) {
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid1)
         // Mint LP token
         await this.swap.issueLPTokensForFloat(txid1)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC)
+
+        const price = await this.swap.getCurrentPriceLP()
+        const mintedLPs = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price)
+        const depositFees = mintedLPs.mul(new BN(30)).div(new BN(10000))
+
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(mintedLPs.sub(depositFees))
 
         /**
          * Swap BTC -> 1 WBTC executed, fees are 0.001 WBTC
@@ -111,11 +124,11 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid2)
         // const res = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // Get price of LP token -> 1.06600000 BTC/WBTC
-        const price = await this.swap.getCurrentPriceLP()
+        const price2 = await this.swap.getCurrentPriceLP()
         // Calculate amount of LP token
-        const mintedLPs = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price)
-        const depositFees = mintedLPs.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC.add(mintedLPs.sub(depositFees)))
+        const mintedLPs2 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price2)
+        const depositFees2 = mintedLPs2.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(mintedLPs.sub(depositFees).add(mintedLPs2).sub(depositFees2))
 
         // mint again
         await this.wbtcTest.mint(this.swap.address, mintAmount)
@@ -127,10 +140,10 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid3)
         // const res = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // Get price of LP token -> 1.05128417 BTC/WBTC
-        const price2 = await this.swap.getCurrentPriceLP()
-        const mintedLPs2 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price2)
-        const depositFees2 = mintedLPs2.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC.add(mintedLPs).sub(depositFees).add(mintedLPs2).sub(depositFees2))
+        const price3 = await this.swap.getCurrentPriceLP()
+        const mintedLPs3 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price3)
+        const depositFees3 = mintedLPs3.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(mintedLPs.sub(depositFees).add(mintedLPs2).sub(depositFees2).add(mintedLPs3).sub(depositFees3))
     })
 
     it('deposit WBTC float', async function () {
@@ -149,7 +162,6 @@ contract('SwapContract', function (accounts) {
 
     it('deposit WBTC float after fees are collected', async function () {
         let floatAmountOfWBTC = new BN("1").mul(new BN(10).pow(new BN(8)))
-        let depositFees = floatAmountOfWBTC.mul(new BN(30)).div(new BN(10000))
 
         // Send from TSS address
         let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
@@ -160,10 +172,10 @@ contract('SwapContract', function (accounts) {
         const issue = await this.swap.issueLPTokensForFloat(txid1)
 
         const price1 = await this.swap.getCurrentPriceLP()
-        const feesLP1 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price1)
-        const depositFeesLP1 = feesLP1.mul(new BN(30)).div(new BN(10000))
+        const LP1 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price1)
+        const depositFeesLP1 = LP1.mul(new BN(30)).div(new BN(10000))
         //console.log(record.receipt.gasUsed, issue.receipt.gasUsed)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
 
         /**
          * Swap BTC -> 1WBTC executed, fees are 0.001 WBTC
@@ -182,11 +194,11 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid2)
         // const res = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // Get price of LP token -> 1.00962888 BTC/WBTC
-        const price = await this.swap.getCurrentPriceLP()
+        const price2 = await this.swap.getCurrentPriceLP()
         // Calculate amount of LP token
-        const mintedLPs = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price)
-        const depositLPFees = mintedLPs.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1).add(mintedLPs))
+        const LP2 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price2)
+        // const depositFeesLP2 = LP2.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2))
 
         // mint again
         await this.wbtcTest.mint(this.swap.address, mintAmount)
@@ -198,11 +210,11 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid3)
         // const res = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // Get price of LP token -> 1.05128417 BTC/WBTC
-        const price2 = await this.swap.getCurrentPriceLP()
+        const price3 = await this.swap.getCurrentPriceLP()
         // Calculate amount of LP token
-        const mintedLPs2 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price2)
-        const depositFees2 = mintedLPs2.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1).add(mintedLPs).add(mintedLPs2))
+        const LP3 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price3)
+        // const depositFeesLP3 = LP3.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2).add(LP3))
     })
 
     it('withdraw BTC float', async function () {
@@ -214,15 +226,20 @@ contract('SwapContract', function (accounts) {
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid1)
         // Mint LP token
         await this.swap.issueLPTokensForFloat(txid1)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC)
+
+        const price1 = await this.swap.getCurrentPriceLP()
+        const LP1 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price1)
+        const depositFeesLP1 = LP1.mul(new BN(30)).div(new BN(10000))
+
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
         // Send LP token to swap contract.
-        await this.lpToken.transfer(this.swap.address, floatAmountOfBTC)
+        await this.lpToken.transfer(this.swap.address, LP1.sub(depositFeesLP1))
         // Send from TSS address
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
+        let addressesAndAmountOfLP = "0x" + web3.utils.padLeft(LP1.sub(depositFeesLP1).toString('hex') + sender.slice(2), 64)
         // BTC == address(0)
-        await this.swap.recordOutcomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid2)
+        await this.swap.recordOutcomingFloat(ZERO_ADDRESS, addressesAndAmountOfLP, txid2)
         // Mint LP token
-        const price = await this.swap.getCurrentPriceLP()
         await this.swap.burnLPTokensForFloat(txid2)
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal('0')
     })
@@ -230,7 +247,6 @@ contract('SwapContract', function (accounts) {
     it('withdraw BTC float after fees are collected', async function () {
         let mintAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
         let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
-
         // Send from TSS address
         let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
@@ -239,7 +255,11 @@ contract('SwapContract', function (accounts) {
         // Mint LP token
         await this.swap.issueLPTokensForFloat(txid1)
 
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC)
+        const price1 = await this.swap.getCurrentPriceLP()
+        const LP1 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price1)
+        const depositFeesLP1 = LP1.mul(new BN(30)).div(new BN(10000))
+
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
 
         /**
          * Swap BTC -> 1WBTC executed, fees are 0.001 WBTC
@@ -257,11 +277,11 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid2)
         // const res = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // Get price of LP token -> 1.034 BTC/WBTC
-        const price = await this.swap.getCurrentPriceLP()
+        const price2 = await this.swap.getCurrentPriceLP()
         // Calculate amount of LP token
-        const mintedLP1 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price)
-        const depositLPFees = mintedLP1.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC.add(mintedLP1).sub(depositLPFees))
+        const LP2 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price2)
+        const depositFeesLP2 = LP2.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2).sub(depositFeesLP2))
 
         await this.wbtcTest.mint(this.swap.address, mintAmount)
 
@@ -271,13 +291,13 @@ contract('SwapContract', function (accounts) {
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid3)
         await this.swap.issueLPTokensForFloat(txid3)
         // Get price of LP token -> 1.05128417 BTC/WBTC
-        const price2 = await this.swap.getCurrentPriceLP()
-        const mintedLP2 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price2)
-        const depositLPFees2 = mintedLP2.mul(new BN(30)).div(new BN(10000))
+        const price3 = await this.swap.getCurrentPriceLP()
+        const LP3 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price3)
+        const depositFeesLP3 = LP3.mul(new BN(30)).div(new BN(10000))
 
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC.add(mintedLP1).sub(depositLPFees).add(mintedLP2).sub(depositLPFees2))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2).sub(depositFeesLP2).add(LP3).sub(depositFeesLP3))
         // LP token amount
-        const AmountOfLPtoken = "0x" + web3.utils.padLeft(mintedLP2.toString('hex'), 64)
+        const AmountOfLPtoken = "0x" + web3.utils.padLeft(LP2.toString('hex'), 64)
         // send back LP token to swap contract
         await this.lpToken.transfer(this.swap.address, AmountOfLPtoken)
         // burn LP Token tx
@@ -285,21 +305,14 @@ contract('SwapContract', function (accounts) {
         await this.swap.recordOutcomingFloat(ZERO_ADDRESS, AmountOfLPtoken, txid4)
         await this.swap.burnLPTokensForFloat(txid4)
 
-        const AmountOfLPtoken2 = "0x" + web3.utils.padLeft(mintedLP1.toString('hex'), 64)
+        const AmountOfLPtoken2 = "0x" + web3.utils.padLeft(LP3.toString('hex'), 64)
         await this.lpToken.transfer(this.swap.address, AmountOfLPtoken2)
         // burn LP Token txs
         let txid5 = "0x5e4e5cb9809a29b9dac6714a8945b44c7840cc58c012a95984f33666a6ceed52"
         await this.swap.recordOutcomingFloat(ZERO_ADDRESS, AmountOfLPtoken2, txid5)
         await this.swap.burnLPTokensForFloat(txid5)
 
-        const price3 = await this.swap.getCurrentPriceLP()
-
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfBTC.sub(depositLPFees).sub(depositLPFees2))
-
-        const balacne = await this.wbtcTest.balanceOf(sender)
-        console.log(balacne.toString())
-        // const price3 = await this.swap.getCurrentPriceLP()
-        // console.log(price3.toString())
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).sub(depositFeesLP2).sub(depositFeesLP3))
     })
 
     it('withdraw WBTC float', async function () {
@@ -307,7 +320,7 @@ contract('SwapContract', function (accounts) {
         let floatAmountOfWBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
 
         // Send from TSS address
-        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfWBTC.mul(new BN('2')).toString('hex') + sender.slice(2), 64)
+        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfWBTC.mul(new BN('1')).toString('hex') + sender.slice(2), 64)
         let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
         // BTC == address(0)
         await this.swap.recordIncomingFloat(this.WBTC_ADDR, addressesAndAmountOfFloat, txid1)
@@ -315,23 +328,22 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid1)
 
         const price1 = await this.swap.getCurrentPriceLP()
-        const feesLP1 = floatAmountOfWBTC.mul(new BN('2')).mul(new BN(10).pow(new BN(8))).div(price1)
-        const depositFeesLP1 = feesLP1.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.add(floatAmountOfWBTC).sub(depositFeesLP1))
+        const LP1 = floatAmountOfWBTC.mul(new BN('1')).mul(new BN(10).pow(new BN(8))).div(price1)
+        const depositFeesLP1 = LP1.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
         // Send LP token to swap contract.
-        await this.lpToken.transfer(this.swap.address, floatAmountOfWBTC)
+        await this.lpToken.transfer(this.swap.address, LP1.sub(depositFeesLP1))
         // Send from TSS address
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         // BTC == address(0), floatAmountOfWBTC == amountOfLPtoken
-        let addressesAndAmountLPToken = "0x" + web3.utils.padLeft(floatAmountOfWBTC.sub(depositFeesLP1).toString('hex') + sender.slice(2), 64)
+        let addressesAndAmountLPToken = "0x" + web3.utils.padLeft(LP1.sub(depositFeesLP1).toString('hex') + sender.slice(2), 64)
 
         await this.wbtcTest.mint(this.swap.address, mintAmount)
 
         await this.swap.recordOutcomingFloat(this.WBTC_ADDR, addressesAndAmountLPToken, txid2)
         // Burn LP token
-        const price = await this.swap.getCurrentPriceLP()
         await this.swap.burnLPTokensForFloat(txid2)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal('0')
     })
 
     it('withdraw WBTC float after fees are collected', async function () {
@@ -346,9 +358,9 @@ contract('SwapContract', function (accounts) {
         // Mint LP token
         await this.swap.issueLPTokensForFloat(txid1)
         const price1 = await this.swap.getCurrentPriceLP()
-        const feesLP1 = floatAmountOfWBTC.mul(new BN('1')).mul(new BN(10).pow(new BN(8))).div(price1)
-        const depositFeesLP1 = feesLP1.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1))
+        const LP1 = floatAmountOfWBTC.mul(new BN('1')).mul(new BN(10).pow(new BN(8))).div(price1)
+        const depositFeesLP1 = LP1.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
 
         /**
         * Swap BTC -> 1WBTC executed, fees are 0.001 WBTC
@@ -366,9 +378,9 @@ contract('SwapContract', function (accounts) {
         // Get price of LP token -> 1.034 BTC/WBTC
         const price = await this.swap.getCurrentPriceLP()
         // Calculate amount of LP token
-        const mintedLP1 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price)
-        const depositFeesLP2 = mintedLP1.mul(new BN(30)).div(new BN(10000))
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1).add(mintedLP1))
+        const LP2 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price)
+        // const depositFeesLP2 = LP2.mul(new BN(30)).div(new BN(10000))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2))
 
         await this.wbtcTest.mint(this.swap.address, mintAmount)
 
@@ -379,10 +391,10 @@ contract('SwapContract', function (accounts) {
         await this.swap.issueLPTokensForFloat(txid3)
         // Get price of LP token -> 1.05128417 BTC/WBTC
         const price2 = await this.swap.getCurrentPriceLP()
-        const mintedLP2 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price2)
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1).add(mintedLP1).add(mintedLP2))
+        const LP3 = floatAmountOfWBTC.mul(new BN(10).pow(new BN(8))).div(price2)
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2).add(LP3))
         // LP token amount
-        const AmountOfLPtoken = "0x" + web3.utils.padLeft(mintedLP2.toString('hex'), 64)
+        const AmountOfLPtoken = "0x" + web3.utils.padLeft(LP3.toString('hex'), 64)
         // send back LP token to swap contract
         await this.lpToken.transfer(this.swap.address, AmountOfLPtoken)
         // burn LP Token tx
@@ -392,15 +404,14 @@ contract('SwapContract', function (accounts) {
 
         //console.log(record.receipt.gasUsed, burn.receipt.gasUsed)
 
-        const AmountOfLPtoken2 = "0x" + web3.utils.padLeft(mintedLP1.toString('hex'), 64)
+        const AmountOfLPtoken2 = "0x" + web3.utils.padLeft(LP2.toString('hex'), 64)
         await this.lpToken.transfer(this.swap.address, AmountOfLPtoken2)
         // burn LP Token txs
         let txid5 = "0x5e4e5cb9809a29b9dac6714a8945b44c7840cc58c012a95984f33666a6ceed52"
         await this.swap.recordOutcomingFloat(this.WBTC_ADDR, AmountOfLPtoken2, txid5)
         await this.swap.burnLPTokensForFloat(txid5)
 
-        const price3 = await this.swap.getCurrentPriceLP()
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(floatAmountOfWBTC.sub(depositFeesLP1))
+        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
     })
 
     it('updates churn address and stakes', async function () {
@@ -422,7 +433,7 @@ contract('SwapContract', function (accounts) {
         rewardAddressAndAmounts = []
         isRemoved = []
         for (i = 0; i < 100; i++) {
-            let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
+            let staked = new BN(2000000).mul(new BN(10).pow(new BN(18)))
             let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + receiver.slice(2), 64)
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
