@@ -10,8 +10,6 @@ contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
     address public WBTC_ADDR;
-    uint256 public DEFAULT_INDEX = 2**256 - 1;
-    bytes32[] public nodes;
 
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
@@ -21,8 +19,12 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private currentExchangeRate;
     address private lpToken;
     uint256 private lpDecimals;
+    uint256 private nodeSize;
 
-    uint256 private totalLPTokensForNode;
+    uint256 private nextMintLPTokensForNode;
+
+    bytes32[] public nodeList;
+    mapping(address => uint256) private nodeIndex;
 
     // Token address -> amount
     mapping(address => uint256) private totalRewards;
@@ -180,19 +182,20 @@ contract SwapContract is Ownable, ISwapContract {
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         uint256 depositFees;
-        if (isBTCOptimal()) {
+        uint8 isFlip = _checkFlips();
+        if (isFlip == 1) {
             depositFees = token == WBTC_ADDR
                 ? 0
                 : amountOfLP.mul(depositFeesBPS).div(10000);
-        } else {
+        } else if (isFlip == 2) {
             depositFees = token == address(0)
                 ? 0
                 : amountOfLP.mul(depositFeesBPS).div(10000);
         }
-        // Send LP tokens to LP
+        //Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
         // Update deposit fees
-        totalLPTokensForNode = totalLPTokensForNode.add(depositFees);
+        nextMintLPTokensForNode = nextMintLPTokensForNode.add(depositFees);
         // Add float amount
         _addFloat(token, amountOfFloat);
         used[_txid] = true;
@@ -254,25 +257,24 @@ contract SwapContract is Ownable, ISwapContract {
 
     function distributeNodeRewards() public override returns (bool) {
         // Reduce Gas
-        uint256 totalRewardLPsForNode = totalLPTokensForNode;
-        require(
-            totalRewardLPsForNode > 0,
-            "totalRewardLPsForNode is not positive"
-        );
+        uint256 rewardLPsForNode = nextMintLPTokensForNode;
+        require(rewardLPsForNode > 0, "totalRewardLPsForNode is not positive");
         uint256 totalStaked = 0;
-        for (uint256 i = 0; i < nodes.length; i++) {
-            totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
-        }
-        for (uint256 i = 0; i < nodes.length; i++) {
-            IBurnableToken(lpToken).mint(
-                address(uint160(uint256(nodes[i]))),
-                totalRewardLPsForNode
-                    .mul(uint256(uint96(bytes12(nodes[i]))))
-                    .div(totalStaked)
+        for (uint256 i = 0; i < nodeList.length; i++) {
+            totalStaked = totalStaked.add(
+                uint256(uint96(bytes12(nodeList[i])))
             );
         }
-        totalLPTokensForNode = 0;
-        emit DistributeNodeRewards(totalRewardLPsForNode);
+        for (uint256 i = 0; i < nodeList.length; i++) {
+            IBurnableToken(lpToken).mint(
+                address(uint160(uint256(nodeList[i]))),
+                rewardLPsForNode.mul(uint256(uint96(bytes12(nodeList[i])))).div(
+                    totalStaked
+                )
+            );
+        }
+        nextMintLPTokensForNode = 0;
+        emit DistributeNodeRewards(nextMintLPTokensForNode);
         return true;
     }
 
@@ -291,16 +293,18 @@ contract SwapContract is Ownable, ISwapContract {
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
             (address newNode, ) = _splitToStakes(_rewardAddressAndAmounts[i]);
-            uint256 index = _checkMatch(newNode);
-            if (index != DEFAULT_INDEX && !_isRemoved[i]) {
-                // Update stakes
-                nodes[index] = _rewardAddressAndAmounts[i];
-            } else if (index != DEFAULT_INDEX && _isRemoved[i]) {
-                // Removed stakes
-                delete (nodes[index]);
-            } else {
+            uint256 index = nodeIndex[newNode];
+            if (_isRemoved[i] && index != 0) {
+                // Remove stakes
+                delete (nodeList[index]);
+                delete (nodeIndex[newNode]);
+            } else if (!_isRemoved[i] && index == 0) {
                 // Add stakes
-                nodes.push(_rewardAddressAndAmounts[i]);
+                nodeIndex[newNode] = nodeList.length.add(1);
+                nodeList[nodeList.length.add(1)] = _rewardAddressAndAmounts[i];
+            } else if (!_isRemoved[i] && index != 0) {
+                // Update stakes
+                nodeList[index] = _rewardAddressAndAmounts[i];
             }
         }
 
@@ -318,18 +322,6 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
-    function isBTCOptimal() public view returns (bool isTrue) {
-        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
-            address(0),
-            WBTC_ADDR
-        );
-        // BTC bal == BTC float + WBTC float - WBTC bal
-        uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
-        require(reserveA.add(reserveB) >= balWBTC, "balWBTC amount invalid");
-        isTrue = reserveA.add(reserveB).sub(balWBTC) > balWBTC ? true : false;
-        return isTrue;
-    }
-
     /**
      * @dev returns reserves - deposit fees.
      */
@@ -343,6 +335,24 @@ contract SwapContract is Ownable, ISwapContract {
             floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
             floatAmountOf[_tokenB].add(totalRewards[_tokenB])
         );
+    }
+
+    function _checkFlips() public view returns (uint8 way) {
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            WBTC_ADDR
+        );
+        // BTC bal == BTC float + WBTC float - WBTC bal
+        uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
+        require(reserveA.add(reserveB) >= balWBTC, "balWBTC amount invalid");
+        if (reserveA.add(reserveB).sub(balWBTC) > balWBTC) {
+            way = 1;
+        } else if (reserveA.add(reserveB).sub(balWBTC) < balWBTC) {
+            way = 2;
+        } else {
+            way = 0;
+        }
+        return way;
     }
 
     function _updateFloatPool(address _tokenA, address _tokenB)
@@ -359,7 +369,7 @@ contract SwapContract is Ownable, ISwapContract {
         currentExchangeRate = totalLPs == 0
             ? currentExchangeRate
             : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.sub(totalLPTokensForNode)
+                totalLPs.add(nextMintLPTokensForNode)
             );
         return currentExchangeRate;
     }
@@ -375,14 +385,14 @@ contract SwapContract is Ownable, ISwapContract {
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
         internal
     {
+        totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
         uint256 amountForLP = _rewardsAmount.mul(nodeRewardsRatio).div(100);
-        totalRewards[_token] = totalRewards[_token].add(amountForLP);
-        // Mint LP tokens
+        // Future mint LP tokens 66% of fees
         uint256 amountLPForNode = _rewardsAmount
             .sub(amountForLP)
             .mul(priceDecimals)
             .div(getCurrentPriceLP());
-        totalLPTokensForNode = totalLPTokensForNode.add(amountLPForNode);
+        nextMintLPTokensForNode = nextMintLPTokensForNode.add(amountLPForNode);
     }
 
     function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
@@ -393,16 +403,6 @@ contract SwapContract is Ownable, ISwapContract {
             return (WBTC_ADDR, txs[WBTC_ADDR][_txid]);
         }
         return (address(0x0), 0x0);
-    }
-
-    function _checkMatch(address _node) internal view returns (uint256) {
-        for (uint256 i = 0; i < nodes.length; i++) {
-            (address node, ) = _splitToStakes(nodes[i]);
-            if (node == _node) {
-                return i;
-            }
-        }
-        return DEFAULT_INDEX;
     }
 
     function _splitToStakes(bytes32 _data)
