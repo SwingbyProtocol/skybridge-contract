@@ -130,7 +130,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas usage 88888 gas (initial), 58888 gas (update)
+     * @dev gas usage 90736 gas (initial), 58888 gas (update)
      */
 
     function collectSwapFeesForBTC(
@@ -165,7 +165,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas usage 131162 gas
+     * @dev gas usage 183033 gas
      */
 
     function issueLPTokensForFloat(bytes32 _txid)
@@ -183,7 +183,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         uint256 depositFees = 0;
-        uint8 isFlip = _checkFlips();
+        uint8 isFlip = _checkFlips(token, amountOfFloat);
         if (isFlip == 1) {
             depositFees = token == WBTC_ADDR
                 ? amountOfLP.mul(depositFeesBPS).div(10000)
@@ -221,7 +221,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas uasge 82241 gas
+     * @dev gas uasge 63677 gas
      */
     function burnLPTokensForFloat(bytes32 _txid)
         public
@@ -243,7 +243,7 @@ contract SwapContract is Ownable, ISwapContract {
             floatAmountOf[token] >= amountOfFloat,
             "Pool balance insufficient."
         );
-        // WBTC transfer if token address is WBTC
+        // WBTC transfer if token address is WBTC_ADDR
         if (token == WBTC_ADDR) {
             require(IERC20(token).transfer(to, amountOfFloat));
         }
@@ -336,11 +336,20 @@ contract SwapContract is Ownable, ISwapContract {
         return floatBalanceOf[_token][_user];
     }
 
-    function _checkFlips() public view returns (uint8 active) {
+    function _checkFlips(address _token, uint256 _amountOfFloat)
+        public
+        view
+        returns (uint8 active)
+    {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
             WBTC_ADDR
         );
+        if (_token == address(0)) {
+            reserveA = reserveA.add(_amountOfFloat);
+        } else if (_token == WBTC_ADDR) {
+            reserveB = reserveB.add(_amountOfFloat);
+        }
         // BTC bal == BTC float + WBTC float - WBTC bal
         uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
         uint256 balBTC = reserveA.add(reserveB).sub(balWBTC);
