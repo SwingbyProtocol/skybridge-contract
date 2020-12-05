@@ -182,12 +182,16 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
-        uint256 depositFees = amountOfLP.mul(depositFeesBPS).div(10000);
+        uint256 depositFees = 0;
         uint8 isFlip = _checkFlips();
         if (isFlip == 1) {
-            depositFees = token == WBTC_ADDR ? 0 : depositFees;
+            depositFees = token == WBTC_ADDR
+                ? amountOfLP.mul(depositFeesBPS).div(10000)
+                : 0;
         } else if (isFlip == 2) {
-            depositFees = token == address(0) ? 0 : depositFees;
+            depositFees = token == address(0)
+                ? amountOfLP.mul(depositFeesBPS).div(10000)
+                : 0;
         }
         //Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
@@ -332,22 +336,23 @@ contract SwapContract is Ownable, ISwapContract {
         return floatBalanceOf[_token][_user];
     }
 
-    function _checkFlips() public view returns (uint8 way) {
+    function _checkFlips() public view returns (uint8 active) {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
             WBTC_ADDR
         );
         // BTC bal == BTC float + WBTC float - WBTC bal
         uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
+        uint256 balBTC = reserveA.add(reserveB).sub(balWBTC);
         require(reserveA.add(reserveB) >= balWBTC, "balWBTC amount invalid");
-        if (reserveA.add(reserveB).sub(balWBTC) > balWBTC) {
-            way = 1;
-        } else if (reserveA.add(reserveB).sub(balWBTC) < balWBTC) {
-            way = 2;
+        if (balBTC <= reserveA.add(reserveB).div(3)) {
+            active = 1; // BTC float insufficient
+        } else if (balWBTC <= reserveA.add(reserveB).div(3)) {
+            active = 2; // WBTC float insufficient
         } else {
-            way = 0;
+            active = 0; // zero fees
         }
-        return way;
+        return active;
     }
 
     function _updateFloatPool(address _tokenA, address _tokenB)
@@ -424,7 +429,7 @@ contract SwapContract is Ownable, ISwapContract {
             uint256 index = nodeIndex[node];
             if (index != 2**256 - 1) {
                 _nodes[count] = nodes[i];
-                count++;
+                count = count.add(1);
             }
         }
         return _nodes;
