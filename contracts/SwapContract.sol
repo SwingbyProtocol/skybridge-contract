@@ -282,7 +282,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas usage 4599585 gas (initial cost), 733785 gas (update cost) for 100 nodes
+     * @dev gas usage 4599585 gas (initial cost), 733763 gas (update cost) for 100 nodes
      */
 
     function churn(

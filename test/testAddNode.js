@@ -45,7 +45,7 @@ contract('SwapContract', function (accounts) {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
-        console.log(tx1.receipt.cumulativeGasUsed)
+        // console.log(tx1.receipt.cumulativeGasUsed)
 
         rewardAddressAndAmounts = []
         isRemoved = []
@@ -61,7 +61,7 @@ contract('SwapContract', function (accounts) {
             gasPrice: 2 * 10 ** 6
         })
 
-        console.log(tx2.receipt.cumulativeGasUsed)
+        // console.log(tx2.receipt.cumulativeGasUsed)
 
         rewardAddressAndAmounts = []
         isRemoved = []
@@ -77,9 +77,11 @@ contract('SwapContract', function (accounts) {
             gasPrice: 2 * 10 ** 6
         })
 
-        const dist = await this.swap.distributeNodeRewards()
-
-        console.log(dist.receipt.cumulativeGasUsed)
+        await expectRevert(
+            this.swap.distributeNodeRewards(),
+            'totalRewardLPsForNode is not positive',
+        );
+        // console.log(dist.receipt.cumulativeGasUsed)
     })
 
 
