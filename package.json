@@ -23,6 +23,7 @@
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
     "@openzeppelin/contracts": "^3.3.0-rc.1",
     "@openzeppelin/test-helpers": "^0.5.9",
+    "@truffle/hdwallet-provider": "^1.2.0",
     "chai": "^4.2.0"
   }
 }
