@@ -1,11 +1,14 @@
 const SwapContract = artifacts.require("SwapContract");
 const LPToken = artifacts.require("LPToken");
 
-const WBTC_ADDR = "Sample token address"
+let WBTC_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
 
 module.exports = async function (deployer, net) {
   if (net == "deployment") {
     return
+  }
+  if (net == "goerli") {
+    WBTC_ADDR = "0xEb47a21C1fC00D1E863019906df1771b80DBE182"
   }
   await deployer.deploy(LPToken)
   const lpToken = await LPToken.deployed()

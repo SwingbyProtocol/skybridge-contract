@@ -10,19 +10,20 @@ contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
     address public WBTC_ADDR;
+    address public lpToken;
 
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
+    
+    uint256 public nextMintLPTokensForNode;
 
     uint256 private priceDecimals;
     uint256 private currentExchangeRate;
-    address private lpToken;
     uint256 private lpDecimals;
     uint256 private nodeSize;
     uint256 private nodeRemoved;
 
-    uint256 private nextMintLPTokensForNode;
 
     // Nodes
     mapping(uint256 => bytes32) private nodes;
