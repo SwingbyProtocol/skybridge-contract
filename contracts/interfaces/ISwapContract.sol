@@ -60,4 +60,8 @@ interface ISwapContract {
     function getFloatReserve(address _tokenA, address _tokenB)
         external
         returns (uint256 reserveA, uint256 reserveB);
+
+    function getFloatBalanceOf(address _token, address _user)
+        external
+        returns (uint256);
 }
