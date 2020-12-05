@@ -15,7 +15,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public churnedInCount;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
-    
+
     uint256 public nextMintLPTokensForNode;
 
     uint256 private priceDecimals;
@@ -23,7 +23,6 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private lpDecimals;
     uint256 private nodeSize;
     uint256 private nodeRemoved;
-
 
     // Nodes
     mapping(uint256 => bytes32) private nodes;
