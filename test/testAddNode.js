@@ -30,6 +30,11 @@ contract('SwapContract', function (accounts) {
         expect(await this.lpToken.owner()).to.equal(this.swap.address)
     })
 
+    it('check float balances', async function() {
+        const bal = await this.swap.getFloatBalanceOf(this.wbtcTest.address, sender)
+        expect(bal).to.bignumber.equal('0')
+    })
+
     it('add 100 nodes into swap contract', async function () {
         let rewardAddressAndAmounts = []
         let isRemoved = []
