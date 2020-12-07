@@ -176,7 +176,9 @@ contract SwapContract is Ownable, ISwapContract {
         require(!isTxUsed(_txid), "The txid is already used");
         (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
+        // Define target address which is recorded bottom 20bytes on tx data
         address to = address(uint160(uint256(transaction)));
+                // Define amountLP which is recorded top 12bytes on tx data
         uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
         // LP token price per BTC/WBTC changed
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
@@ -232,7 +234,9 @@ contract SwapContract is Ownable, ISwapContract {
         // _token should be address(0) or WBTC_ADDR
         (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
+        // Define target address which is recorded bottom 20bytes on tx data
         address to = address(uint160(uint256(transaction)));
+        // Define amountLP which is recorded top 12bytes on tx data
         uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
         // Calculate amountOfLP
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
