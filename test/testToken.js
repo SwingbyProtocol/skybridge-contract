@@ -6,7 +6,7 @@ const LPToken = artifacts.require('LPToken');
 
 contract('LPToken', function (accounts) {
     const [sender, receiver] = accounts
-    const name = 'BTC-LP token test';
+    const name = 'BTC-LP Test token';
     const symbol = 'BTC-LP test';
 
     beforeEach(async function () {

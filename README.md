@@ -7,7 +7,7 @@
 - web3 - v1.2.9
 
 ## Test 
-You have to start testrpc with `8545` port before doing test
+You have to start testrpc with 100 accounts and binding port `8545` before doing test
 ```
 $ npm run test
 or 
