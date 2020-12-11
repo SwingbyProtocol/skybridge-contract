@@ -26,7 +26,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     
     - name: Download go-ethereum
-      run: git clone https://github.com/ethereum/go-ethereum /tmp/go-ethereum && go install /tmp/go-ethereum/cmd/abigen
+      run: git clone https://github.com/ethereum/go-ethereum /tmp/go-ethereum && cd /tmp/go-ethereum && go install ./cmd/abigen
 
     - name: Run truffle compile
       run: npm install && npm run compile
