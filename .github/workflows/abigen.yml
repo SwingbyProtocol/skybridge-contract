@@ -1,0 +1,50 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: bahmutov/npm-install@v1
+
+    - name: Usep Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    
+    - name: Download go-ethereum
+      run: go get github.com/ethereum/go-ethereum
+    
+    - name: Istall go-ethereum
+      run: cd $GOPATH/src/github.com/ethereum/go-ethereum && go install ./cmd/abigen
+
+    - name: Run truffle compile
+      run: npm install && npm run compile
+
+    - name: Run abigen:
+      run: npm run gen-go
+      
+    - name: Commit files
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        git checkout master
+        git add .
+        git commit -m "Auto build" -a
+        git push origin HEAD
