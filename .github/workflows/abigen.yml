@@ -41,7 +41,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-        git checkout master
+        git checkout main
         git add .
         git commit -m "Auto build" -a
         git push origin HEAD
