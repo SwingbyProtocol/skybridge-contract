@@ -34,7 +34,7 @@ jobs:
     - name: Run truffle compile
       run: npm install && npm run compile
 
-    - name: Run abigen:
+    - name: Run abigen
       run: npm run gen-go
       
     - name: Commit files
