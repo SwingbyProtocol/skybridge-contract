@@ -69,7 +69,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Set nodeRewardsRatio
         nodeRewardsRatio = 66;
         // Set depositFeesBPS
-        depositFeesBPS = 30;
+        depositFeesBPS = 20;
         // Set priceDecimals
         priceDecimals = 10**8;
         // Set currentExchangeRate
@@ -184,17 +184,11 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
-        uint256 depositFees = 0;
-        uint8 isFlip = _checkFlips(token, amountOfFloat);
-        if (isFlip == 1) {
-            depositFees = token == WBTC_ADDR
-                ? amountOfLP.mul(depositFeesBPS).div(10000)
-                : 0;
-        } else if (isFlip == 2) {
-            depositFees = token == address(0)
-                ? amountOfLP.mul(depositFeesBPS).div(10000)
-                : 0;
-        }
+        uint256 depositFeeRate = getDepositFeeRate(token, amountOfFloat);
+        uint256 depositFees = depositFeeRate != 0
+            ? amountOfLP.mul(depositFeeRate).div(10000)
+            : 0;
+
         //Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
         // Update deposit fees
@@ -316,8 +310,22 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
+    function getDepositFeeRate(address _token, uint256 _amountOfFloat)
+        public
+        override
+        view
+        returns (uint256 depositFeeRate)
+    {
+        uint8 isFlip = _checkFlips(_token, _amountOfFloat);
+        if (isFlip == 1) {
+            depositFeeRate = _token == WBTC_ADDR ? depositFeesBPS : 0;
+        } else if (isFlip == 2) {
+            depositFeeRate = _token == address(0) ? depositFeesBPS : 0;
+        }
+    }
+
     /**
-     * @dev returns reserves - deposit fees.
+     * @dev returns float amounts not balances.
      */
     function getFloatReserve(address _tokenA, address _tokenB)
         public
@@ -341,7 +349,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     function _checkFlips(address _token, uint256 _amountOfFloat)
-        public
+        internal
         view
         returns (uint8 active)
     {
