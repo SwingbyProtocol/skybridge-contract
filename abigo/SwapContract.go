@@ -371,6 +371,9 @@ func (_SwapContract *SwapContractCaller) GetFloatReserve(opts *bind.CallOpts, _t
 		ReserveA *big.Int
 		ReserveB *big.Int
 	})
+	if err != nil {
+		return *outstruct, err
+	}
 
 	outstruct.ReserveA = out[0].(*big.Int)
 	outstruct.ReserveB = out[1].(*big.Int)
