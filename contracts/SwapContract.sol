@@ -158,23 +158,27 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _addressesAndAmountOfFloat,
         bytes32 _txid
     ) public override onlyOwner returns (bool) {
-        require(txs[_token][_txid] == 0x0);
-        txs[_token][_txid] = _addressesAndAmountOfFloat;
-        emit RecordIncomingFloat(_token, _addressesAndAmountOfFloat, _txid);
+        // require(txs[_token][_txid] == 0x0);
+        // txs[_token][_txid] = _addressesAndAmountOfFloat;
+        // emit RecordIncomingFloat(_token, _addressesAndAmountOfFloat, _txid);
+        require(
+            _issueLPTokensForFloat(_token, _addressesAndAmountOfFloat, _txid)
+        );
         return true;
     }
+
 
     /**
      * @dev gas usage 183033 gas
      */
 
-    function issueLPTokensForFloat(bytes32 _txid)
-        public
-        override
-        returns (bool)
-    {
+    function _issueLPTokensForFloat(
+        address token,
+        bytes32 transaction,
+        bytes32 _txid
+    ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        (address token, bytes32 transaction) = _loadTx(_txid);
+        // (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
         // Define target address which is recorded bottom 20bytes on tx data
         address to = address(uint160(uint256(transaction)));
@@ -209,24 +213,27 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _addressesAndAmountOfLPtoken,
         bytes32 _txid
     ) public override returns (bool) {
-        require(txs[_token][_txid] == 0x0);
+        // require(txs[_token][_txid] == 0x0);
         // _token should be address(0) or WBTC_ADDR, txid should be unique
-        txs[_token][_txid] = _addressesAndAmountOfLPtoken;
-        emit RecordOutcomingFloat(_token, _addressesAndAmountOfLPtoken, _txid);
+        // txs[_token][_txid] = _addressesAndAmountOfLPtoken;
+        // emit RecordOutcomingFloat(_token, _addressesAndAmountOfLPtoken, _txid);
+        require(
+            _burnLPTokensForFloat(_token, _addressesAndAmountOfLPtoken, _txid)
+        );
         return true;
     }
 
     /**
      * @dev gas uasge 63677 gas
      */
-    function burnLPTokensForFloat(bytes32 _txid)
-        public
-        override
-        returns (bool)
-    {
+    function _burnLPTokensForFloat(
+        address token,
+        bytes32 transaction,
+        bytes32 _txid
+    ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
         // _token should be address(0) or WBTC_ADDR
-        (address token, bytes32 transaction) = _loadTx(_txid);
+        // (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
         // Define target address which is recorded bottom 20bytes on tx data
         address to = address(uint160(uint256(transaction)));
