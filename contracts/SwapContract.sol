@@ -86,17 +86,20 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         address _to,
         uint256 _amount,
-        uint256 _rewardsAmount
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
     ) public override onlyOwner returns (bool) {
         require(IERC20(_token).transfer(_to, _amount));
         _rewardsCollection(_token, _rewardsAmount);
+        _addTxidUsed(_redeemedFloatTxIds);
         return true;
     }
 
     function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
-        uint256 _rewardsAmount
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
     ) public override onlyOwner returns (bool) {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
@@ -109,6 +112,7 @@ contract SwapContract is Ownable, ISwapContract {
             );
         }
         _rewardsCollection(_token, _rewardsAmount);
+        _addTxidUsed(_redeemedFloatTxIds);
         return true;
     }
 
@@ -116,7 +120,8 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         address[] memory _contributors,
         uint256[] memory _amounts,
-        uint256 _rewardsAmount
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
     ) public override onlyOwner returns (bool) {
         require(
             _contributors.length == _amounts.length,
@@ -126,6 +131,7 @@ contract SwapContract is Ownable, ISwapContract {
             require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
         _rewardsCollection(_token, _rewardsAmount);
+        _addTxidUsed(_redeemedFloatTxIds);
         return true;
     }
 
@@ -168,42 +174,6 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas usage 183033 gas
-     */
-
-    function _issueLPTokensForFloat(
-        address token,
-        bytes32 transaction,
-        bytes32 _txid
-    ) internal returns (bool) {
-        require(!isTxUsed(_txid), "The txid is already used");
-        // (address token, bytes32 transaction) = _loadTx(_txid);
-        require(transaction != 0x0, "The transaction is not found");
-        // Define target address which is recorded bottom 20bytes on tx data
-        address to = address(uint160(uint256(transaction)));
-        // Define amountLP which is recorded top 12bytes on tx data
-        uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
-        // LP token price per BTC/WBTC changed
-        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
-        // Calculate amount of LP token
-        uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
-        uint256 depositFeeRate = getDepositFeeRate(token, amountOfFloat);
-        uint256 depositFees = depositFeeRate != 0
-            ? amountOfLP.mul(depositFeeRate).div(10000)
-            : 0;
-
-        //Send LP tokens to LP
-        IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
-        // Update deposit fees
-        nextMintLPTokensForNode = nextMintLPTokensForNode.add(depositFees);
-        // Add float amount
-        _addFloat(token, to, amountOfFloat);
-        used[_txid] = true;
-        emit IssueLPTokensForFloat(to, amountOfLP, _txid);
-        return true;
-    }
-
-    /**
      * @dev gas uasge 43628 gas
      */
 
@@ -219,44 +189,6 @@ contract SwapContract is Ownable, ISwapContract {
         require(
             _burnLPTokensForFloat(_token, _addressesAndAmountOfLPtoken, _txid)
         );
-        return true;
-    }
-
-    /**
-     * @dev gas uasge 63677 gas
-     */
-    function _burnLPTokensForFloat(
-        address token,
-        bytes32 transaction,
-        bytes32 _txid
-    ) internal returns (bool) {
-        require(!isTxUsed(_txid), "The txid is already used");
-        // _token should be address(0) or WBTC_ADDR
-        // (address token, bytes32 transaction) = _loadTx(_txid);
-        require(transaction != 0x0, "The transaction is not found");
-        // Define target address which is recorded bottom 20bytes on tx data
-        address to = address(uint160(uint256(transaction)));
-        // Define amountLP which is recorded top 12bytes on tx data
-        uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
-        // Calculate amountOfLP
-        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
-        // Calculate amountOfFloat
-        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
-
-        require(
-            floatAmountOf[token] >= amountOfFloat,
-            "Pool balance insufficient."
-        );
-        // WBTC transfer if token address is WBTC_ADDR
-        if (token == WBTC_ADDR) {
-            require(IERC20(token).transfer(to, amountOfFloat));
-        }
-        // Burn LP tokens
-        require(IBurnableToken(lpToken).burn(amountOfLP));
-        // Remove float amount
-        _removeFloat(token, to, amountOfFloat);
-        used[_txid] = true;
-        emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
         return true;
     }
 
@@ -354,6 +286,79 @@ contract SwapContract is Ownable, ISwapContract {
         return floatBalanceOf[_token][_user];
     }
 
+    /**
+     * @dev gas usage 183033 gas
+     */
+    function _issueLPTokensForFloat(
+        address token,
+        bytes32 transaction,
+        bytes32 _txid
+    ) internal returns (bool) {
+        require(!isTxUsed(_txid), "The txid is already used");
+        // (address token, bytes32 transaction) = _loadTx(_txid);
+        require(transaction != 0x0, "The transaction is not found");
+        // Define target address which is recorded bottom 20bytes on tx data
+        address to = address(uint160(uint256(transaction)));
+        // Define amountLP which is recorded top 12bytes on tx data
+        uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
+        // LP token price per BTC/WBTC changed
+        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
+        // Calculate amount of LP token
+        uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
+        uint256 depositFeeRate = getDepositFeeRate(token, amountOfFloat);
+        uint256 depositFees = depositFeeRate != 0
+            ? amountOfLP.mul(depositFeeRate).div(10000)
+            : 0;
+
+        //Send LP tokens to LP
+        IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
+        // Update deposit fees
+        nextMintLPTokensForNode = nextMintLPTokensForNode.add(depositFees);
+        // Add float amount
+        _addFloat(token, to, amountOfFloat);
+        used[_txid] = true;
+        emit IssueLPTokensForFloat(to, amountOfLP, _txid);
+        return true;
+    }
+
+    /**
+     * @dev gas uasge 63677 gas
+     */
+    function _burnLPTokensForFloat(
+        address token,
+        bytes32 transaction,
+        bytes32 _txid
+    ) internal returns (bool) {
+        require(!isTxUsed(_txid), "The txid is already used");
+        // _token should be address(0) or WBTC_ADDR
+        // (address token, bytes32 transaction) = _loadTx(_txid);
+        require(transaction != 0x0, "The transaction is not found");
+        // Define target address which is recorded bottom 20bytes on tx data
+        address to = address(uint160(uint256(transaction)));
+        // Define amountLP which is recorded top 12bytes on tx data
+        uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
+        // Calculate amountOfLP
+        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
+        // Calculate amountOfFloat
+        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
+
+        require(
+            floatAmountOf[token] >= amountOfFloat,
+            "Pool balance insufficient."
+        );
+        // WBTC transfer if token address is WBTC_ADDR
+        if (token == WBTC_ADDR) {
+            require(IERC20(token).transfer(to, amountOfFloat));
+        }
+        // Burn LP tokens
+        require(IBurnableToken(lpToken).burn(amountOfLP));
+        // Remove float amount
+        _removeFloat(token, to, amountOfFloat);
+        used[_txid] = true;
+        emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
+        return true;
+    }
+
     function _checkFlips(address _token, uint256 _amountOfFloat)
         internal
         view
@@ -446,6 +451,12 @@ contract SwapContract is Ownable, ISwapContract {
             return (WBTC_ADDR, txs[WBTC_ADDR][_txid]);
         }
         return (address(0x0), 0x0);
+    }
+
+    function _addTxidUsed(bytes32[] memory _txs) internal {
+        for (uint256 i = 0; i < _txs.length; i++) {
+            used[_txs[i]] = true;
+        }
     }
 
     function _loadNodes() internal view returns (bytes32[] memory) {
