@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = constants;
 const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
 
-contract('SwapContract', function (accounts) {
+contract('Test for swap actions', function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {

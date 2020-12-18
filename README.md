@@ -7,7 +7,7 @@
 - web3 - v1.2.9
 
 ## Deploy contract
-There are 2 steps to setup contracts on the ethereum network.
+There are 2 steps to setup contracts on the ethereum testnet.
 1. Deploy SwapContract and LP token contract
 ```
 $ export SEED=<your mnemonic key>
