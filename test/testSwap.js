@@ -24,6 +24,11 @@ contract('Test for swap actions', function (accounts) {
 
         this.depositFeesBPS = new BN(20)
 
+        this.redeemedFloatTxIds = [
+            "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
+            "0xce66450451e62b9b4c406d0a83b90a5036039673d2682d4ec292f375ae571382"
+        ]
+
         await this.lpToken.transferOwnership(this.swap.address)
     });
 
@@ -50,7 +55,7 @@ contract('Test for swap actions', function (accounts) {
         const txs = [
             senbackTokens1, senbackTokens2
         ]
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, txs, rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, txs, rewardsAmount, this.redeemedFloatTxIds)
         expect(await this.wbtcTest.balanceOf(this.swap.address)).to.bignumber.equal(new BN("0"))
         expect(await this.wbtcTest.balanceOf(sender)).to.bignumber.equal(amount2)
         expect(await this.wbtcTest.balanceOf(receiver)).to.bignumber.equal(amount3)
@@ -121,7 +126,7 @@ contract('Test for swap actions', function (accounts) {
         let senbackTokens1 = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.001 WBTC)
         let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [senbackTokens1], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [senbackTokens1], rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid2)
@@ -137,7 +142,7 @@ contract('Test for swap actions', function (accounts) {
         // mint again
         await this.wbtcTest.mint(this.swap.address, mintAmount)
 
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [senbackTokens1], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [senbackTokens1], rewardsAmount, this.redeemedFloatTxIds)
         // Third deposit tx
         let txid3 = "0xbceaa7c52bcb637ddbb7dab980ec8e015f259b3aa4f8b4c4115fd1bcb4a5779c"
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid3)
@@ -190,7 +195,8 @@ contract('Test for swap actions', function (accounts) {
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.001 WBTC)
         let rewardsAmount = "0x" + web3.utils.padLeft(new BN(1).mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [swapTx], rewardsAmount)
+
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [swapTx], rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, txid2)
@@ -205,8 +211,12 @@ contract('Test for swap actions', function (accounts) {
 
         // mint again
         await this.wbtcTest.mint(this.swap.address, mintAmount)
+        let redeemedFloatTxIds = [
+            "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
+            "0xce66450451e62b9b4c406d0a83b90a5036039673d2682d4ec292f375ae571382"
+        ]
 
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [swapTx], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, [swapTx], rewardsAmount, this.redeemedFloatTxIds)
         // Third deposit tx
         let txid3 = "0xbceaa7c52bcb637ddbb7dab980ec8e015f259b3aa4f8b4c4115fd1bcb4a5779c"
         await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, txid3)
@@ -273,7 +283,7 @@ contract('Test for swap actions', function (accounts) {
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.1 WBTC)
         let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid2)
@@ -288,7 +298,7 @@ contract('Test for swap actions', function (accounts) {
 
         await this.wbtcTest.mint(this.swap.address, mintAmount)
 
-        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount, this.redeemedFloatTxIds)
         // Third deposit tx
         let txid3 = "0xbceaa7c52bcb637ddbb7dab980ec8e015f259b3aa4f8b4c4115fd1bcb4a5779c"
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, txid3)
@@ -346,9 +356,9 @@ contract('Test for swap actions', function (accounts) {
         await this.swap.recordOutcomingFloat(this.WBTC_ADDR, addressesAndAmountLPToken, txid2)
         // Burn LP token
         const tx = // await this.swap.burnLPTokensForFloat(txid2)
-        // console.log(tx.receipt.gasUsed)
+            // console.log(tx.receipt.gasUsed)
 
-        expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal('0')
+            expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal('0')
     })
 
     it('withdraw WBTC float after fees are collected', async function () {
@@ -375,7 +385,7 @@ contract('Test for swap actions', function (accounts) {
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.1 WBTC)
         let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(6))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
         await this.swap.recordIncomingFloat(this.WBTC_ADDR, addressesAndAmountOfFloat, txid2)
@@ -389,7 +399,7 @@ contract('Test for swap actions', function (accounts) {
 
         await this.wbtcTest.mint(this.swap.address, mintAmount)
 
-        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount)
+        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], rewardsAmount, this.redeemedFloatTxIds)
         // Third deposit tx
         let txid3 = "0xbceaa7c52bcb637ddbb7dab980ec8e015f259b3aa4f8b4c4115fd1bcb4a5779c"
         await this.swap.recordIncomingFloat(this.WBTC_ADDR, addressesAndAmountOfFloat, txid3)
