@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "build": "npm run compile && truffle run abigen && npm run test",
     "test": "truffle test",
     "compile": "truffle compile",
     "gen-go": "node scripts/generateGoBindings.js"
@@ -16,7 +17,7 @@
     "url": "git+https://github.com/SwingbyProtocol/skybridge-contract.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "See LICENSE file",
   "bugs": {
     "url": "https://github.com/SwingbyProtocol/skybridge-contract/issues"
   },
