@@ -43,5 +43,5 @@ jobs:
         git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
         git checkout main
         git add .
-        git commit -m "Auto build" -a
+        git commit -m "Auto build" -a || echo "No files to commit"
         git push origin HEAD
