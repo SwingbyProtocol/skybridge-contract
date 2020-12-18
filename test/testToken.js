@@ -6,8 +6,8 @@ const LPToken = artifacts.require('LPToken');
 
 contract('LPToken', function (accounts) {
     const [sender, receiver] = accounts
-    const name = 'BTC-LP Test token';
-    const symbol = 'BTC-LP test';
+    const name = 'Swingby BTC-LP Token';
+    const symbol = 'sbBTC';
 
     beforeEach(async function () {
         // The bundled BN library is the same one web3 uses under the hood

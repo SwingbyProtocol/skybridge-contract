@@ -167,7 +167,6 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-
     /**
      * @dev gas usage 183033 gas
      */

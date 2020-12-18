@@ -10,10 +10,10 @@ contract SwapContractFactory {
         address _lpToken,
         address _wbtc
     ) public returns (address) {
-        SwapContract wallet = new SwapContract(_lpToken, _wbtc);
-        wallet.transferOwnership(_owner);
-        emit Deployed(address(wallet));
-        return address(wallet);
+        SwapContract sc = new SwapContract(_lpToken, _wbtc);
+        sc.transferOwnership(_owner);
+        emit Deployed(address(sc));
+        return address(sc);
     }
 
     // The contract doesn't allow receiving Ether.

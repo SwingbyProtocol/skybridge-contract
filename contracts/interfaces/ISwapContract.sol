@@ -57,7 +57,10 @@ interface ISwapContract {
 
     function getCurrentPriceLP() external view returns (uint256);
 
-    function getDepositFeeRate(address _token, uint256 _amountOfFloat) external view returns (uint256);
+    function getDepositFeeRate(address _token, uint256 _amountOfFloat)
+        external
+        view
+        returns (uint256);
 
     function getFloatReserve(address _tokenA, address _tokenB)
         external
