@@ -27,7 +27,7 @@ var (
 )
 
 // SwapContractFactoryABI is the input ABI used to generate the binding from.
-const SwapContractFactoryABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"wallet\",\"type\":\"address\"}],\"name\":\"Deployed\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wbtc\",\"type\":\"address\"}],\"name\":\"deployNewWallet\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const SwapContractFactoryABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"lpToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"swapContract\",\"type\":\"address\"}],\"name\":\"Deployed\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wbtc\",\"type\":\"address\"}],\"name\":\"deployNewContracts\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // SwapContractFactory is an auto generated Go binding around an Ethereum contract.
 type SwapContractFactory struct {
@@ -171,25 +171,25 @@ func (_SwapContractFactory *SwapContractFactoryTransactorRaw) Transact(opts *bin
 	return _SwapContractFactory.Contract.contract.Transact(opts, method, params...)
 }
 
-// DeployNewWallet is a paid mutator transaction binding the contract method 0x4aced83c.
+// DeployNewContracts is a paid mutator transaction binding the contract method 0xd5959ac4.
 //
-// Solidity: function deployNewWallet(address _owner, address _lpToken, address _wbtc) returns(address)
-func (_SwapContractFactory *SwapContractFactoryTransactor) DeployNewWallet(opts *bind.TransactOpts, _owner common.Address, _lpToken common.Address, _wbtc common.Address) (*types.Transaction, error) {
-	return _SwapContractFactory.contract.Transact(opts, "deployNewWallet", _owner, _lpToken, _wbtc)
+// Solidity: function deployNewContracts(address _owner, address _wbtc) returns(address)
+func (_SwapContractFactory *SwapContractFactoryTransactor) DeployNewContracts(opts *bind.TransactOpts, _owner common.Address, _wbtc common.Address) (*types.Transaction, error) {
+	return _SwapContractFactory.contract.Transact(opts, "deployNewContracts", _owner, _wbtc)
 }
 
-// DeployNewWallet is a paid mutator transaction binding the contract method 0x4aced83c.
+// DeployNewContracts is a paid mutator transaction binding the contract method 0xd5959ac4.
 //
-// Solidity: function deployNewWallet(address _owner, address _lpToken, address _wbtc) returns(address)
-func (_SwapContractFactory *SwapContractFactorySession) DeployNewWallet(_owner common.Address, _lpToken common.Address, _wbtc common.Address) (*types.Transaction, error) {
-	return _SwapContractFactory.Contract.DeployNewWallet(&_SwapContractFactory.TransactOpts, _owner, _lpToken, _wbtc)
+// Solidity: function deployNewContracts(address _owner, address _wbtc) returns(address)
+func (_SwapContractFactory *SwapContractFactorySession) DeployNewContracts(_owner common.Address, _wbtc common.Address) (*types.Transaction, error) {
+	return _SwapContractFactory.Contract.DeployNewContracts(&_SwapContractFactory.TransactOpts, _owner, _wbtc)
 }
 
-// DeployNewWallet is a paid mutator transaction binding the contract method 0x4aced83c.
+// DeployNewContracts is a paid mutator transaction binding the contract method 0xd5959ac4.
 //
-// Solidity: function deployNewWallet(address _owner, address _lpToken, address _wbtc) returns(address)
-func (_SwapContractFactory *SwapContractFactoryTransactorSession) DeployNewWallet(_owner common.Address, _lpToken common.Address, _wbtc common.Address) (*types.Transaction, error) {
-	return _SwapContractFactory.Contract.DeployNewWallet(&_SwapContractFactory.TransactOpts, _owner, _lpToken, _wbtc)
+// Solidity: function deployNewContracts(address _owner, address _wbtc) returns(address)
+func (_SwapContractFactory *SwapContractFactoryTransactorSession) DeployNewContracts(_owner common.Address, _wbtc common.Address) (*types.Transaction, error) {
+	return _SwapContractFactory.Contract.DeployNewContracts(&_SwapContractFactory.TransactOpts, _owner, _wbtc)
 }
 
 // Fallback is a paid mutator transaction binding the contract fallback function.
@@ -282,13 +282,14 @@ func (it *SwapContractFactoryDeployedIterator) Close() error {
 
 // SwapContractFactoryDeployed represents a Deployed event raised by the SwapContractFactory contract.
 type SwapContractFactoryDeployed struct {
-	Wallet common.Address
-	Raw    types.Log // Blockchain specific contextual infos
+	LpToken      common.Address
+	SwapContract common.Address
+	Raw          types.Log // Blockchain specific contextual infos
 }
 
-// FilterDeployed is a free log retrieval operation binding the contract event 0xf40fcec21964ffb566044d083b4073f29f7f7929110ea19e1b3ebe375d89055e.
+// FilterDeployed is a free log retrieval operation binding the contract event 0x09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20.
 //
-// Solidity: event Deployed(address wallet)
+// Solidity: event Deployed(address lpToken, address swapContract)
 func (_SwapContractFactory *SwapContractFactoryFilterer) FilterDeployed(opts *bind.FilterOpts) (*SwapContractFactoryDeployedIterator, error) {
 
 	logs, sub, err := _SwapContractFactory.contract.FilterLogs(opts, "Deployed")
@@ -298,9 +299,9 @@ func (_SwapContractFactory *SwapContractFactoryFilterer) FilterDeployed(opts *bi
 	return &SwapContractFactoryDeployedIterator{contract: _SwapContractFactory.contract, event: "Deployed", logs: logs, sub: sub}, nil
 }
 
-// WatchDeployed is a free log subscription operation binding the contract event 0xf40fcec21964ffb566044d083b4073f29f7f7929110ea19e1b3ebe375d89055e.
+// WatchDeployed is a free log subscription operation binding the contract event 0x09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20.
 //
-// Solidity: event Deployed(address wallet)
+// Solidity: event Deployed(address lpToken, address swapContract)
 func (_SwapContractFactory *SwapContractFactoryFilterer) WatchDeployed(opts *bind.WatchOpts, sink chan<- *SwapContractFactoryDeployed) (event.Subscription, error) {
 
 	logs, sub, err := _SwapContractFactory.contract.WatchLogs(opts, "Deployed")
@@ -335,9 +336,9 @@ func (_SwapContractFactory *SwapContractFactoryFilterer) WatchDeployed(opts *bin
 	}), nil
 }
 
-// ParseDeployed is a log parse operation binding the contract event 0xf40fcec21964ffb566044d083b4073f29f7f7929110ea19e1b3ebe375d89055e.
+// ParseDeployed is a log parse operation binding the contract event 0x09e48df7857bd0c1e0d31bb8a85d42cf1874817895f171c917f6ee2cea73ec20.
 //
-// Solidity: event Deployed(address wallet)
+// Solidity: event Deployed(address lpToken, address swapContract)
 func (_SwapContractFactory *SwapContractFactoryFilterer) ParseDeployed(log types.Log) (*SwapContractFactoryDeployed, error) {
 	event := new(SwapContractFactoryDeployed)
 	if err := _SwapContractFactory.contract.UnpackLog(event, "Deployed", log); err != nil {
