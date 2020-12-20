@@ -18,6 +18,11 @@ $ truffle migrate --network {development/goerli}
 $ truffle exec scripts/transferOwnership.js --network {development/goerli} 
 ```
 
+## Build contract
+```
+$ npn run build
+```
+
 ## Test 
 You have to start testrpc with 100 accounts and binding port `8545` before doing test
 ```

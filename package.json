@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "npm run compile && truffle run abigen && npm run test",
-    "test": "truffle test",
+    "test": "npm run lint && truffle test",
+    "lint": "eslint --fix . --ext .js",
     "compile": "truffle compile",
     "gen-go": "node scripts/generateGoBindings.js"
   },
@@ -28,5 +29,8 @@
     "@openzeppelin/test-helpers": "^0.5.9",
     "@truffle/hdwallet-provider": "^1.2.0",
     "chai": "^4.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.16.0"
   }
 }
