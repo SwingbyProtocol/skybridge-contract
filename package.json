@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "npm run compile && truffle run abigen && npm run test",
+    "build": "npm run compile && rm -rf abigenBindings && truffle run abigen && npm run test",
     "test": "npm run lint && truffle test",
     "lint": "eslint --fix . --ext .js",
     "compile": "truffle compile",

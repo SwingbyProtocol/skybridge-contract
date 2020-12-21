@@ -23,6 +23,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private lpDecimals;
     uint256 private nodeSize;
     uint256 private nodeRemoved;
+    uint256 private activeWBTCBalances;
 
     // Nodes
     mapping(uint256 => bytes32) private nodes;
@@ -86,10 +87,12 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         address _to,
         uint256 _amount,
+        uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) public override onlyOwner returns (bool) {
         require(IERC20(_token).transfer(_to, _amount));
+        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
@@ -98,6 +101,7 @@ contract SwapContract is Ownable, ISwapContract {
     function multiTransferERC20TightlyPacked(
         address _token,
         bytes32[] memory _addressesAndAmounts,
+        uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) public override onlyOwner returns (bool) {
@@ -111,6 +115,7 @@ contract SwapContract is Ownable, ISwapContract {
                 "Batch transfer error"
             );
         }
+        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
@@ -120,6 +125,7 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         address[] memory _contributors,
         uint256[] memory _amounts,
+        uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) public override onlyOwner returns (bool) {
@@ -130,6 +136,7 @@ contract SwapContract is Ownable, ISwapContract {
         for (uint256 i = 0; i < _contributors.length; i++) {
             require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
+        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
@@ -141,10 +148,12 @@ contract SwapContract is Ownable, ISwapContract {
 
     function collectSwapFeesForBTC(
         address _feeToken,
+        uint256 _incomingAmount,
         uint256 _rewardsAmount,
         bytes32 _txid
     ) public override onlyOwner returns (bool) {
         require(!used[_txid], "txid is already used");
+        activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
         // _feeToken should be address(0) == BTC
         _rewardsCollection(_feeToken, _rewardsAmount);
         // Add txid to used list.
@@ -374,12 +383,15 @@ contract SwapContract is Ownable, ISwapContract {
             reserveB = reserveB.add(_amountOfFloat);
         }
         // BTC bal == BTC float + WBTC float - WBTC bal
-        uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
-        uint256 balBTC = reserveA.add(reserveB).sub(balWBTC);
-        require(reserveA.add(reserveB) >= balWBTC, "balWBTC amount invalid");
+        // uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
+        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
+        require(
+            reserveA.add(reserveB) >= activeWBTCBalances,
+            "balWBTC amount invalid"
+        );
         if (balBTC <= reserveA.add(reserveB).div(3)) {
             active = 1; // BTC float insufficient
-        } else if (balWBTC <= reserveA.add(reserveB).div(3)) {
+        } else if (activeWBTCBalances <= reserveA.add(reserveB).div(3)) {
             active = 2; // WBTC float insufficient
         } else {
             active = 0; // zero fees
@@ -415,6 +427,9 @@ contract SwapContract is Ownable, ISwapContract {
         floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].add(
             _amount
         );
+        if (_token == WBTC_ADDR) {
+            activeWBTCBalances = activeWBTCBalances.add(_amount);
+        }
     }
 
     function _removeFloat(
@@ -426,6 +441,9 @@ contract SwapContract is Ownable, ISwapContract {
         floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].sub(
             _amount
         );
+         if (_token == WBTC_ADDR) {
+            activeWBTCBalances = activeWBTCBalances.sub(_amount);
+        }
     }
 
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
