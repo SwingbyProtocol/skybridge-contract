@@ -13,9 +13,9 @@ There are 2 steps to setup contracts on the ethereum testnet.
 $ export SEED=<your mnemonic key>
 $ truffle migrate --network {development/goerli}
 ```
-2. Change LP token's owner to SwapContract
+2. Change the owner of SwapContract to TSS address
 ```
-$ truffle exec scripts/transferOwnership.js --network {development/goerli} 
+$ TSS=<The TSS wallet address> truffle exec scripts/transferSwapContractOwnership.js --network {development/goerli} 
 ```
 
 ## Build contract
