@@ -27,7 +27,7 @@ var (
 )
 
 // ISwapContractABI is the input ABI used to generate the binding from.
-const ISwapContractABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_contributors\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_amounts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_feeToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"getFloatBalanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const ISwapContractABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_contributors\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_amounts\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_feeToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"getFloatBalanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // ISwapContract is an auto generated Go binding around an Ethereum contract.
 type ISwapContract struct {
@@ -285,25 +285,25 @@ func (_ISwapContract *ISwapContractTransactorSession) Churn(_newOwner common.Add
 	return _ISwapContract.Contract.Churn(&_ISwapContract.TransactOpts, _newOwner, _rewardAddressAndAmounts, _isRemoved, _churnedInCount, _nodeRewardsRatio)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x1a4ed638.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x6221d029.
 //
-// Solidity: function collectSwapFeesForBTC(address _feeToken, uint256 _rewardsAmount, bytes32 _txid) returns(bool)
-func (_ISwapContract *ISwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _feeToken common.Address, _rewardsAmount *big.Int, _txid [32]byte) (*types.Transaction, error) {
-	return _ISwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _feeToken, _rewardsAmount, _txid)
+// Solidity: function collectSwapFeesForBTC(address _feeToken, uint256 _incomingAmount, uint256 _rewardsAmount, bytes32 _txid) returns(bool)
+func (_ISwapContract *ISwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _feeToken common.Address, _incomingAmount *big.Int, _rewardsAmount *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _ISwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _feeToken, _incomingAmount, _rewardsAmount, _txid)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x1a4ed638.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x6221d029.
 //
-// Solidity: function collectSwapFeesForBTC(address _feeToken, uint256 _rewardsAmount, bytes32 _txid) returns(bool)
-func (_ISwapContract *ISwapContractSession) CollectSwapFeesForBTC(_feeToken common.Address, _rewardsAmount *big.Int, _txid [32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _feeToken, _rewardsAmount, _txid)
+// Solidity: function collectSwapFeesForBTC(address _feeToken, uint256 _incomingAmount, uint256 _rewardsAmount, bytes32 _txid) returns(bool)
+func (_ISwapContract *ISwapContractSession) CollectSwapFeesForBTC(_feeToken common.Address, _incomingAmount *big.Int, _rewardsAmount *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _feeToken, _incomingAmount, _rewardsAmount, _txid)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x1a4ed638.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x6221d029.
 //
-// Solidity: function collectSwapFeesForBTC(address _feeToken, uint256 _rewardsAmount, bytes32 _txid) returns(bool)
-func (_ISwapContract *ISwapContractTransactorSession) CollectSwapFeesForBTC(_feeToken common.Address, _rewardsAmount *big.Int, _txid [32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _feeToken, _rewardsAmount, _txid)
+// Solidity: function collectSwapFeesForBTC(address _feeToken, uint256 _incomingAmount, uint256 _rewardsAmount, bytes32 _txid) returns(bool)
+func (_ISwapContract *ISwapContractTransactorSession) CollectSwapFeesForBTC(_feeToken common.Address, _incomingAmount *big.Int, _rewardsAmount *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _feeToken, _incomingAmount, _rewardsAmount, _txid)
 }
 
 // DistributeNodeRewards is a paid mutator transaction binding the contract method 0xe9e9bf6a.
@@ -369,46 +369,46 @@ func (_ISwapContract *ISwapContractTransactorSession) GetFloatReserve(_tokenA co
 	return _ISwapContract.Contract.GetFloatReserve(&_ISwapContract.TransactOpts, _tokenA, _tokenB)
 }
 
-// MultiTransferERC20 is a paid mutator transaction binding the contract method 0x86217a5a.
+// MultiTransferERC20 is a paid mutator transaction binding the contract method 0xb9cb2e1e.
 //
-// Solidity: function multiTransferERC20(address token, address[] _contributors, uint256[] _amounts, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractTransactor) MultiTransferERC20(opts *bind.TransactOpts, token common.Address, _contributors []common.Address, _amounts []*big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.contract.Transact(opts, "multiTransferERC20", token, _contributors, _amounts, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function multiTransferERC20(address token, address[] _contributors, uint256[] _amounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractTransactor) MultiTransferERC20(opts *bind.TransactOpts, token common.Address, _contributors []common.Address, _amounts []*big.Int, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.contract.Transact(opts, "multiTransferERC20", token, _contributors, _amounts, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// MultiTransferERC20 is a paid mutator transaction binding the contract method 0x86217a5a.
+// MultiTransferERC20 is a paid mutator transaction binding the contract method 0xb9cb2e1e.
 //
-// Solidity: function multiTransferERC20(address token, address[] _contributors, uint256[] _amounts, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractSession) MultiTransferERC20(token common.Address, _contributors []common.Address, _amounts []*big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.MultiTransferERC20(&_ISwapContract.TransactOpts, token, _contributors, _amounts, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function multiTransferERC20(address token, address[] _contributors, uint256[] _amounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractSession) MultiTransferERC20(token common.Address, _contributors []common.Address, _amounts []*big.Int, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.MultiTransferERC20(&_ISwapContract.TransactOpts, token, _contributors, _amounts, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// MultiTransferERC20 is a paid mutator transaction binding the contract method 0x86217a5a.
+// MultiTransferERC20 is a paid mutator transaction binding the contract method 0xb9cb2e1e.
 //
-// Solidity: function multiTransferERC20(address token, address[] _contributors, uint256[] _amounts, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractTransactorSession) MultiTransferERC20(token common.Address, _contributors []common.Address, _amounts []*big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.MultiTransferERC20(&_ISwapContract.TransactOpts, token, _contributors, _amounts, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function multiTransferERC20(address token, address[] _contributors, uint256[] _amounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractTransactorSession) MultiTransferERC20(token common.Address, _contributors []common.Address, _amounts []*big.Int, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.MultiTransferERC20(&_ISwapContract.TransactOpts, token, _contributors, _amounts, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xd4d3eda8.
+// MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xad289e76.
 //
-// Solidity: function multiTransferERC20TightlyPacked(address _token, bytes32[] _addressesAndAmounts, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractTransactor) MultiTransferERC20TightlyPacked(opts *bind.TransactOpts, _token common.Address, _addressesAndAmounts [][32]byte, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.contract.Transact(opts, "multiTransferERC20TightlyPacked", _token, _addressesAndAmounts, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function multiTransferERC20TightlyPacked(address _token, bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractTransactor) MultiTransferERC20TightlyPacked(opts *bind.TransactOpts, _token common.Address, _addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.contract.Transact(opts, "multiTransferERC20TightlyPacked", _token, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xd4d3eda8.
+// MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xad289e76.
 //
-// Solidity: function multiTransferERC20TightlyPacked(address _token, bytes32[] _addressesAndAmounts, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractSession) MultiTransferERC20TightlyPacked(_token common.Address, _addressesAndAmounts [][32]byte, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.MultiTransferERC20TightlyPacked(&_ISwapContract.TransactOpts, _token, _addressesAndAmounts, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function multiTransferERC20TightlyPacked(address _token, bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractSession) MultiTransferERC20TightlyPacked(_token common.Address, _addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.MultiTransferERC20TightlyPacked(&_ISwapContract.TransactOpts, _token, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xd4d3eda8.
+// MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xad289e76.
 //
-// Solidity: function multiTransferERC20TightlyPacked(address _token, bytes32[] _addressesAndAmounts, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractTransactorSession) MultiTransferERC20TightlyPacked(_token common.Address, _addressesAndAmounts [][32]byte, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.MultiTransferERC20TightlyPacked(&_ISwapContract.TransactOpts, _token, _addressesAndAmounts, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function multiTransferERC20TightlyPacked(address _token, bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractTransactorSession) MultiTransferERC20TightlyPacked(_token common.Address, _addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.MultiTransferERC20TightlyPacked(&_ISwapContract.TransactOpts, _token, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
 // RecordIncomingFloat is a paid mutator transaction binding the contract method 0xcf10b16b.
@@ -453,23 +453,23 @@ func (_ISwapContract *ISwapContractTransactorSession) RecordOutcomingFloat(_toke
 	return _ISwapContract.Contract.RecordOutcomingFloat(&_ISwapContract.TransactOpts, _token, _addressesAndAmountOfLPtoken, _txid)
 }
 
-// SingleTransferERC20 is a paid mutator transaction binding the contract method 0x368c6bdf.
+// SingleTransferERC20 is a paid mutator transaction binding the contract method 0x0d63aca7.
 //
-// Solidity: function singleTransferERC20(address _token, address _to, uint256 _amount, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractTransactor) SingleTransferERC20(opts *bind.TransactOpts, _token common.Address, _to common.Address, _amount *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.contract.Transact(opts, "singleTransferERC20", _token, _to, _amount, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function singleTransferERC20(address _token, address _to, uint256 _amount, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractTransactor) SingleTransferERC20(opts *bind.TransactOpts, _token common.Address, _to common.Address, _amount *big.Int, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.contract.Transact(opts, "singleTransferERC20", _token, _to, _amount, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// SingleTransferERC20 is a paid mutator transaction binding the contract method 0x368c6bdf.
+// SingleTransferERC20 is a paid mutator transaction binding the contract method 0x0d63aca7.
 //
-// Solidity: function singleTransferERC20(address _token, address _to, uint256 _amount, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractSession) SingleTransferERC20(_token common.Address, _to common.Address, _amount *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.SingleTransferERC20(&_ISwapContract.TransactOpts, _token, _to, _amount, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function singleTransferERC20(address _token, address _to, uint256 _amount, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractSession) SingleTransferERC20(_token common.Address, _to common.Address, _amount *big.Int, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.SingleTransferERC20(&_ISwapContract.TransactOpts, _token, _to, _amount, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// SingleTransferERC20 is a paid mutator transaction binding the contract method 0x368c6bdf.
+// SingleTransferERC20 is a paid mutator transaction binding the contract method 0x0d63aca7.
 //
-// Solidity: function singleTransferERC20(address _token, address _to, uint256 _amount, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
-func (_ISwapContract *ISwapContractTransactorSession) SingleTransferERC20(_token common.Address, _to common.Address, _amount *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.SingleTransferERC20(&_ISwapContract.TransactOpts, _token, _to, _amount, _rewardsAmount, _redeemedFloatTxIds)
+// Solidity: function singleTransferERC20(address _token, address _to, uint256 _amount, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _redeemedFloatTxIds) returns(bool)
+func (_ISwapContract *ISwapContractTransactorSession) SingleTransferERC20(_token common.Address, _to common.Address, _amount *big.Int, _totalSwapped *big.Int, _rewardsAmount *big.Int, _redeemedFloatTxIds [][32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.SingleTransferERC20(&_ISwapContract.TransactOpts, _token, _to, _amount, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
