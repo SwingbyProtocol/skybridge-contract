@@ -79,7 +79,6 @@ contract SwapContract is Ownable, ISwapContract {
         nextMintLPTokensForNode = 0;
     }
 
-
     /**
      * Transfer part
      */
@@ -428,6 +427,9 @@ contract SwapContract is Ownable, ISwapContract {
         floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].add(
             _amount
         );
+        if (_token == WBTC_ADDR) {
+            activeWBTCBalances = activeWBTCBalances.add(_amount);
+        }
     }
 
     function _removeFloat(
@@ -439,6 +441,9 @@ contract SwapContract is Ownable, ISwapContract {
         floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].sub(
             _amount
         );
+         if (_token == WBTC_ADDR) {
+            activeWBTCBalances = activeWBTCBalances.sub(_amount);
+        }
     }
 
     function _rewardsCollection(address _token, uint256 _rewardsAmount)
