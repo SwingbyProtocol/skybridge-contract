@@ -98,7 +98,10 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
         require(IERC20(_token).transfer(_to, _amount));
-        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped, "activeWBTCBalances insufficient");
+        activeWBTCBalances = activeWBTCBalances.sub(
+            _totalSwapped,
+            "activeWBTCBalances insufficient"
+        );
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
@@ -122,7 +125,10 @@ contract SwapContract is Ownable, ISwapContract {
             );
         }
         if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped, "activeWBTCBalances insufficient");
+            activeWBTCBalances = activeWBTCBalances.sub(
+                _totalSwapped,
+                "activeWBTCBalances insufficient"
+            );
         }
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
@@ -145,7 +151,10 @@ contract SwapContract is Ownable, ISwapContract {
             require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
         if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped, "activeWBTCBalances insufficient");
+            activeWBTCBalances = activeWBTCBalances.sub(
+                _totalSwapped,
+                "activeWBTCBalances insufficient"
+            );
         }
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
@@ -449,12 +458,19 @@ contract SwapContract is Ownable, ISwapContract {
         address _user,
         uint256 _amount
     ) internal {
-        floatAmountOf[_token] = floatAmountOf[_token].sub(_amount);
+        floatAmountOf[_token] = floatAmountOf[_token].sub(
+            _amount,
+            "float amount insufficient"
+        );
         floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].sub(
-            _amount
+            _amount,
+            "float amount which is for user insufficient"
         );
         if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(_amount);
+            activeWBTCBalances = activeWBTCBalances.sub(
+                _amount,
+                "activeWBTCBalances insufficient"
+            );
         }
     }
 
