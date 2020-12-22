@@ -30,16 +30,16 @@ contract('Test for churn and float', function (accounts) {
         expect(await this.lpToken.owner()).to.equal(this.swap.address)
     })
 
-    it('check float balances for WBTC', async function() {
-        const bal = await this.swap.getFloatBalanceOf(this.wbtcTest.address, sender)
-        expect(bal).to.bignumber.equal('0')
-    })
+    // it('check float balances for WBTC', async function() {
+    //     const bal = await this.swap.getFloatBalanceOf(this.wbtcTest.address, sender)
+    //     expect(bal).to.bignumber.equal('0')
+    // })
 
-    it('check float balances for BTC', async function() {
-        const btcAddress = ZERO_ADDRESS
-        const bal = await this.swap.getFloatBalanceOf(btcAddress, sender)
-        expect(bal).to.bignumber.equal('0')
-    })
+    // it('check float balances for BTC', async function() {
+    //     const btcAddress = ZERO_ADDRESS
+    //     const bal = await this.swap.getFloatBalanceOf(btcAddress, sender)
+    //     expect(bal).to.bignumber.equal('0')
+    // })
 
     it('add 100 nodes into swap contract', async function () {
         let rewardAddressAndAmounts = []
