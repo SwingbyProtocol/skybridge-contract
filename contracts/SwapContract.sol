@@ -115,7 +115,9 @@ contract SwapContract is Ownable, ISwapContract {
                 "Batch transfer error"
             );
         }
-        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+        if (_token == WBTC_ADDR) {
+            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+        }
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
@@ -136,11 +138,15 @@ contract SwapContract is Ownable, ISwapContract {
         for (uint256 i = 0; i < _contributors.length; i++) {
             require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
-        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+        if (_token == WBTC_ADDR) {
+            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+        }
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
     }
+
+    
 
     /**
      * @dev gas usage 90736 gas (initial), 58888 gas (update)
@@ -149,15 +155,14 @@ contract SwapContract is Ownable, ISwapContract {
     function collectSwapFeesForBTC(
         address _feeToken,
         uint256 _incomingAmount,
-        uint256 _rewardsAmount,
-        bytes32 _txid
+        uint256 _rewardsAmount
     ) public override onlyOwner returns (bool) {
-        require(!used[_txid], "txid is already used");
+        //require(!used[_txid], "txid is already used");
         activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
         // _feeToken should be address(0) == BTC
         _rewardsCollection(_feeToken, _rewardsAmount);
         // Add txid to used list.
-        used[_txid] = true;
+        //used[_txid] = true;
         return true;
     }
 
@@ -441,7 +446,7 @@ contract SwapContract is Ownable, ISwapContract {
         floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].sub(
             _amount
         );
-         if (_token == WBTC_ADDR) {
+        if (_token == WBTC_ADDR) {
             activeWBTCBalances = activeWBTCBalances.sub(_amount);
         }
     }

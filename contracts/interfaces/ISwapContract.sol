@@ -30,8 +30,7 @@ interface ISwapContract {
     function collectSwapFeesForBTC(
         address _feeToken,
         uint256 _incomingAmount,
-        uint256 _rewardsAmount,
-        bytes32 _txid
+        uint256 _rewardsAmount
     ) external returns (bool);
 
     function recordIncomingFloat(
