@@ -98,7 +98,7 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
         require(IERC20(_token).transfer(_to, _amount));
-        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+        activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped, "activeWBTCBalances insufficient");
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         return true;
@@ -122,7 +122,7 @@ contract SwapContract is Ownable, ISwapContract {
             );
         }
         if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped, "activeWBTCBalances insufficient");
         }
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
@@ -145,7 +145,7 @@ contract SwapContract is Ownable, ISwapContract {
             require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
         }
         if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
+            activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped, "activeWBTCBalances insufficient");
         }
         _rewardsCollection(_token, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
@@ -214,7 +214,7 @@ contract SwapContract is Ownable, ISwapContract {
      * @dev gas usage 3129064 gas for 100 nodes
      */
 
-    function distributeNodeRewards() public override returns (bool) {
+    function distributeNodeRewards() external override returns (bool) {
         // Reduce Gas
         uint256 rewardLPsForNode = nextMintLPTokensForNode;
         require(rewardLPsForNode > 0, "totalRewardLPsForNode is not positive");

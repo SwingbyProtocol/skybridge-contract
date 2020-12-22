@@ -7,7 +7,7 @@ contract SwapContractFactory {
     event Deployed(address lpToken, address swapContract);
 
     function deployNewContracts(address _owner, address _wbtc)
-        public
+        external
         returns (address)
     {
         LPToken lpToken = new LPToken();
