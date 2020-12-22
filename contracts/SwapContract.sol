@@ -480,7 +480,9 @@ contract SwapContract is Ownable, ISwapContract {
 
     function _loadNodes() internal view returns (bytes32[] memory) {
         uint256 count = 0;
-        bytes32[] memory _nodes = new bytes32[](nodeSize.sub(nodeRemoved));
+        bytes32[] memory _nodes = new bytes32[](
+            nodeSize.sub(nodeRemoved, "nodeSize insufficient")
+        );
         for (uint256 i = 1; i <= nodeSize; i++) {
             (address node, ) = _splitToStakes(nodes[i]);
             uint256 index = nodeIndex[node];
