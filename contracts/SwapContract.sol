@@ -18,7 +18,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public depositFeesBPS;
 
     uint256 public activeWBTCBalances;
-    uint256 public nextMintLPTokensForNode;
+    uint256 public lockedLPTokensForNode;
 
     uint256 private priceDecimals;
     uint256 private currentExchangeRate;
@@ -76,8 +76,8 @@ contract SwapContract is Ownable, ISwapContract {
         priceDecimals = 10**8;
         // Set currentExchangeRate
         currentExchangeRate = priceDecimals;
-        // Set nextMintLPTokensForNode
-        nextMintLPTokensForNode = 0;
+        // Set lockedLPTokensForNode
+        lockedLPTokensForNode = 0;
         // SEt whitelist
         whitelist[WBTC_ADDR] = true;
         whitelist[lpToken] = true;
@@ -229,8 +229,8 @@ contract SwapContract is Ownable, ISwapContract {
 
     function distributeNodeRewards() external override returns (bool) {
         // Reduce Gas
-        uint256 rewardLPsForNode = nextMintLPTokensForNode;
-        require(rewardLPsForNode > 0, "totalRewardLPsForNode is not positive");
+        uint256 rewardLPsForNodes = lockedLPTokensForNode;
+        require(rewardLPsForNodes > 0, "totalRewardLPsForNode is not positive");
         bytes32[] memory nodeList = _loadNodes();
         uint256 totalStaked = 0;
         for (uint256 i = 0; i < nodeList.length; i++) {
@@ -239,12 +239,12 @@ contract SwapContract is Ownable, ISwapContract {
         for (uint256 i = 0; i < nodeList.length; i++) {
             IBurnableToken(lpToken).mint(
                 address(uint160(uint256(nodeList[i]))),
-                rewardLPsForNode.mul(uint256(uint96(bytes12(nodeList[i])))).div(
-                    totalStaked
-                )
+                rewardLPsForNodes
+                    .mul(uint256(uint96(bytes12(nodeList[i]))))
+                    .div(totalStaked)
             );
         }
-        nextMintLPTokensForNode = 0;
+        lockedLPTokensForNode = 0;
         return true;
     }
 
@@ -334,8 +334,8 @@ contract SwapContract is Ownable, ISwapContract {
 
         //Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
-        // Update deposit fees
-        nextMintLPTokensForNode = nextMintLPTokensForNode.add(depositFees);
+        // Add deposit fees
+        lockedLPTokensForNode = lockedLPTokensForNode.add(depositFees);
         // Add float amount
         _addFloat(token, amountOfFloat);
         used[_txid] = true;
@@ -398,22 +398,18 @@ contract SwapContract is Ownable, ISwapContract {
         } else if (_token == WBTC_ADDR) {
             reserveB = reserveB.add(_amountOfFloat);
         }
-        // BTC bal == BTC float + WBTC float - WBTC bal
-        // uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
-        uint256 balBTC = reserveA.add(reserveB).sub(
-            activeWBTCBalances,
-            "balBTC is negative"
-        );
-        require(
-            reserveA.add(reserveB) >= activeWBTCBalances,
-            "balWBTC amount invalid"
-        );
-        if (balBTC <= reserveA.add(reserveB).div(3)) {
-            active = 1; // BTC float insufficient
-        } else if (activeWBTCBalances <= reserveA.add(reserveB).div(3)) {
-            active = 2; // WBTC float insufficient
-        } else {
-            active = 0; // zero fees
+        if (activeWBTCBalances > reserveA.add(reserveB)) {
+            return active;
+        } else if (reserveA.add(reserveB) >= activeWBTCBalances) {
+            // BTC balance == balance of BTC float + balance of WBTC float - balance of WBTC
+            uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
+            if (balBTC <= reserveA.add(reserveB).div(3)) {
+                active = 1; // BTC float insufficient
+            } else if (activeWBTCBalances <= reserveA.add(reserveB).div(3)) {
+                active = 2; // WBTC float insufficient
+            } else {
+                active = 0; // zero fees
+            }
         }
         return active;
     }
@@ -432,7 +428,7 @@ contract SwapContract is Ownable, ISwapContract {
         currentExchangeRate = totalLPs == 0
             ? currentExchangeRate
             : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.add(nextMintLPTokensForNode)
+                totalLPs.add(lockedLPTokensForNode)
             );
         return currentExchangeRate;
     }
@@ -463,13 +459,13 @@ contract SwapContract is Ownable, ISwapContract {
         // Add all fees into pool
         totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
         uint256 amountForLP = _rewardsAmount.mul(nodeRewardsRatio).div(100);
-        // Alloc LP tokens by inejecting 66% of fees
+        // Alloc LP tokens for nodes as fees
         uint256 amountLPForNode = _rewardsAmount
             .sub(amountForLP)
             .mul(priceDecimals)
             .div(getCurrentPriceLP());
         // Add minted LP tokens for Nodes
-        nextMintLPTokensForNode = nextMintLPTokensForNode.add(amountLPForNode);
+        lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
     }
 
     function _addTxidUsed(bytes32[] memory _txs) internal {
