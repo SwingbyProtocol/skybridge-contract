@@ -1,4 +1,4 @@
-pragma solidity =0.7.5;
+pragma solidity >=0.6.0 <0.8.0;
 
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
@@ -24,6 +24,8 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private nodeSize;
     uint256 private nodeRemoved;
     uint256 private activeWBTCBalances;
+    // Support tokens
+    mapping(address => bool) whitelist;
 
     // Nodes
     mapping(uint256 => bytes32) private nodes;
@@ -77,6 +79,10 @@ contract SwapContract is Ownable, ISwapContract {
         currentExchangeRate = priceDecimals;
         // Set nextMintLPTokensForNode
         nextMintLPTokensForNode = 0;
+        // SEt whitelist
+        whitelist[WBTC_ADDR] = true;
+        whitelist[lpToken] = true;
+        whitelist[address(0)] = true;
     }
 
     /**
@@ -90,7 +96,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
-    ) public override onlyOwner returns (bool) {
+    ) external override onlyOwner returns (bool) {
         require(IERC20(_token).transfer(_to, _amount));
         activeWBTCBalances = activeWBTCBalances.sub(_totalSwapped);
         _rewardsCollection(_token, _rewardsAmount);
@@ -104,7 +110,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
-    ) public override onlyOwner returns (bool) {
+    ) external override onlyOwner returns (bool) {
         require(_token != address(0));
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             require(
@@ -130,7 +136,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
-    ) public override onlyOwner returns (bool) {
+    ) external override onlyOwner returns (bool) {
         require(
             _contributors.length == _amounts.length,
             "Length of inputs array is mismatch"
@@ -146,8 +152,6 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    
-
     /**
      * @dev gas usage 90736 gas (initial), 58888 gas (update)
      */
@@ -156,7 +160,7 @@ contract SwapContract is Ownable, ISwapContract {
         address _feeToken,
         uint256 _incomingAmount,
         uint256 _rewardsAmount
-    ) public override onlyOwner returns (bool) {
+    ) external override onlyOwner returns (bool) {
         //require(!used[_txid], "txid is already used");
         activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
         // _feeToken should be address(0) == BTC
@@ -177,8 +181,8 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         bytes32 _addressesAndAmountOfFloat,
         bytes32 _txid
-    ) public override onlyOwner returns (bool) {
-        // require(txs[_token][_txid] == 0x0);
+    ) external override onlyOwner returns (bool) {
+        require(whitelist[_token], "_token is invalid");
         // txs[_token][_txid] = _addressesAndAmountOfFloat;
         // emit RecordIncomingFloat(_token, _addressesAndAmountOfFloat, _txid);
         require(
@@ -195,8 +199,8 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
         bytes32 _txid
-    ) public override returns (bool) {
-        // require(txs[_token][_txid] == 0x0);
+    ) external override onlyOwner returns (bool) {
+        require(whitelist[_token], "_token is invalid");
         // _token should be address(0) or WBTC_ADDR, txid should be unique
         // txs[_token][_txid] = _addressesAndAmountOfLPtoken;
         // emit RecordOutcomingFloat(_token, _addressesAndAmountOfLPtoken, _txid);
@@ -241,7 +245,7 @@ contract SwapContract is Ownable, ISwapContract {
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _nodeRewardsRatio
-    ) public override onlyOwner returns (bool) {
+    ) external override onlyOwner returns (bool) {
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
@@ -292,7 +296,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     function getFloatBalanceOf(address _token, address _user)
-        public
+        external
         override
         view
         returns (uint256)
@@ -362,7 +366,10 @@ contract SwapContract is Ownable, ISwapContract {
         );
         // WBTC transfer if token address is WBTC_ADDR
         if (token == WBTC_ADDR) {
-            require(IERC20(token).transfer(to, amountOfFloat));
+            require(
+                IERC20(token).transfer(to, amountOfFloat),
+                "WBTC balance insufficient"
+            );
         }
         // Burn LP tokens
         require(IBurnableToken(lpToken).burn(amountOfLP));
