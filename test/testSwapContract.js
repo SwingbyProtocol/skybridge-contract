@@ -68,11 +68,11 @@ contract('Test for swap actions', function (accounts) {
     it('test collectSwapFeesForBTC', async function () {
         let rewardsAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
         let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
-        const tx = await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, this.incomingAmount, rewardsAmount, txid1)
+        const tx = await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, this.incomingAmount, rewardsAmount)
         let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
-        await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, this.incomingAmount, rewardsAmount, txid2)
-        expect(await this.swap.isTxUsed(txid1)).equal(true)
-        expect(await this.swap.isTxUsed(txid2)).equal(true)
+        await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, this.incomingAmount, rewardsAmount)
+        // expect(await this.swap.isTxUsed(txid1)).equal(true)
+        // åexpect(await this.swap.isTxUsed(txid2)).equal(true)
         // console.log(tx.receipt.gasUsed)
     })
 
