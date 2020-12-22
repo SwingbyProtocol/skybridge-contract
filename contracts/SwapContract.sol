@@ -400,7 +400,10 @@ contract SwapContract is Ownable, ISwapContract {
         }
         // BTC bal == BTC float + WBTC float - WBTC bal
         // uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
-        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances, "balBTC is negative");
+        uint256 balBTC = reserveA.add(reserveB).sub(
+            activeWBTCBalances,
+            "balBTC is negative"
+        );
         require(
             reserveA.add(reserveB) >= activeWBTCBalances,
             "balWBTC amount invalid"
