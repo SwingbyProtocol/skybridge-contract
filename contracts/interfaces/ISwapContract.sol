@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity >=0.6.0 <0.8.0;
 
 interface ISwapContract {
@@ -71,8 +72,4 @@ interface ISwapContract {
     function getFloatReserve(address _tokenA, address _tokenB)
         external
         returns (uint256 reserveA, uint256 reserveB);
-
-    function getFloatBalanceOf(address _token, address _user)
-        external
-        returns (uint256);
 }

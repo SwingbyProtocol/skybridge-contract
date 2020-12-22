@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity >=0.6.0 <0.8.0;
 
 import "./interfaces/IBurnableToken.sol";
@@ -16,6 +17,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
 
+    uint256 public activeWBTCBalances;
     uint256 public nextMintLPTokensForNode;
 
     uint256 private priceDecimals;
@@ -23,7 +25,6 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private lpDecimals;
     uint256 private nodeSize;
     uint256 private nodeRemoved;
-    uint256 private activeWBTCBalances;
     // Support tokens
     mapping(address => bool) whitelist;
 
@@ -34,8 +35,6 @@ contract SwapContract is Ownable, ISwapContract {
     // Token address -> amount
     mapping(address => uint256) private totalRewards;
     mapping(address => uint256) private floatAmountOf;
-    mapping(address => mapping(address => uint256)) private floatBalanceOf;
-    mapping(address => mapping(bytes32 => bytes32)) private txs;
     mapping(bytes32 => bool) private used;
 
     /**
@@ -89,6 +88,12 @@ contract SwapContract is Ownable, ISwapContract {
      * Transfer part
      */
 
+    /// @dev singleTransferERC20 function sends tokens from contract.
+    /// @param _token Address of token.
+    /// @param _to Recevier address.
+    /// @param _amount The amount of tokens.
+    /// @param _totalSwapped the amount of swapped amount which is for send.
+    /// @param _rewardsAmount Value that should be paid as fees
     function singleTransferERC20(
         address _token,
         address _to,
@@ -164,7 +169,6 @@ contract SwapContract is Ownable, ISwapContract {
     /**
      * @dev gas usage 90736 gas (initial), 58888 gas (update)
      */
-
     function collectSwapFeesForBTC(
         address _feeToken,
         uint256 _incomingAmount,
@@ -304,15 +308,6 @@ contract SwapContract is Ownable, ISwapContract {
         );
     }
 
-    function getFloatBalanceOf(address _token, address _user)
-        external
-        override
-        view
-        returns (uint256)
-    {
-        return floatBalanceOf[_token][_user];
-    }
-
     /**
      * @dev gas usage 183033 gas
      */
@@ -342,7 +337,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Update deposit fees
         nextMintLPTokensForNode = nextMintLPTokensForNode.add(depositFees);
         // Add float amount
-        _addFloat(token, to, amountOfFloat);
+        _addFloat(token, amountOfFloat);
         used[_txid] = true;
         emit IssueLPTokensForFloat(to, amountOfLP, _txid);
         return true;
@@ -383,7 +378,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Burn LP tokens
         require(IBurnableToken(lpToken).burn(amountOfLP));
         // Remove float amount
-        _removeFloat(token, to, amountOfFloat);
+        _removeFloat(token, amountOfFloat);
         used[_txid] = true;
         emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
         return true;
@@ -405,7 +400,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
         // BTC bal == BTC float + WBTC float - WBTC bal
         // uint256 balWBTC = IERC20(WBTC_ADDR).balanceOf(address(this));
-        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
+        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances, "balBTC is negative");
         require(
             reserveA.add(reserveB) >= activeWBTCBalances,
             "balWBTC amount invalid"
@@ -439,32 +434,17 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
-    function _addFloat(
-        address _token,
-        address _user,
-        uint256 _amount
-    ) internal {
+    function _addFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
-        floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].add(
-            _amount
-        );
         if (_token == WBTC_ADDR) {
             activeWBTCBalances = activeWBTCBalances.add(_amount);
         }
     }
 
-    function _removeFloat(
-        address _token,
-        address _user,
-        uint256 _amount
-    ) internal {
+    function _removeFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].sub(
             _amount,
             "float amount insufficient"
-        );
-        floatBalanceOf[_token][_user] = floatBalanceOf[_token][_user].sub(
-            _amount,
-            "float amount which is for user insufficient"
         );
         if (_token == WBTC_ADDR) {
             activeWBTCBalances = activeWBTCBalances.sub(
@@ -487,16 +467,6 @@ contract SwapContract is Ownable, ISwapContract {
             .div(getCurrentPriceLP());
         // Add minted LP tokens for Nodes
         nextMintLPTokensForNode = nextMintLPTokensForNode.add(amountLPForNode);
-    }
-
-    function _loadTx(bytes32 _txid) internal view returns (address, bytes32) {
-        if (txs[address(0)][_txid] != 0x0) {
-            return (address(0), txs[address(0)][_txid]);
-        }
-        if (txs[WBTC_ADDR][_txid] != 0x0) {
-            return (WBTC_ADDR, txs[WBTC_ADDR][_txid]);
-        }
-        return (address(0x0), 0x0);
     }
 
     function _addTxidUsed(bytes32[] memory _txs) internal {
