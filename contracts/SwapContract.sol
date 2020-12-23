@@ -148,36 +148,6 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    function multiTransferERC20(
-        address _destToken,
-        address[] memory _contributors,
-        uint256[] memory _amounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external override onlyOwner returns (bool) {
-        require(
-            _destToken != address(0),
-            "_destToken should not be address(0)"
-        );
-        require(
-            _contributors.length == _amounts.length,
-            "Length of inputs array is mismatch"
-        );
-        for (uint256 i = 0; i < _contributors.length; i++) {
-            require(IERC20(_destToken).transfer(_contributors[i], _amounts[i]));
-        }
-        if (_destToken == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _totalSwapped,
-                "activeWBTCBalances insufficient"
-            );
-        }
-        _rewardsCollection(_destToken, _rewardsAmount);
-        _addTxidUsed(_redeemedFloatTxIds);
-        return true;
-    }
-
     /**
      * @dev gas usage 90736 gas (initial), 58888 gas (update)
      */
