@@ -3,7 +3,7 @@ pragma solidity >=0.6.0 <0.8.0;
 
 interface ISwapContract {
     function singleTransferERC20(
-        address _token,
+        address _destToken,
         address _to,
         uint256 _amount,
         uint256 _totalSwapped,
@@ -12,24 +12,15 @@ interface ISwapContract {
     ) external returns (bool);
 
     function multiTransferERC20TightlyPacked(
-        address _token,
+        address _destToken,
         bytes32[] memory _addressesAndAmounts,
         uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external returns (bool);
 
-    function multiTransferERC20(
-        address token,
-        address[] memory _contributors,
-        uint256[] memory _amounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external returns (bool);
-
     function collectSwapFeesForBTC(
-        address _feeToken,
+        address _destToken,
         uint256 _incomingAmount,
         uint256 _rewardsAmount
     ) external returns (bool);

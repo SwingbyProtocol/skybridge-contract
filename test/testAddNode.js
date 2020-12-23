@@ -20,7 +20,7 @@ contract('Test for churn and float', function (accounts) {
 
         this.WBTC_ADDR = this.wbtcTest.address
 
-        this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address);
+        this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address, 0);
 
         await this.lpToken.transferOwnership(this.swap.address)
     });

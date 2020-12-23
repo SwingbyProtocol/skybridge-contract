@@ -61,7 +61,11 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
-    constructor(address _lpToken, address _wbtc) public {
+    constructor(
+        address _lpToken,
+        address _wbtc,
+        uint256 _existingBTCFloat
+    ) public {
         // burner = new Burner();
         lpToken = _lpToken;
         // Set initial price of LP token per BTC/WBTC.
@@ -82,6 +86,7 @@ contract SwapContract is Ownable, ISwapContract {
         whitelist[WBTC_ADDR] = true;
         whitelist[lpToken] = true;
         whitelist[address(0)] = true;
+        floatAmountOf[address(0)] = _existingBTCFloat;
     }
 
     /**
@@ -89,52 +94,60 @@ contract SwapContract is Ownable, ISwapContract {
      */
 
     /// @dev singleTransferERC20 function sends tokens from contract.
-    /// @param _token Address of token.
+    /// @param _destToken Address of token.
     /// @param _to Recevier address.
     /// @param _amount The amount of tokens.
     /// @param _totalSwapped the amount of swapped amount which is for send.
     /// @param _rewardsAmount Value that should be paid as fees.
     /// @param _redeemedFloatTxIds the txs which is for records txids.
     function singleTransferERC20(
-        address _token,
+        address _destToken,
         address _to,
         uint256 _amount,
         uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
-        require(whitelist[_token], "token is not whitelisted");
-        if (_token == WBTC_ADDR && _totalSwapped > 0) {
+                require(whitelist[_destToken], "_destToken is not whitelisted");
+        require(
+            _destToken != address(0),
+            "_destToken should not be address(0)"
+        );
+        if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
             activeWBTCBalances = activeWBTCBalances.sub(
                 _totalSwapped,
                 "activeWBTCBalances insufficient"
             );
         }
-        _rewardsCollection(_token, _rewardsAmount);
+        _rewardsCollection(_destToken, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
-        require(IERC20(_token).transfer(_to, _amount));
+        require(IERC20(_destToken).transfer(_to, _amount));
         return true;
     }
 
     function multiTransferERC20TightlyPacked(
-        address _token,
+        address _destToken,
         bytes32[] memory _addressesAndAmounts,
         uint256 _totalSwapped,
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
-        require(whitelist[_token], "token is not whitelisted");
-        if (_token == WBTC_ADDR && _totalSwapped > 0) {
+        require(whitelist[_destToken], "_destToken is not whitelisted");
+        require(
+            _destToken != address(0),
+            "_destToken should not be address(0)"
+        );
+        if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
             activeWBTCBalances = activeWBTCBalances.sub(
                 _totalSwapped,
                 "activeWBTCBalances insufficient"
             );
         }
-        _rewardsCollection(_token, _rewardsAmount);
+        _rewardsCollection(_destToken, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             require(
-                IERC20(_token).transfer(
+                IERC20(_destToken).transfer(
                     address(uint160(uint256(_addressesAndAmounts[i]))),
                     uint256(uint96(bytes12(_addressesAndAmounts[i])))
                 ),
@@ -144,46 +157,17 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    function multiTransferERC20(
-        address _token,
-        address[] memory _contributors,
-        uint256[] memory _amounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external override onlyOwner returns (bool) {
-        require(
-            _contributors.length == _amounts.length,
-            "Length of inputs array is mismatch"
-        );
-        if (_token == WBTC_ADDR && _totalSwapped > 0) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _totalSwapped,
-                "activeWBTCBalances insufficient"
-            );
-        }
-        _rewardsCollection(_token, _rewardsAmount);
-        _addTxidUsed(_redeemedFloatTxIds);
-        for (uint256 i = 0; i < _contributors.length; i++) {
-            require(IERC20(_token).transfer(_contributors[i], _amounts[i]));
-        }
-        return true;
-    }
-
     /**
      * @dev gas usage 90736 gas (initial), 58888 gas (update)
      */
     function collectSwapFeesForBTC(
-        address _feeToken,
+        address _destToken,
         uint256 _incomingAmount,
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
-        //require(!used[_txid], "txid is already used");
+        require(_destToken == address(0), "_destToken should be address(0)");
         activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
-        // _feeToken should be address(0) == BTC
-        _rewardsCollection(_feeToken, _rewardsAmount);
-        // Add txid to used list.
-        //used[_txid] = true;
+        _rewardsCollection(_destToken, _rewardsAmount);
         return true;
     }
 
@@ -200,8 +184,6 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) external override onlyOwner returns (bool) {
         require(whitelist[_token], "_token is invalid");
-        // txs[_token][_txid] = _addressesAndAmountOfFloat;
-        // emit RecordIncomingFloat(_token, _addressesAndAmountOfFloat, _txid);
         require(
             _issueLPTokensForFloat(_token, _addressesAndAmountOfFloat, _txid)
         );
@@ -218,9 +200,6 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) external override onlyOwner returns (bool) {
         require(whitelist[_token], "_token is invalid");
-        // _token should be address(0) or WBTC_ADDR, txid should be unique
-        // txs[_token][_txid] = _addressesAndAmountOfLPtoken;
-        // emit RecordOutcomingFloat(_token, _addressesAndAmountOfLPtoken, _txid);
         require(
             _burnLPTokensForFloat(_token, _addressesAndAmountOfLPtoken, _txid)
         );
@@ -407,11 +386,11 @@ contract SwapContract is Ownable, ISwapContract {
             .div(3);
         if (_token == WBTC_ADDR) {
             if (activeWBTCBalances.add(_amountOfFloat) >= threshold) {
-                return 1;  // BTC float insufficient
+                return 1; // BTC float insufficient
             }
         } else if (_token == address(0)) {
             if (balBTC.add(_amountOfFloat) >= threshold) {
-                return 2;  // WBTC float insufficient
+                return 2; // WBTC float insufficient
             }
         }
         return 0;
@@ -456,11 +435,14 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
-    function _rewardsCollection(address _token, uint256 _rewardsAmount)
+    function _rewardsCollection(address _destToken, uint256 _rewardsAmount)
         internal
     {
+        if (_destToken == lpToken) return;
+        // The fee is always collected in the source token (it's left in the float on the origin chain).
+        address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
         // Add all fees into pool
-        totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
+        totalRewards[_feesToken] = totalRewards[_feesToken].add(_rewardsAmount);
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
         uint256 amountLPForNode = amountForNodes.mul(priceDecimals).div(

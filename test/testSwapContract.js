@@ -20,7 +20,7 @@ contract('Test for swap actions', function (accounts) {
 
         this.WBTC_ADDR = this.wbtcTest.address
 
-        this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address);
+        this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address, 0);
 
         this.depositFeesBPS = new BN(50)
 
