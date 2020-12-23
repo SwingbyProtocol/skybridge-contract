@@ -12,7 +12,7 @@ module.exports = async function (deployer, net) {
   }
   await deployer.deploy(LPToken)
   const lpToken = await LPToken.deployed()
-  await deployer.deploy(SwapContract, lpToken.address, WBTC_ADDR);
+  await deployer.deploy(SwapContract, lpToken.address, WBTC_ADDR, 0);
   const swapContract = await SwapContract.deployed()
   await lpToken.transferOwnership(swapContract.address)
 };
