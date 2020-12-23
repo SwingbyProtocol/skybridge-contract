@@ -460,6 +460,7 @@ contract SwapContract is Ownable, ISwapContract {
     function _rewardsCollection(address _destToken, uint256 _rewardsAmount)
         internal
     {
+        if (_destToken == lpToken) return;
         // The fee is always collected in the source token (it's left in the float on the origin chain).
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
         // Add all fees into pool
