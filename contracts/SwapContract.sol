@@ -108,7 +108,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
-                require(whitelist[_destToken], "_destToken is not whitelisted");
+        require(whitelist[_destToken], "_destToken is not whitelisted");
         require(
             _destToken != address(0),
             "_destToken should not be address(0)"
