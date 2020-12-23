@@ -266,7 +266,7 @@ contract SwapContract is Ownable, ISwapContract {
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
-            (address newNode, ) = _splitToStakes(_rewardAddressAndAmounts[i]);
+            (address newNode, ) = _splitToValues(_rewardAddressAndAmounts[i]);
             _addNode(newNode, _rewardAddressAndAmounts[i], _isRemoved[i]);
         }
         churnedInCount = _churnedInCount;
@@ -324,9 +324,8 @@ contract SwapContract is Ownable, ISwapContract {
         // (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
         // Define target address which is recorded bottom 20bytes on tx data
-        address to = address(uint160(uint256(transaction)));
         // Define amountLP which is recorded top 12bytes on tx data
-        uint256 amountOfFloat = uint256(uint96(bytes12(transaction)));
+        (address to, uint256 amountOfFloat) = _splitToValues(transaction);
         // LP token price per BTC/WBTC changed
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amount of LP token
@@ -360,9 +359,8 @@ contract SwapContract is Ownable, ISwapContract {
         // (address token, bytes32 transaction) = _loadTx(_txid);
         require(transaction != 0x0, "The transaction is not found");
         // Define target address which is recorded bottom 20bytes on tx data
-        address to = address(uint160(uint256(transaction)));
         // Define amountLP which is recorded top 12bytes on tx data
-        uint256 amountOfLP = uint256(uint96(bytes12(transaction)));
+        (address to, uint256 amountOfLP) = _splitToValues(transaction);
         // Calculate amountOfLP
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amountOfFloat
@@ -484,7 +482,7 @@ contract SwapContract is Ownable, ISwapContract {
             nodeSize.sub(nodeRemoved, "nodeSize insufficient")
         );
         for (uint256 i = 1; i <= nodeSize; i++) {
-            (address node, ) = _splitToStakes(nodes[i]);
+            (address node, ) = _splitToValues(nodes[i]);
             uint256 index = nodeIndex[node];
             if (index != 2**256 - 1) {
                 _nodes[count] = nodes[i];
@@ -515,7 +513,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    function _splitToStakes(bytes32 _data)
+    function _splitToValues(bytes32 _data)
         internal
         pure
         returns (address, uint256)
