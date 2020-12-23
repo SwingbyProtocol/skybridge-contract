@@ -20,7 +20,7 @@ contract('SwapFactory', function (accounts) {
     });
 
     it('Deploy new contracts and checking the owner', async function () {
-        const sc = await this.factory.deployNewContracts(receiver, WBTC_ADDR)
+        const sc = await this.factory.deployNewContracts(receiver, WBTC_ADDR, 0)
         const newLPToken = await LPToken.at(sc.receipt.logs[0].args.lpToken)
         const newSwapContract = await SwapContract.at(sc.receipt.logs[0].args.swapContract)
 

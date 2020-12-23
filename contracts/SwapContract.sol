@@ -61,7 +61,11 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
-    constructor(address _lpToken, address _wbtc, uint256 _existingBTCFloat) {
+    constructor(
+        address _lpToken,
+        address _wbtc,
+        uint256 _existingBTCFloat
+    ) public {
         // burner = new Burner();
         lpToken = _lpToken;
         // Set initial price of LP token per BTC/WBTC.
