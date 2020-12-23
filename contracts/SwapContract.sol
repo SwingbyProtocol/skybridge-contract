@@ -389,31 +389,32 @@ contract SwapContract is Ownable, ISwapContract {
     function _checkFlips(address _token, uint256 _amountOfFloat)
         internal
         view
-        returns (uint8 active)
+        returns (uint8)
     {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
             WBTC_ADDR
         );
-        if (_token == address(0)) {
-            reserveA = reserveA.add(_amountOfFloat);
-        } else if (_token == WBTC_ADDR) {
-            reserveB = reserveB.add(_amountOfFloat);
-        }
         if (activeWBTCBalances > reserveA.add(reserveB)) {
-            return active;
-        } else if (reserveA.add(reserveB) >= activeWBTCBalances) {
-            // BTC balance == balance of BTC float + balance of WBTC float - balance of WBTC
-            uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
-            if (balBTC <= reserveA.add(reserveB).div(3)) {
-                active = 1; // BTC float insufficient
-            } else if (activeWBTCBalances <= reserveA.add(reserveB).div(3)) {
-                active = 2; // WBTC float insufficient
-            } else {
-                active = 0; // zero fees
+            return 0;
+        }
+        // BTC balance == balance of BTC float + balance of WBTC float - balance of WBTC
+        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
+        uint256 threshold = reserveA
+            .add(reserveB)
+            .add(_amountOfFloat)
+            .mul(2)
+            .div(3);
+        if (_token == WBTC_ADDR) {
+            if (activeWBTCBalances.add(_amountOfFloat) >= threshold) {
+                return 1;  // BTC float insufficient
+            }
+        } else if (_token == address(0)) {
+            if (balBTC.add(_amountOfFloat) >= threshold) {
+                return 2;  // WBTC float insufficient
             }
         }
-        return active;
+        return 0;
     }
 
     function _updateFloatPool(address _tokenA, address _tokenB)
@@ -460,12 +461,11 @@ contract SwapContract is Ownable, ISwapContract {
     {
         // Add all fees into pool
         totalRewards[_token] = totalRewards[_token].add(_rewardsAmount);
-        uint256 amountForLP = _rewardsAmount.mul(nodeRewardsRatio).div(100);
+        uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
-        uint256 amountLPForNode = _rewardsAmount
-            .sub(amountForLP)
-            .mul(priceDecimals)
-            .div(getCurrentPriceLP());
+        uint256 amountLPForNode = amountForNodes.mul(priceDecimals).div(
+            getCurrentPriceLP()
+        );
         // Add minted LP tokens for Nodes
         lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
     }
