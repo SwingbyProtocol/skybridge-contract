@@ -186,12 +186,8 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        //require(!used[_txid], "txid is already used");
         activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
-        // _destToken should be address(0) == BTC
         _rewardsCollection(_destToken, _rewardsAmount);
-        // Add txid to used list.
-        //used[_txid] = true;
         return true;
     }
 
@@ -208,8 +204,6 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) external override onlyOwner returns (bool) {
         require(whitelist[_token], "_token is invalid");
-        // txs[_token][_txid] = _addressesAndAmountOfFloat;
-        // emit RecordIncomingFloat(_token, _addressesAndAmountOfFloat, _txid);
         require(
             _issueLPTokensForFloat(_token, _addressesAndAmountOfFloat, _txid)
         );
@@ -226,9 +220,6 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) external override onlyOwner returns (bool) {
         require(whitelist[_token], "_token is invalid");
-        // _token should be address(0) or WBTC_ADDR, txid should be unique
-        // txs[_token][_txid] = _addressesAndAmountOfLPtoken;
-        // emit RecordOutcomingFloat(_token, _addressesAndAmountOfLPtoken, _txid);
         require(
             _burnLPTokensForFloat(_token, _addressesAndAmountOfLPtoken, _txid)
         );
