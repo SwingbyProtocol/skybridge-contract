@@ -7,12 +7,17 @@ import "./LPToken.sol";
 contract SwapContractFactory {
     event Deployed(address lpToken, address swapContract);
 
-    function deployNewContracts(address _owner, address _wbtc)
-        external
-        returns (address)
-    {
+    function deployNewContracts(
+        address _owner,
+        address _wbtc,
+        uint256 _existingBTCFloat
+    ) external returns (address) {
         LPToken lpToken = new LPToken();
-        SwapContract sc = new SwapContract(address(lpToken), _wbtc);
+        SwapContract sc = new SwapContract(
+            address(lpToken),
+            _wbtc,
+            _existingBTCFloat
+        );
         lpToken.transferOwnership(address(sc));
         sc.transferOwnership(_owner);
         emit Deployed(address(lpToken), address(sc));
