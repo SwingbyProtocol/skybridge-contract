@@ -467,6 +467,7 @@ contract('Test for swap actions', function (accounts) {
             gasPrice: 2 * 10 ** 6
         })
         // console.log(tx1.receipt.gasUsed)
+        // Gas cost 102882 gas
         rewardAddressAndAmounts = []
         isRemoved = []
         for (i = 0; i < 1; i++) {
@@ -481,5 +482,6 @@ contract('Test for swap actions', function (accounts) {
             from: receiver
         })
         // console.log(tx2.receipt.gasUsed)
+        // Gas cost 83682 gas
     })
 })
