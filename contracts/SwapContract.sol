@@ -61,6 +61,12 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
+    modifier priceCheck() {
+        uint256 beforePrice = getCurrentPriceLP();
+        _;
+        require(getCurrentPriceLP() >= beforePrice, "Invalid  LP price change");
+    }
+
     constructor(
         address _lpToken,
         address _wbtc,
@@ -182,7 +188,7 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         bytes32 _addressesAndAmountOfFloat,
         bytes32 _txid
-    ) external override onlyOwner returns (bool) {
+    ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "_token is invalid");
         require(
             _issueLPTokensForFloat(_token, _addressesAndAmountOfFloat, _txid)
@@ -198,7 +204,7 @@ contract SwapContract is Ownable, ISwapContract {
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
         bytes32 _txid
-    ) external override onlyOwner returns (bool) {
+    ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "_token is invalid");
         require(
             _burnLPTokensForFloat(_token, _addressesAndAmountOfLPtoken, _txid)
@@ -217,7 +223,7 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32[] memory nodeList = _loadNodes();
         uint256 totalStaked = 0;
         for (uint256 i = 0; i < nodeList.length; i++) {
-            totalStaked = totalStaked.add(uint256(uint96(bytes12(nodes[i]))));
+            totalStaked = totalStaked.add(uint256(uint96(bytes12(nodeList[i]))));
         }
         for (uint256 i = 0; i < nodeList.length; i++) {
             IBurnableToken(lpToken).mint(
