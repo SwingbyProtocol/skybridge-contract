@@ -57,7 +57,7 @@ contract('Test for churn and float', function (accounts) {
             gasPrice: 2 * 10 ** 6
         })
         // console.log(tx1.receipt.cumulativeGasUsed)
-
+        // Gas cost 4493006 gas
         rewardAddressAndAmounts = []
         isRemoved = []
 
@@ -73,7 +73,7 @@ contract('Test for churn and float', function (accounts) {
         })
 
         // console.log(tx2.receipt.cumulativeGasUsed)
-
+        // Gas cost 215506 gas
         rewardAddressAndAmounts = []
         isRemoved = []
 
@@ -92,7 +92,8 @@ contract('Test for churn and float', function (accounts) {
             this.swap.distributeNodeRewards(),
             'totalRewardLPsForNode is not positive',
         );
-        // console.log(dist.receipt.cumulativeGasUsed)
+        // console.log(tx3.receipt.cumulativeGasUsed)
+        // Gas cost 51706 gas
     })
 
 

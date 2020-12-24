@@ -23,15 +23,13 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private priceDecimals;
     uint256 private currentExchangeRate;
     uint256 private lpDecimals;
-    uint256 private nodeSize;
-    uint256 private nodeRemoved;
     // Support tokens
     mapping(address => bool) whitelist;
 
     // Nodes
-    mapping(uint256 => bytes32) private nodes;
+    mapping(address => bytes32) private nodes;
     mapping(address => uint256) private nodeIndex;
-
+    address[] private nodeAddrs;
     // Token address -> amount
     mapping(address => uint256) private totalRewards;
     mapping(address => uint256) private floatAmountOf;
@@ -220,10 +218,12 @@ contract SwapContract is Ownable, ISwapContract {
         // Reduce Gas
         uint256 rewardLPsForNodes = lockedLPTokensForNode;
         require(rewardLPsForNodes > 0, "totalRewardLPsForNode is not positive");
-        bytes32[] memory nodeList = _loadNodes();
+        bytes32[] memory nodeList = getActiveNodes();
         uint256 totalStaked = 0;
         for (uint256 i = 0; i < nodeList.length; i++) {
-            totalStaked = totalStaked.add(uint256(uint96(bytes12(nodeList[i]))));
+            totalStaked = totalStaked.add(
+                uint256(uint96(bytes12(nodeList[i])))
+            );
         }
         for (uint256 i = 0; i < nodeList.length; i++) {
             IBurnableToken(lpToken).mint(
@@ -296,6 +296,26 @@ contract SwapContract is Ownable, ISwapContract {
             floatAmountOf[_tokenB].add(totalRewards[_tokenB])
         );
     }
+
+    function getActiveNodes() public override view returns (bytes32[] memory) {
+        uint256 nodeCount = 0;
+        uint256 count = 0;
+        // Seek all nodes
+        for (uint256 i = 0; i < nodeAddrs.length; i++) {
+            if (nodes[nodeAddrs[i]] != 0x0) {
+                nodeCount = nodeCount.add(1);
+            }
+        }
+        bytes32[] memory _nodes = new bytes32[](nodeCount);
+        for (uint256 i = 0; i < nodeAddrs.length; i++) {
+            if (nodes[nodeAddrs[i]] != 0x0) {
+                _nodes[count] = nodes[nodeAddrs[i]];
+                count = count.add(1);
+            }
+        }
+        return _nodes;
+    }
+
 
     /**
      * @dev gas usage 183033 gas
@@ -464,39 +484,18 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
-    function _loadNodes() internal view returns (bytes32[] memory) {
-        uint256 count = 0;
-        bytes32[] memory _nodes = new bytes32[](
-            nodeSize.sub(nodeRemoved, "nodeSize insufficient")
-        );
-        for (uint256 i = 1; i <= nodeSize; i++) {
-            (address node, ) = _splitToValues(nodes[i]);
-            uint256 index = nodeIndex[node];
-            if (index != 2**256 - 1) {
-                _nodes[count] = nodes[i];
-                count = count.add(1);
-            }
-        }
-        return _nodes;
-    }
-
     function _addNode(
         address _addr,
         bytes32 _data,
         bool _remove
     ) internal returns (bool) {
         if (_remove) {
-            nodeIndex[_addr] = 2**256 - 1;
-            nodeRemoved = nodeRemoved.add(1);
+            nodes[_addr] = 0x0;
             return true;
         }
-        uint256 index = nodeIndex[_addr]; // 0 => not exist, != 0 => exist, 2 ^ 256 -1 => removed.
-        if (index == 0) {
-            nodeSize = nodeSize.add(1);
-            nodes[nodeSize] = _data;
-            nodeIndex[_addr] = nodeSize;
-        } else {
-            nodes[index] = _data;
+        if (nodes[_addr] == 0x0) {
+            nodeAddrs.push(_addr);
+            nodes[_addr] = _data;
         }
         return true;
     }
