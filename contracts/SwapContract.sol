@@ -28,7 +28,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     // Nodes
     mapping(address => bytes32) private nodes;
-    mapping(address => uint256) private nodeIndex;
+    mapping(address => bool) private isInList;
     address[] private nodeAddrs;
     // Token address -> amount
     mapping(address => uint256) private totalRewards;
@@ -316,7 +316,6 @@ contract SwapContract is Ownable, ISwapContract {
         return _nodes;
     }
 
-
     /**
      * @dev gas usage 183033 gas
      */
@@ -490,11 +489,14 @@ contract SwapContract is Ownable, ISwapContract {
         bool _remove
     ) internal returns (bool) {
         if (_remove) {
-            nodes[_addr] = 0x0;
+            delete nodes[_addr];
             return true;
         }
-        if (nodes[_addr] == 0x0) {
+        if (!isInList[_addr]) {
             nodeAddrs.push(_addr);
+            isInList[_addr] = true;
+        }
+        if (nodes[_addr] == 0x0) {
             nodes[_addr] = _data;
         }
         return true;
