@@ -455,6 +455,7 @@ contract('Test for swap actions', function (accounts) {
         let rewardAddressAndAmounts = []
         let isRemoved = []
         let churnedInCount = 25
+        let tssThreshold = 16
         let nodeRewardsRatio = 66
         for (i = 0; i < 1; i++) {
             let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
@@ -462,7 +463,7 @@ contract('Test for swap actions', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx1 = await this.swap.churn(receiver, rewardAddressAndAmounts, isRemoved, churnedInCount, nodeRewardsRatio, {
+        const tx1 = await this.swap.churn(receiver, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
@@ -476,7 +477,7 @@ contract('Test for swap actions', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx2 = await this.swap.churn(receiver, rewardAddressAndAmounts, isRemoved, churnedInCount + 1, nodeRewardsRatio + 1, {
+        const tx2 = await this.swap.churn(receiver, rewardAddressAndAmounts, isRemoved, churnedInCount + 1, tssThreshold + 1, nodeRewardsRatio + 1, {
             value: 0,
             gasPrice: 2 * 10 ** 6,
             from: receiver
