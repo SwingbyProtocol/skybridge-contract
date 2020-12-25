@@ -250,12 +250,32 @@ contract SwapContract is Ownable, ISwapContract {
         uint8 _tssThreshold,
         uint8 _nodeRewardsRatio
     ) external override onlyOwner returns (bool) {
+        require(
+            _tssThreshold >= tssThreshold,
+            "_tssThreshold should be >= tssThreshold"
+        );
+        require(
+            _churnedInCount >= _tssThreshold + uint8(1),
+            "n should be >= t+1"
+        );
+        require(
+            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
+            "_nodeRewardsRatio is not valid"
+        );
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
             (address newNode, ) = _splitToValues(_rewardAddressAndAmounts[i]);
             _addNode(newNode, _rewardAddressAndAmounts[i], _isRemoved[i]);
         }
+        require(
+            _tssThreshold >= tssThreshold,
+            "_tssThreshold should be >= tssThreshold"
+        );
+        require(
+            _churnedInCount >= _tssThreshold + uint8(1),
+            "n should be >= t+1"
+        );
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
         // The ratio should be 100x of actual rate.
