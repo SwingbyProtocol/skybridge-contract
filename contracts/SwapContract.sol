@@ -268,17 +268,8 @@ contract SwapContract is Ownable, ISwapContract {
             (address newNode, ) = _splitToValues(_rewardAddressAndAmounts[i]);
             _addNode(newNode, _rewardAddressAndAmounts[i], _isRemoved[i]);
         }
-        require(
-            _tssThreshold >= tssThreshold,
-            "_tssThreshold should be >= tssThreshold"
-        );
-        require(
-            _churnedInCount >= _tssThreshold + uint8(1),
-            "n should be >= t+1"
-        );
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
-        // The ratio should be 100x of actual rate.
         nodeRewardsRatio = _nodeRewardsRatio;
         return true;
     }
