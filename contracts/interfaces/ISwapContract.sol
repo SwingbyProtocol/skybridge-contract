@@ -48,6 +48,7 @@ interface ISwapContract {
         bytes32[] memory _rewardAddressAndAmounts,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
+        uint8 _tssThreshold,
         uint8 _nodeRewardsRatio
     ) external returns (bool);
 

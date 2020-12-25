@@ -14,6 +14,7 @@ contract SwapContract is Ownable, ISwapContract {
     address public lpToken;
 
     uint8 public churnedInCount;
+    uint8 public tssThreshold;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
 
@@ -246,6 +247,7 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32[] memory _rewardAddressAndAmounts,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
+        uint8 _tssThreshold,
         uint8 _nodeRewardsRatio
     ) external override onlyOwner returns (bool) {
         transferOwnership(_newOwner);
@@ -255,6 +257,7 @@ contract SwapContract is Ownable, ISwapContract {
             _addNode(newNode, _rewardAddressAndAmounts[i], _isRemoved[i]);
         }
         churnedInCount = _churnedInCount;
+        tssThreshold = _tssThreshold;
         // The ratio should be 100x of actual rate.
         nodeRewardsRatio = _nodeRewardsRatio;
         return true;
