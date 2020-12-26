@@ -208,6 +208,10 @@ contract SwapContract is Ownable, ISwapContract {
     ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "_token is invalid");
         require(
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
+            "_withdrawalFeeBPS is invalid"
+        );
+        require(
             _burnLPTokensForFloat(
                 _token,
                 _addressesAndAmountOfLPtoken,
@@ -398,12 +402,16 @@ contract SwapContract is Ownable, ISwapContract {
             floatAmountOf[_token] >= amountOfFloat,
             "Pool balance insufficient."
         );
+        require(
+            _minerFee <= amountOfFees,
+            "amountOfFees.sub(_minerFee) is negative"
+        );
         // Burn LP tokens
         require(IBurnableToken(lpToken).burn(amountOfLP));
         // Remove float amount
         _removeFloat(_token, amountOfFloat);
         // Collect fees
-        _rewardsCollection(_token, amountOfFees.add(_minerFee));
+        _rewardsCollection(_token, amountOfFees.sub(_minerFee));
         used[_txid] = true;
         // WBTC transfer if token address is WBTC_ADDR
         if (_token == WBTC_ADDR) {
@@ -493,6 +501,7 @@ contract SwapContract is Ownable, ISwapContract {
         internal
     {
         if (_destToken == lpToken) return;
+        if (_rewardsAmount == 0) return;
         // The fee is always collected in the source token (it's left in the float on the origin chain).
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
         // Add all fees into pool
