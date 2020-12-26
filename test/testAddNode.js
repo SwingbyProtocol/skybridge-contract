@@ -57,8 +57,8 @@ contract('Test for churn and float', function (accounts) {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
-        console.log(tx1.receipt.cumulativeGasUsed)
-        // Gas cost 6675694 gas
+        // console.log(tx1.receipt.cumulativeGasUsed)
+        // Gas cost 6676812 gas
         let getNode1 = await this.swap.getActiveNodes()
         expect(getNode1.length).to.equal(100)
 

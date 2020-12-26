@@ -308,6 +308,28 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
+    function getMinimumAmountOfLPTokens(
+        uint256 _withdrawalFeeBPS,
+        uint256 _minerFees
+    ) public override view returns (uint256) {
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            WBTC_ADDR
+        );
+        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
+        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
+        uint256 nowPrice = totalLPs == 0
+            ? currentExchangeRate
+            : (reserveA.add(reserveB)).mul(lpDecimals).div(
+                totalLPs.add(lockedLPTokensForNode)
+            );
+        uint256 requiredFloat = _minerFees.mul(10000).div(_withdrawalFeeBPS);
+        uint256 amountOfLPTokens = requiredFloat.mul(priceDecimals).div(
+            nowPrice
+        );
+        return amountOfLPTokens;
+    }
+
     /**
      * @dev returns float amounts not balances.
      */
