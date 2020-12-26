@@ -202,12 +202,14 @@ contract SwapContract is Ownable, ISwapContract {
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
-        bytes32 _txid
+        bytes32 _txid,
+        uint256 _rewardsAmount
     ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "_token is invalid");
         require(
             _burnLPTokensForFloat(_token, _addressesAndAmountOfLPtoken, _txid)
         );
+        _rewardsCollection(_token, _rewardsAmount);
         return true;
     }
 
