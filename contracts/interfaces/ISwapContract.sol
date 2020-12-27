@@ -72,5 +72,5 @@ interface ISwapContract {
     function getMinimumAmountOfLPTokens(
         uint256 _withdrawalFeeBPS,
         uint256 _minerFees
-    ) external returns (uint256);
+    ) external view returns (uint256);
 }
