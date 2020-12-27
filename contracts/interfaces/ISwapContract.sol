@@ -36,6 +36,8 @@ interface ISwapContract {
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
+        uint256 _withdrawalFeeBPS,
+        uint256 _minerFee,
         bytes32 _txid
     ) external returns (bool);
 
@@ -66,4 +68,9 @@ interface ISwapContract {
         returns (uint256 reserveA, uint256 reserveB);
 
     function getActiveNodes() external returns (bytes32[] memory);
+
+    function getMinimumAmountOfLPTokens(
+        uint256 _withdrawalFeeBPS,
+        uint256 _minerFees
+    ) external returns (uint256);
 }
