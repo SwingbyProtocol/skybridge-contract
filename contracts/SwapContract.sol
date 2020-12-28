@@ -130,6 +130,12 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /// @dev multiTransferERC20TightlyPacked function sends tokens from contract.
+    /// @param _destToken Address of token.
+    /// @param _addressesAndAmounts Recevier address and amounts.
+    /// @param _totalSwapped the amount of swapped amount which is for send.
+    /// @param _rewardsAmount Value that should be paid as fees.
+    /// @param _redeemedFloatTxIds the txs which is for records txids.
     function multiTransferERC20TightlyPacked(
         address _destToken,
         bytes32[] memory _addressesAndAmounts,
@@ -162,9 +168,10 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /**
-     * @dev gas usage 90736 gas (initial), 58888 gas (update)
-     */
+    /// @dev collectSwapFeesForBTC function collectes fees on BTC.
+    /// @param _destToken Address of token.
+    /// @param _incomingAmount spent amount of BTC.
+    /// @param _rewardsAmount Value that should be paid as fees.
     function collectSwapFeesForBTC(
         address _destToken,
         uint256 _incomingAmount,
@@ -180,9 +187,11 @@ contract SwapContract is Ownable, ISwapContract {
      * Float part
      */
 
-    /**
-     * @dev gas usage 44910 gas
-     */
+    /// @dev recordIncomingFloat function mint LP token.
+    /// @param _token Address of target token.
+    /// @param _addressesAndAmountOfFloat Recevier address and amounts.
+    /// @param _zerofee The flag of accept.
+    /// @param _txid the txs which is for records txids.
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
@@ -201,10 +210,11 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /**
-     * @dev gas uasge 43628 gas
-     */
-
+    /// @dev recordOutcomingFloat function burn LP token.
+    /// @param _token Address of target token.
+    /// @param _addressesAndAmountOfLPtoken Sender address and amounts.
+    /// @param _withdrawalFeeBPS The amount of withdrawal fees.
+    /// @param _txid the txs which is for records txids.
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
@@ -229,10 +239,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /**
-     * @dev gas usage 3999911 gas for 100 nodes
-     */
-
+    /// @dev distributeNodeRewards function sends rewards for Nodes.
     function distributeNodeRewards() external override returns (bool) {
         // Reduce Gas
         uint256 rewardLPsForNodes = lockedLPTokensForNode;
@@ -256,10 +263,13 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /**
-     * @dev gas usage 7653778 gas (initial cost), 1284578 gas (update cost) for 100 nodes
-     */
-
+    /// @dev churn function transfer contract ownership and set variables.
+    /// @param _newOwner Address of new Owner.
+    /// @param _rewardAddressAndAmounts Staker addresses and amounts.
+    /// @param _isRemoved The flags for remove node.
+    /// @param _churnedInCount The number of next N count.
+    /// @param _tssThreshold The number of next T.
+    /// @param _nodeRewardsRatio The number of next node rewards ratio.
     function churn(
         address _newOwner,
         bytes32[] memory _rewardAddressAndAmounts,
@@ -296,14 +306,20 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /// @dev isTxUsed function sends rewards for Nodes.
+    /// @param _txid txid of incoming tx.
     function isTxUsed(bytes32 _txid) public override view returns (bool) {
         return used[_txid];
     }
 
+    /// @dev getCurrentPriceLP function returns exchange rate of LP token.
     function getCurrentPriceLP() public override view returns (uint256) {
         return currentExchangeRate;
     }
 
+    /// @dev getDepositFeeRate function returns deposit fees rate
+    /// @param _token The address of target token.
+    /// @param _amountOfFloat The amount of float.
     function getDepositFeeRate(address _token, uint256 _amountOfFloat)
         public
         override
@@ -318,6 +334,9 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
+    /// @dev getMinimumAmountOfLPTokens function returns the minimum amount of LP Token.
+    /// @param _withdrawalFeeBPS The withdrawal fees.
+    /// @param _minerFees The amount of miner Fees (BTC).
     function getMinimumAmountOfLPTokens(
         uint256 _withdrawalFeeBPS,
         uint256 _minerFees
@@ -340,9 +359,7 @@ contract SwapContract is Ownable, ISwapContract {
         return amountOfLPTokens;
     }
 
-    /**
-     * @dev returns float amounts not balances.
-     */
+    /// @dev getFloatReserve function returns float reserves not current balances.
     function getFloatReserve(address _tokenA, address _tokenB)
         public
         override
@@ -355,6 +372,7 @@ contract SwapContract is Ownable, ISwapContract {
         );
     }
 
+    /// @dev getActiveNodes function returns active nodes list (stakes and amount)
     function getActiveNodes() public override view returns (bytes32[] memory) {
         uint256 nodeCount = 0;
         uint256 count = 0;
@@ -374,9 +392,11 @@ contract SwapContract is Ownable, ISwapContract {
         return _nodes;
     }
 
-    /**
-     * @dev gas usage 183033 gas
-     */
+    /// @dev _issueLPTokensForFloat
+    /// @param _token Address of target token.
+    /// @param _transaction Recevier address and amounts.
+    /// @param _zerofee The flag of accept.
+    /// @param _txid the txs which is for records txids.
     function _issueLPTokensForFloat(
         address _token,
         bytes32 _transaction,
@@ -412,9 +432,11 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /**
-     * @dev gas uasge 63677 gas
-     */
+    /// @dev _burnLPTokensForFloat
+    /// @param _token Address of target token.
+    /// @param _transaction Sender address and amounts.
+    /// @param _withdrawalFeeBPS The amount of withdrawal fees.
+    /// @param _txid the txs which is for records txids.
     function _burnLPTokensForFloat(
         address _token,
         bytes32 _transaction,
@@ -463,6 +485,9 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /// @dev _checkFlips
+    /// @param _token Address of target token.
+    /// @param _amountOfFloat The amount of float.
     function _checkFlips(address _token, uint256 _amountOfFloat)
         internal
         view
@@ -494,6 +519,9 @@ contract SwapContract is Ownable, ISwapContract {
         return 0;
     }
 
+    /// @dev _updateFloatPool updates float balances.
+    /// @param _tokenA Address of target tokenA.
+    /// @param _tokenB Address of target tokenB.
     function _updateFloatPool(address _tokenA, address _tokenB)
         internal
         returns (uint256)
@@ -513,6 +541,9 @@ contract SwapContract is Ownable, ISwapContract {
         return currentExchangeRate;
     }
 
+    /// @dev _addFloat updates Float.
+    /// @param _token The address of target token.
+    /// @param _amount The amount of float.
     function _addFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
         if (_token == WBTC_ADDR) {
@@ -520,6 +551,9 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
+    /// @dev _removeFloat remove Float.
+    /// @param _token The address of target token.
+    /// @param _amount The amount of float.
     function _removeFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].sub(
             _amount,
@@ -533,6 +567,9 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
+    /// @dev _rewardsCollection collects rewards.
+    /// @param _destToken The address of target token.
+    /// @param _rewardsAmount The amount of rewards.
     function _rewardsCollection(address _destToken, uint256 _rewardsAmount)
         internal
     {
@@ -551,12 +588,18 @@ contract SwapContract is Ownable, ISwapContract {
         lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
     }
 
+    /// @dev _addTxidUsed updates a spent txhash.
+    /// @param _txs The array of txid.
     function _addTxidUsed(bytes32[] memory _txs) internal {
         for (uint256 i = 0; i < _txs.length; i++) {
             used[_txs[i]] = true;
         }
     }
 
+    /// @dev _addNode updates a Staker.
+    /// @param _addr The address of staker.
+    /// @param _data The data of staker.
+    /// @param _remove The flag for remove.
     function _addNode(
         address _addr,
         bytes32 _data,
@@ -576,6 +619,8 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
+    /// @dev _splitToValues returns address and amount of stakes
+    /// @param _data The data of staker.
     function _splitToValues(bytes32 _data)
         internal
         pure
@@ -587,7 +632,7 @@ contract SwapContract is Ownable, ISwapContract {
         );
     }
 
-    // The contract doesn't allow receiving Ether.
+    /// @dev The contract doesn't allow receiving Ether.
     fallback() external {
         revert();
     }
