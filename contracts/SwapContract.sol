@@ -82,6 +82,8 @@ contract SwapContract is Ownable, ISwapContract {
         nodeRewardsRatio = 66;
         // Set depositFeesBPS
         depositFeesBPS = 50;
+        // Set withdrawalFeeBPS
+        withdrawalFeeBPS = 20;
         // Set priceDecimals
         priceDecimals = 10**8;
         // Set currentExchangeRate

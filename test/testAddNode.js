@@ -22,6 +22,8 @@ contract('Test for churn and float', function (accounts) {
 
         this.totalSwapped = new BN(0)
 
+        this.withdrawalFeeBPS = new BN(20)
+
         this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address, 0);
 
         this.redeemedFloatTxIds = [
@@ -61,7 +63,7 @@ contract('Test for churn and float', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx1 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+        const tx1 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, this.withdrawalFeeBPS, {
             value: 0,
             gas: 9000000,
             gasPrice: 2 * 10 ** 6
@@ -80,7 +82,7 @@ contract('Test for churn and float', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx2 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+        const tx2 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, this.withdrawalFeeBPS, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
@@ -114,7 +116,7 @@ contract('Test for churn and float', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(true)
         }
-        const tx3 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+        const tx3 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, this.withdrawalFeeBPS, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
@@ -141,7 +143,7 @@ contract('Test for churn and float', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx1 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+        const tx1 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, this.withdrawalFeeBPS, {
             value: 0,
             gas: 9000000,
             gasPrice: 2 * 10 ** 6
@@ -160,7 +162,7 @@ contract('Test for churn and float', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx2 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+        const tx2 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, this.withdrawalFeeBPS, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
@@ -194,7 +196,7 @@ contract('Test for churn and float', function (accounts) {
             rewardAddressAndAmounts.push(addressesAndAmountStaked)
             isRemoved.push(false)
         }
-        const tx3 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+        const tx3 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, this.withdrawalFeeBPS, {
             value: 0,
             gasPrice: 2 * 10 ** 6
         })
