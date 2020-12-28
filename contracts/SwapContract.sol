@@ -17,6 +17,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public tssThreshold;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
+    uint8 public withdrawalFeeBPS;
 
     uint256 public activeWBTCBalances;
     uint256 public lockedLPTokensForNode;
@@ -213,25 +214,19 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev recordOutcomingFloat function burn LP token.
     /// @param _token Address of target token.
     /// @param _addressesAndAmountOfLPtoken Sender address and amounts.
-    /// @param _withdrawalFeeBPS The amount of withdrawal fees.
     /// @param _txid the txs which is for records txids.
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
-        uint256 _withdrawalFeeBPS,
         uint256 _minerFee,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "_token is invalid");
         require(
-            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
-            "_withdrawalFeeBPS is invalid"
-        );
-        require(
             _burnLPTokensForFloat(
                 _token,
                 _addressesAndAmountOfLPtoken,
-                _withdrawalFeeBPS,
+                withdrawalFeeBPS,
                 _minerFee,
                 _txid
             )
@@ -270,13 +265,15 @@ contract SwapContract is Ownable, ISwapContract {
     /// @param _churnedInCount The number of next N count.
     /// @param _tssThreshold The number of next T.
     /// @param _nodeRewardsRatio The number of next node rewards ratio.
+    /// @param _withdrawalFeeBPS The amount of wthdrawal fees.
     function churn(
         address _newOwner,
         bytes32[] memory _rewardAddressAndAmounts,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
-        uint8 _nodeRewardsRatio
+        uint8 _nodeRewardsRatio,
+        uint8 _withdrawalFeeBPS
     ) external override onlyOwner returns (bool) {
         require(
             _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
@@ -289,6 +286,10 @@ contract SwapContract is Ownable, ISwapContract {
         require(
             _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
             "_nodeRewardsRatio is not valid"
+        );
+        require(
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
+            "_withdrawalFeeBPS is invalid"
         );
         transferOwnership(_newOwner);
         // Update active node list
@@ -303,6 +304,7 @@ contract SwapContract is Ownable, ISwapContract {
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
         nodeRewardsRatio = _nodeRewardsRatio;
+        withdrawalFeeBPS = _withdrawalFeeBPS;
         return true;
     }
 

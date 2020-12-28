@@ -37,7 +37,6 @@ interface ISwapContract {
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
-        uint256 _withdrawalFeeBPS,
         uint256 _minerFee,
         bytes32 _txid
     ) external returns (bool);
@@ -52,7 +51,8 @@ interface ISwapContract {
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
-        uint8 _nodeRewardsRatio
+        uint8 _nodeRewardsRatio,
+        uint8 _withdrawalFeeBPS
     ) external returns (bool);
 
     function isTxUsed(bytes32 _txid) external view returns (bool);
