@@ -230,7 +230,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas usage 3129064 gas for 100 nodes
+     * @dev gas usage 3999911 gas for 100 nodes
      */
 
     function distributeNodeRewards() external override returns (bool) {
@@ -257,7 +257,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /**
-     * @dev gas usage 4599585 gas (initial cost), 733763 gas (update cost) for 100 nodes
+     * @dev gas usage 7653778 gas (initial cost), 1284578 gas (update cost) for 100 nodes
      */
 
     function churn(

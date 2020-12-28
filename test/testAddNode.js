@@ -66,7 +66,7 @@ contract('Test for churn and float', function (accounts) {
             gas: 9000000,
             gasPrice: 2 * 10 ** 6
         })
-        console.log(tx1.receipt.cumulativeGasUsed)
+        // console.log(tx1.receipt.cumulativeGasUsed)
         // Gas cost 6676812 => 7653778 gas
         let getNode1 = await this.swap.getActiveNodes()
         expect(getNode1.length).to.equal(100)
@@ -85,7 +85,7 @@ contract('Test for churn and float', function (accounts) {
             gasPrice: 2 * 10 ** 6
         })
 
-        console.log(tx2.receipt.cumulativeGasUsed)
+        // console.log(tx2.receipt.cumulativeGasUsed)
         // Gas cost 306494 => 1284578 gas
         let getNode2 = await this.swap.getActiveNodes()
         expect(getNode2.length).to.equal(100)
@@ -103,7 +103,7 @@ contract('Test for churn and float', function (accounts) {
 
         const distribute = await this.swap.distributeNodeRewards()
         // Gas 3999911 gas
-        console.log(distribute.receipt.cumulativeGasUsed)
+        // console.log(distribute.receipt.cumulativeGasUsed)
 
         rewardAddressAndAmounts = []
         isRemoved = []
@@ -128,5 +128,85 @@ contract('Test for churn and float', function (accounts) {
         );
         //console.log(tx3.receipt.cumulativeGasUsed)
         // Gas cost 51700 => 867293 gas
+    })
+    it('add 60 nodes into swap contract then update 100 nodes', async function () {
+        let rewardAddressAndAmounts = []
+        let isRemoved = []
+        let churnedInCount = 25
+        let tssThreshold = 16
+        let nodeRewardsRatio = 66
+        for (i = 0; i < 60; i++) {
+            let staked = new BN(3000000).mul(new BN(10).pow(new BN(18)))
+            let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + accounts[i].slice(2), 64)
+            rewardAddressAndAmounts.push(addressesAndAmountStaked)
+            isRemoved.push(false)
+        }
+        const tx1 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+            value: 0,
+            gas: 9000000,
+            gasPrice: 2 * 10 ** 6
+        })
+        console.log(tx1.receipt.cumulativeGasUsed)
+        // Gas cost 4615206 gas
+        let getNode1 = await this.swap.getActiveNodes()
+        expect(getNode1.length).to.equal(60)
+
+        rewardAddressAndAmounts = []
+        isRemoved = []
+
+        for (i = 0; i < 60; i++) {
+            let staked = new BN(1500000).mul(new BN(10).pow(new BN(18)))
+            let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + accounts[i].slice(2), 64)
+            rewardAddressAndAmounts.push(addressesAndAmountStaked)
+            isRemoved.push(false)
+        }
+        const tx2 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+            value: 0,
+            gasPrice: 2 * 10 ** 6
+        })
+
+         console.log(tx2.receipt.cumulativeGasUsed)
+        // Gas cost 784326 gas
+        let getNode2 = await this.swap.getActiveNodes()
+        expect(getNode2.length).to.equal(60)
+
+
+        let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
+
+        await this.wbtcTest.mint(this.swap.address, floatAmountOfBTC)
+
+        let swapTx = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
+        // fees are collected. (0.1 WBTC)
+        let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
+        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
+        // Second deposit tx
+
+        const distribute = await this.swap.distributeNodeRewards()
+        // Gas 3999911 gas
+        // console.log(distribute.receipt.cumulativeGasUsed)
+
+        rewardAddressAndAmounts = []
+        isRemoved = []
+
+        for (i = 0; i < 100; i++) {
+            let staked = new BN(500000).mul(new BN(10).pow(new BN(18)))
+            let addressesAndAmountStaked = "0x" + web3.utils.padLeft(staked.toString('hex') + accounts[i].slice(2), 64)
+            rewardAddressAndAmounts.push(addressesAndAmountStaked)
+            isRemoved.push(false)
+        }
+        const tx3 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
+            value: 0,
+            gasPrice: 2 * 10 ** 6
+        })
+
+        let getNode3 = await this.swap.getActiveNodes()
+        expect(getNode3.length).to.equal(100)
+
+        await expectRevert(
+            this.swap.distributeNodeRewards(),
+            'totalRewardLPsForNode is not positive',
+        );
+        // console.log(tx3.receipt.cumulativeGasUsed)
+        // Gas cost 784326 gas
     })
 })
