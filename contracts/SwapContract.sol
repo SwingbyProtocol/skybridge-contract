@@ -286,6 +286,10 @@ contract SwapContract is Ownable, ISwapContract {
             (address newNode, ) = _splitToValues(_rewardAddressAndAmounts[i]);
             _addNode(newNode, _rewardAddressAndAmounts[i], _isRemoved[i]);
         }
+        bytes32[] memory nodeList = getActiveNodes();
+        if (nodeList.length > 100) {
+            revert("node size should be <= 100");
+        }
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
         nodeRewardsRatio = _nodeRewardsRatio;

@@ -63,10 +63,11 @@ contract('Test for churn and float', function (accounts) {
         }
         const tx1 = await this.swap.churn(sender, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, {
             value: 0,
+            gas: 9000000,
             gasPrice: 2 * 10 ** 6
         })
-        // console.log(tx1.receipt.cumulativeGasUsed)
-        // Gas cost 6676812 gas
+        console.log(tx1.receipt.cumulativeGasUsed)
+        // Gas cost 6676812 => 7653778 gas
         let getNode1 = await this.swap.getActiveNodes()
         expect(getNode1.length).to.equal(100)
 
@@ -84,8 +85,8 @@ contract('Test for churn and float', function (accounts) {
             gasPrice: 2 * 10 ** 6
         })
 
-        // console.log(tx2.receipt.cumulativeGasUsed)
-        // Gas cost 306494 gas
+        console.log(tx2.receipt.cumulativeGasUsed)
+        // Gas cost 306494 => 1284578 gas
         let getNode2 = await this.swap.getActiveNodes()
         expect(getNode2.length).to.equal(100)
 
@@ -102,7 +103,7 @@ contract('Test for churn and float', function (accounts) {
 
         const distribute = await this.swap.distributeNodeRewards()
         // Gas 3999911 gas
-        // console.log(distribute.receipt.cumulativeGasUsed)
+        console.log(distribute.receipt.cumulativeGasUsed)
 
         rewardAddressAndAmounts = []
         isRemoved = []
@@ -125,7 +126,7 @@ contract('Test for churn and float', function (accounts) {
             this.swap.distributeNodeRewards(),
             'totalRewardLPsForNode is not positive',
         );
-        // console.log(tx3.receipt.cumulativeGasUsed)
-        // Gas cost 51700 gas
+        //console.log(tx3.receipt.cumulativeGasUsed)
+        // Gas cost 51700 => 867293 gas
     })
 })
