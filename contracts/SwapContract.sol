@@ -186,11 +186,17 @@ contract SwapContract is Ownable, ISwapContract {
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
+        bool _zerofee,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "_token is invalid");
         require(
-            _issueLPTokensForFloat(_token, _addressesAndAmountOfFloat, _txid)
+            _issueLPTokensForFloat(
+                _token,
+                _addressesAndAmountOfFloat,
+                _zerofee,
+                _txid
+            )
         );
         return true;
     }
@@ -370,6 +376,7 @@ contract SwapContract is Ownable, ISwapContract {
     function _issueLPTokensForFloat(
         address _token,
         bytes32 _transaction,
+        bool _zerofee,
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
@@ -387,6 +394,9 @@ contract SwapContract is Ownable, ISwapContract {
             ? amountOfLP.mul(depositFeeRate).div(10000)
             : 0;
 
+        if (_zerofee && depositFees != 0) {
+            revert();
+        }
         //Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
         // Add deposit fees

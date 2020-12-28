@@ -28,6 +28,7 @@ interface ISwapContract {
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
+        bool _zerofee,
         bytes32 _txid
     ) external returns (bool);
 
