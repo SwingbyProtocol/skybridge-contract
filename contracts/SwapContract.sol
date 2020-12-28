@@ -26,7 +26,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private currentExchangeRate;
     uint256 private lpDecimals;
     // Support tokens
-    mapping(address => bool) whitelist;
+    mapping(address => bool) public whitelist;
 
     // Nodes
     mapping(address => bytes32) private nodes;
