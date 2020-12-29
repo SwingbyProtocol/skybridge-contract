@@ -346,10 +346,16 @@ contract('Test for swap actions', function (accounts) {
         let txid4 = "0x000000000000000000033d05abcee8adbd9897cdcf184e135191dc06b095534b"
 
         const price4 = await this.swap.getCurrentPriceLP()
+        // LP price is 1.00050969 BTC/WBTC 
         const amountFloat = LP2.sub(depositFeesLP2).mul(price4).div(new BN(10).pow(new BN(8)))
-        // amoutn of float 0.99516900
+        // amount of float 0.99516900
+        console.log(price4.toString())
+        result = await this.swap.getMinimumAmountOfLPTokens(this.minerFees)
+        // Get required amount and updated price.
+        console.log(result[0].toString(), result[1].toString())
+        const requireAmountLP = "0x" + web3.utils.padLeft(result[0].toString('hex') + sender.toString().slice(2), 64)
         // console.log(amountFloat.toString())
-        await this.swap.recordOutcomingFloat(ZERO_ADDRESS, AmountOfLPtoken, this.minerFees, txid4)
+        await this.swap.recordOutcomingFloat(ZERO_ADDRESS, requireAmountLP, this.minerFees, txid4)
         // await this.swap.burnLPTokensForFloat(txid4)
         const price5 = await this.swap.getCurrentPriceLP()
         // LP price is 1.00050969 BTC/WBTC

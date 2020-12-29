@@ -30,8 +30,6 @@ contract('Test for churn and float', function (accounts) {
             "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
             "0xce66450451e62b9b4c406d0a83b90a5036039673d2682d4ec292f375ae571382"
         ]
-
-
         await this.lpToken.transferOwnership(this.swap.address)
     });
 
@@ -184,7 +182,7 @@ contract('Test for churn and float', function (accounts) {
         // Second deposit tx
 
         const distribute = await this.swap.distributeNodeRewards()
-        // Gas 3999911 gas
+        // Gas 2413235 gas
         // console.log(distribute.receipt.cumulativeGasUsed)
 
         rewardAddressAndAmounts = []

@@ -70,8 +70,8 @@ interface ISwapContract {
 
     function getActiveNodes() external returns (bytes32[] memory);
 
-    function getMinimumAmountOfLPTokens(
-        uint256 _withdrawalFeeBPS,
-        uint256 _minerFees
-    ) external view returns (uint256);
+    function getMinimumAmountOfLPTokens(uint256 _minerFees)
+        external
+        view
+        returns (uint256, uint256);
 }

@@ -339,12 +339,13 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev getMinimumAmountOfLPTokens function returns the minimum amount of LP Token.
-    /// @param _withdrawalFeeBPS The withdrawal fees.
     /// @param _minerFees The amount of miner Fees (BTC).
-    function getMinimumAmountOfLPTokens(
-        uint256 _withdrawalFeeBPS,
-        uint256 _minerFees
-    ) public override view returns (uint256) {
+    function getMinimumAmountOfLPTokens(uint256 _minerFees)
+        public
+        override
+        view
+        returns (uint256, uint256)
+    {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
             WBTC_ADDR
@@ -356,11 +357,11 @@ contract SwapContract is Ownable, ISwapContract {
             : (reserveA.add(reserveB)).mul(lpDecimals).div(
                 totalLPs.add(lockedLPTokensForNode)
             );
-        uint256 requiredFloat = _minerFees.mul(10000).div(_withdrawalFeeBPS);
-        uint256 amountOfLPTokens = requiredFloat.mul(priceDecimals).div(
+        uint256 requiredFloat = _minerFees.mul(10000).div(withdrawalFeeBPS);
+        uint256 amountOfLPTokens = requiredFloat.add(10).mul(priceDecimals).div(
             nowPrice
         );
-        return amountOfLPTokens;
+        return (amountOfLPTokens, nowPrice);
     }
 
     /// @dev getFloatReserve function returns float reserves not current balances.
