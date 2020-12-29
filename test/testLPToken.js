@@ -6,7 +6,7 @@ const LPToken = artifacts.require('LPToken');
 
 contract('LPToken', function (accounts) {
     const [sender, receiver] = accounts
-    const name = 'Swingby BTC';
+    const name = "Swingby BTC LP Token";
     const symbol = 'sbBTC';
 
     beforeEach(async function () {
