@@ -5,6 +5,6 @@ import "./BurnableToken.sol";
 
 contract LPToken is BurnableToken {
     constructor() {
-        _initialize("Swingby BTC", "sbBTC", 8, 0, true);
+        _initialize("Swingby BTC LP Token", "sbBTC", 8, 0, true);
     }
 }
