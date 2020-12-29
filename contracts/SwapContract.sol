@@ -293,6 +293,10 @@ contract SwapContract is Ownable, ISwapContract {
             _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
             "_withdrawalFeeBPS is invalid"
         );
+        require(
+            _rewardAddressAndAmounts.length == _isRemoved.length,
+            "_rewardAddressAndAmounts and _isRemoved length is not match"
+        );
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {
