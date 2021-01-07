@@ -120,7 +120,7 @@ contract SwapContract is Ownable, ISwapContract {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
         _rewardsCollection(_destToken, _rewardsAmount);
-        _addTxidUsed(_redeemedFloatTxIds);
+        _addUsedTxs(_redeemedFloatTxIds);
         require(IERC20(_destToken).transfer(_to, _amount));
         return true;
     }
@@ -147,7 +147,7 @@ contract SwapContract is Ownable, ISwapContract {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
         _rewardsCollection(_destToken, _rewardsAmount);
-        _addTxidUsed(_redeemedFloatTxIds);
+        _addUsedTxs(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             require(
                 IERC20(_destToken).transfer(
@@ -170,7 +170,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        _swap(WBTC_ADDR, address(0), _incomingAmount.add(_rewardsAmount));
+        _swap(WBTC_ADDR, address(0), _incomingAmount.sub(_rewardsAmount));
         _rewardsCollection(_destToken, _rewardsAmount);
         return true;
     }
@@ -245,6 +245,28 @@ contract SwapContract is Ownable, ISwapContract {
             );
         }
         lockedLPTokensForNode = 0;
+        return true;
+    }
+
+    /**
+     * Life cycle part
+     */
+
+    /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
+    /// @param _minerFees The miner fees for sending BTCs.
+    /// @param _txid the txhash which is for recording.
+    function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid)
+        public
+        override
+        onlyOwner
+        returns (bool)
+    {
+        require(!isTxUsed(_txid), "The txid is already used");
+        floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
+            _minerFees,
+            "float amount insufficient"
+        );
+        _addUsedTx(_txid);
         return true;
     }
 
@@ -429,7 +451,7 @@ contract SwapContract is Ownable, ISwapContract {
         lockedLPTokensForNode = lockedLPTokensForNode.add(depositFees);
         // Add float amount
         _addFloat(_token, amountOfFloat);
-        used[_txid] = true;
+        _addUsedTx(_txid);
         emit IssueLPTokensForFloat(to, amountOfFloat, amountOfLP, _txid);
         return true;
     }
@@ -470,7 +492,7 @@ contract SwapContract is Ownable, ISwapContract {
         _removeFloat(_token, amountOfFloat);
         // Collect fees
         _rewardsCollection(_token, amountOfFees.sub(_minerFee));
-        used[_txid] = true;
+        _addUsedTx(_txid);
         // WBTC transfer if token address is WBTC_ADDR
         if (_token == WBTC_ADDR) {
             require(
@@ -584,6 +606,11 @@ contract SwapContract is Ownable, ISwapContract {
         if (_rewardsAmount == 0) return;
         // The fee is always collected in the source token (it's left in the float on the origin chain).
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
+        // Reduce float pool on source token
+        floatAmountOf[_feesToken] = floatAmountOf[_feesToken].sub(
+            _rewardsAmount,
+            "float amount of _feesToken insufficient"
+        );
         // Add all fees into pool
         totalRewards[_feesToken] = totalRewards[_feesToken].add(_rewardsAmount);
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
@@ -595,11 +622,17 @@ contract SwapContract is Ownable, ISwapContract {
         lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
     }
 
-    /// @dev _addTxidUsed updates a spent txhash.
-    /// @param _txs The array of txid.
-    function _addTxidUsed(bytes32[] memory _txs) internal {
-        for (uint256 i = 0; i < _txs.length; i++) {
-            used[_txs[i]] = true;
+    /// @dev _addUsedTx updates txhash list which is spent. (single hash)
+    /// @param _txid The array of txid.
+    function _addUsedTx(bytes32 _txid) internal {
+        used[_txid] = true;
+    }
+
+    /// @dev _addUsedTxs updates txhash list which is spent. (multiple hash)
+    /// @param _txids The array of txid.
+    function _addUsedTxs(bytes32[] memory _txids) internal {
+        for (uint256 i = 0; i < _txids.length; i++) {
+            used[_txids[i]] = true;
         }
     }
 
