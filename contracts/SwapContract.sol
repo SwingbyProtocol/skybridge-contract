@@ -160,7 +160,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev collectSwapFeesForBTC function collectes fees on BTC.
+    /// @dev collectSwapFeesForBTC collectes fees on the case of swap WBTC to BTC.
     /// @param _destToken Address of token.
     /// @param _incomingAmount spent amount of BTC.
     /// @param _rewardsAmount Value that should be paid as fees.
