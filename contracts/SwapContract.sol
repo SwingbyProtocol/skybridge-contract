@@ -215,7 +215,6 @@ contract SwapContract is Ownable, ISwapContract {
             _burnLPTokensForFloat(
                 _token,
                 _addressesAndAmountOfLPtoken,
-                withdrawalFeeBPS,
                 _minerFee,
                 _txid
             )
@@ -339,7 +338,8 @@ contract SwapContract is Ownable, ISwapContract {
     {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
-            WBTC_ADDR
+            WBTC_ADDR,
+            true
         );
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
@@ -356,16 +356,20 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev getFloatReserve function returns float reserves not current balances.
-    function getFloatReserve(address _tokenA, address _tokenB)
-        public
-        override
-        view
-        returns (uint256 reserveA, uint256 reserveB)
-    {
-        (reserveA, reserveB) = (
-            floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
-            floatAmountOf[_tokenB].add(totalRewards[_tokenB])
-        );
+    /// @param _tokenA Address of target tokenA.
+    /// @param _tokenB Address of target tokenB.
+    /// @param _mergeRewards The flag to merge collected rewards.
+    function getFloatReserve(
+        address _tokenA,
+        address _tokenB,
+        bool _mergeRewards
+    ) public override view returns (uint256 reserveA, uint256 reserveB) {
+        (reserveA, reserveB) = _mergeRewards
+            ? (
+                floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
+                floatAmountOf[_tokenB].add(totalRewards[_tokenB])
+            )
+            : (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
     }
 
     /// @dev getActiveNodes function returns active nodes list (stakes and amount)
@@ -431,12 +435,10 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev _burnLPTokensForFloat
     /// @param _token Address of target token.
     /// @param _transaction Sender address and amounts.
-    /// @param _withdrawalFeeBPS The amount of withdrawal fees.
     /// @param _txid the txs which is for records txids.
     function _burnLPTokensForFloat(
         address _token,
         bytes32 _transaction,
-        uint256 _withdrawalFeeBPS,
         uint256 _minerFee,
         bytes32 _txid
     ) internal returns (bool) {
@@ -451,7 +453,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
         // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
-        uint256 amountOfFees = amountOfFloat.mul(_withdrawalFeeBPS).div(10000);
+        uint256 amountOfFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             floatAmountOf[_token] >= amountOfFloat,
             "Pool balance insufficient."
@@ -477,7 +479,7 @@ contract SwapContract is Ownable, ISwapContract {
                 "WBTC balance insufficient"
             );
         }
-        emit BurnLPTokensForFloat(to, amountOfLP,amountOfFloat, _txid);
+        emit BurnLPTokensForFloat(to, amountOfLP, amountOfFloat, _txid);
         return true;
     }
 
@@ -491,7 +493,8 @@ contract SwapContract is Ownable, ISwapContract {
     {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
-            WBTC_ADDR
+            WBTC_ADDR,
+            true
         );
         uint256 threshold = reserveA
             .add(reserveB)
@@ -520,7 +523,8 @@ contract SwapContract is Ownable, ISwapContract {
         // Reduce gas cost.
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             _tokenA,
-            _tokenB
+            _tokenB,
+            true
         );
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
