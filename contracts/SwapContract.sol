@@ -492,7 +492,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev _checkFlips
+    /// @dev _checkFlips checks whether the fees are activated.
     /// @param _token Address of target token.
     /// @param _amountOfFloat The amount of float.
     function _checkFlips(address _token, uint256 _amountOfFloat)
@@ -504,22 +504,17 @@ contract SwapContract is Ownable, ISwapContract {
             address(0),
             WBTC_ADDR
         );
-        if (activeWBTCBalances > reserveA.add(reserveB)) {
-            return 0;
-        }
-        // BTC balance == balance of BTC float + balance of WBTC float - balance of WBTC
-        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
         uint256 threshold = reserveA
             .add(reserveB)
             .add(_amountOfFloat)
             .mul(2)
             .div(3);
         if (_token == WBTC_ADDR) {
-            if (activeWBTCBalances.add(_amountOfFloat) >= threshold) {
+            if (reserveA.add(_amountOfFloat) >= threshold) {
                 return 1; // BTC float insufficient
             }
         } else if (_token == address(0)) {
-            if (balBTC.add(_amountOfFloat) >= threshold) {
+            if (reserveB.add(_amountOfFloat) >= threshold) {
                 return 2; // WBTC float insufficient
             }
         }
@@ -565,16 +560,22 @@ contract SwapContract is Ownable, ISwapContract {
         );
     }
 
+    /// @dev _swap collects swap amount to change float.
+    /// @param _sourceToken The address of source token
+    /// @param _destToken The address of target token.
+    /// @param _swapAmount The amount of swap.
     function _swap(
-        address _from,
-        address _dist,
-        uint256 _amount
+        address _sourceToken,
+        address _destToken,
+        uint256 _swapAmount
     ) internal {
-        floatAmountOf[_dist] = floatAmountOf[_dist].sub(
-            _amount,
+        floatAmountOf[_destToken] = floatAmountOf[_destToken].sub(
+            _swapAmount,
             "float amount insufficient"
         );
-        floatAmountOf[_from] = floatAmountOf[_from].add(_amount);
+        floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
+            _swapAmount
+        );
     }
 
     /// @dev _rewardsCollection collects rewards.
