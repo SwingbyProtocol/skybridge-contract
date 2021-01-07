@@ -40,6 +40,8 @@ contract SwapContract is Ownable, ISwapContract {
      * Events
      */
 
+    event Swap(address from, address to, uint256 amount);
+
     event IssueLPTokensForFloat(
         address to,
         uint256 amountOfFloat,
@@ -168,7 +170,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        _swap(WBTC_ADDR, address(0), _incomingAmount);
+        _swap(WBTC_ADDR, address(0), _incomingAmount.add(_rewardsAmount));
         _rewardsCollection(_destToken, _rewardsAmount);
         return true;
     }
@@ -564,11 +566,12 @@ contract SwapContract is Ownable, ISwapContract {
     ) internal {
         floatAmountOf[_destToken] = floatAmountOf[_destToken].sub(
             _swapAmount,
-            "float amount insufficient"
+            "float amount of _destToken insufficient"
         );
         floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
             _swapAmount
         );
+        emit Swap(_sourceToken, _destToken, _swapAmount);
     }
 
     /// @dev _rewardsCollection collects rewards.
