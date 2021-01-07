@@ -40,12 +40,6 @@ contract SwapContract is Ownable, ISwapContract {
      * Events
      */
 
-    event RecordIncomingFloat(
-        address token,
-        bytes32 addressesAndAmountOfFloat,
-        bytes32 txid
-    );
-
     event IssueLPTokensForFloat(
         address to,
         uint256 amountOfFloat,
@@ -53,14 +47,9 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
-    event RecordOutcomingFloat(
-        address token,
-        bytes32 addressesAndAmountOfLPtoken,
-        bytes32 txid
-    );
-
     event BurnLPTokensForFloat(
         address token,
+        uint256 amountOfLP,
         uint256 amountOfFloat,
         bytes32 txid
     );
@@ -488,7 +477,7 @@ contract SwapContract is Ownable, ISwapContract {
                 "WBTC balance insufficient"
             );
         }
-        emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
+        emit BurnLPTokensForFloat(to, amountOfLP,amountOfFloat, _txid);
         return true;
     }
 
