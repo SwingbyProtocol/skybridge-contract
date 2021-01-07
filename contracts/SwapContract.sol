@@ -19,7 +19,6 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
 
-    uint256 public activeWBTCBalances;
     uint256 public lockedLPTokensForNode;
 
     uint256 private priceDecimals;
@@ -47,7 +46,12 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 txid
     );
 
-    event IssueLPTokensForFloat(address to, uint256 amountOfLP, bytes32 txid);
+    event IssueLPTokensForFloat(
+        address to,
+        uint256 amountOfFloat,
+        uint256 amountOfLP,
+        bytes32 txid
+    );
 
     event RecordOutcomingFloat(
         address token,
@@ -122,10 +126,7 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _totalSwapped,
-                "activeWBTCBalances insufficient"
-            );
+            _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
         _rewardsCollection(_destToken, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
@@ -152,10 +153,7 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _totalSwapped,
-                "activeWBTCBalances insufficient"
-            );
+            _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
         _rewardsCollection(_destToken, _rewardsAmount);
         _addTxidUsed(_redeemedFloatTxIds);
@@ -181,7 +179,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
+        _swap(WBTC_ADDR, address(0), _incomingAmount);
         _rewardsCollection(_destToken, _rewardsAmount);
         return true;
     }
@@ -437,7 +435,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Add float amount
         _addFloat(_token, amountOfFloat);
         used[_txid] = true;
-        emit IssueLPTokensForFloat(to, amountOfLP, _txid);
+        emit IssueLPTokensForFloat(to, amountOfFloat, amountOfLP, _txid);
         return true;
     }
 
@@ -555,9 +553,6 @@ contract SwapContract is Ownable, ISwapContract {
     /// @param _amount The amount of float.
     function _addFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
-        if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.add(_amount);
-        }
     }
 
     /// @dev _removeFloat remove Float.
@@ -568,12 +563,18 @@ contract SwapContract is Ownable, ISwapContract {
             _amount,
             "float amount insufficient"
         );
-        if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _amount,
-                "activeWBTCBalances insufficient"
-            );
-        }
+    }
+
+    function _swap(
+        address _from,
+        address _dist,
+        uint256 _amount
+    ) internal {
+        floatAmountOf[_dist] = floatAmountOf[_dist].sub(
+            _amount,
+            "float amount insufficient"
+        );
+        floatAmountOf[_from] = floatAmountOf[_from].add(_amount);
     }
 
     /// @dev _rewardsCollection collects rewards.
