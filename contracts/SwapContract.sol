@@ -25,7 +25,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 public lockedLPTokensForNode;
 
     uint256 private priceDecimals;
-    uint256 private currentExchangeRate;
+    uint256 private initialExchangeRate;
     uint256 private lpDecimals;
 
     // Nodes
@@ -66,7 +66,7 @@ contract SwapContract is Ownable, ISwapContract {
     );
 
     modifier priceCheck() {
-        uint256 beforePrice = currentExchangeRate;
+        uint256 beforePrice = getCurrentPriceLP();
         _;
         require(getCurrentPriceLP() >= beforePrice, "Invalid  LP price change");
     }
@@ -90,8 +90,8 @@ contract SwapContract is Ownable, ISwapContract {
         withdrawalFeeBPS = 20;
         // Set priceDecimals
         priceDecimals = 10**8;
-        // Set currentExchangeRate
-        currentExchangeRate = priceDecimals;
+        // Set initialExchangeRate
+        initialExchangeRate = priceDecimals;
         // Set lockedLPTokensForNode
         lockedLPTokensForNode = 0;
         // SEt whitelist
@@ -354,7 +354,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         nowPrice = totalLPs == 0
-            ? currentExchangeRate
+            ? initialExchangeRate
             : (reserveA.add(reserveB)).mul(lpDecimals).div(
                 totalLPs.add(lockedLPTokensForNode)
             );
@@ -449,7 +449,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Define amountLP which is recorded top 12bytes on tx data
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
         // LP token price per BTC/WBTC changed
-        uint256 nowPrice = _updateCurrentPriceLP();
+        uint256 nowPrice = getCurrentPriceLP();
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
@@ -495,7 +495,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Define amountLP which is recorded top 12bytes on tx data
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
         // Calculate amountOfLP
-        uint256 nowPrice = _updateCurrentPriceLP();
+        uint256 nowPrice = getCurrentPriceLP();
         // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
         uint256 amountOfFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
@@ -507,12 +507,11 @@ contract SwapContract is Ownable, ISwapContract {
             _minerFee <= amountOfFees,
             "amountOfFees.sub(_minerFee) is negative"
         );
-        // Burn LP tokens
-        require(IBurnableToken(lpToken).burn(amountOfLP));
+        // Collect fees before remove float
+        _rewardsCollection(_token, amountOfFees.sub(_minerFee));
         // Remove float amount
         _removeFloat(_token, amountOfFloat);
-        // Collect fees
-        _rewardsCollection(_token, amountOfFees.sub(_minerFee));
+        // Add txid for recording.
         _addUsedTx(_txid);
         // WBTC transfer if token address is WBTC_ADDR
         if (_token == WBTC_ADDR) {
@@ -524,6 +523,8 @@ contract SwapContract is Ownable, ISwapContract {
                 "WBTC balance insufficient"
             );
         }
+        // Burn LP tokens
+        require(IBurnableToken(lpToken).burn(amountOfLP));
         emit BurnLPTokensForFloat(
             to,
             amountOfLP,
@@ -562,12 +563,6 @@ contract SwapContract is Ownable, ISwapContract {
             }
         }
         return 0;
-    }
-
-    /// @dev _updateCurrentPriceLP updates current LP token price.
-    function _updateCurrentPriceLP() internal returns (uint256) {
-        currentExchangeRate = getCurrentPriceLP();
-        return currentExchangeRate;
     }
 
     /// @dev _addFloat updates one side of float.
