@@ -270,7 +270,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev churn transfers contract ownership and set variables for next TSS validator set.
+    /// @dev churn transfers contract ownership and set variables of next TSS validator set.
     /// @param _newOwner Address of new Owner.
     /// @param _rewardAddressAndAmounts Staker addresses and amounts.
     /// @param _isRemoved The flags for remove node.
@@ -331,8 +331,25 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev getCurrentPriceLP returns exchange rate of LP token.
-    function getCurrentPriceLP() public override view returns (uint256) {
-        return currentExchangeRate;
+    function getCurrentPriceLP()
+        public
+        override
+        view
+        returns (uint256 nowPrice)
+    {
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            WBTC_ADDR,
+            true
+        );
+        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
+        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
+        nowPrice = totalLPs == 0
+            ? currentExchangeRate
+            : (reserveA.add(reserveB)).mul(lpDecimals).div(
+                totalLPs.add(lockedLPTokensForNode)
+            );
+        return nowPrice;
     }
 
     /// @dev getDepositFeeRate returns deposit fees rate
@@ -360,22 +377,12 @@ contract SwapContract is Ownable, ISwapContract {
         view
         returns (uint256, uint256)
     {
-        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
-            address(0),
-            WBTC_ADDR,
-            true
-        );
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
-        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
-        uint256 nowPrice = totalLPs == 0
-            ? currentExchangeRate
-            : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.add(lockedLPTokensForNode)
-            );
+        uint256 nowPrice = getCurrentPriceLP();
         uint256 requiredFloat = _minerFees.mul(10000).div(withdrawalFeeBPS);
-        uint256 amountOfLPTokens = requiredFloat.add(10).mul(priceDecimals).div(
-            nowPrice
-        );
+        uint256 amountOfLPTokens = requiredFloat
+            .add(10)
+            .mul(priceDecimals)
+            .div(nowPrice);
         return (amountOfLPTokens, nowPrice);
     }
 
@@ -416,7 +423,7 @@ contract SwapContract is Ownable, ISwapContract {
         return _nodes;
     }
 
-    /// @dev _issueLPTokensForFloat 
+    /// @dev _issueLPTokensForFloat
     /// @param _token Address of target token.
     /// @param _transaction Recevier address and amounts.
     /// @param _zerofee The flag of accept.
@@ -434,7 +441,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Define amountLP which is recorded top 12bytes on tx data
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
         // LP token price per BTC/WBTC changed
-        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
+        uint256 nowPrice = _updateCurrentPriceLP();
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
@@ -474,7 +481,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Define amountLP which is recorded top 12bytes on tx data
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
         // Calculate amountOfLP
-        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
+        uint256 nowPrice = _updateCurrentPriceLP();
         // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
         uint256 amountOfFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
@@ -537,26 +544,9 @@ contract SwapContract is Ownable, ISwapContract {
         return 0;
     }
 
-    /// @dev _updateFloatPool updates float balances.
-    /// @param _tokenA Address of target tokenA.
-    /// @param _tokenB Address of target tokenB.
-    function _updateFloatPool(address _tokenA, address _tokenB)
-        internal
-        returns (uint256)
-    {
-        // Reduce gas cost.
-        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
-            _tokenA,
-            _tokenB,
-            true
-        );
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
-        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
-        currentExchangeRate = totalLPs == 0
-            ? currentExchangeRate
-            : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.add(lockedLPTokensForNode)
-            );
+    /// @dev _updateCurrentPriceLP updates current LP token price.
+    function _updateCurrentPriceLP() internal returns (uint256) {
+        currentExchangeRate = getCurrentPriceLP();
         return currentExchangeRate;
     }
 
