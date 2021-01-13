@@ -13,6 +13,9 @@ contract SwapContract is Ownable, ISwapContract {
     address public WBTC_ADDR;
     address public lpToken;
 
+    // Whitelisted token addresses
+    mapping(address => bool) public whitelist;
+
     uint8 public churnedInCount;
     uint8 public tssThreshold;
     uint8 public nodeRewardsRatio;
@@ -24,8 +27,6 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private priceDecimals;
     uint256 private currentExchangeRate;
     uint256 private lpDecimals;
-    // Support tokens
-    mapping(address => bool) public whitelist;
 
     // Nodes
     mapping(address => bytes32) private nodes;
@@ -42,10 +43,17 @@ contract SwapContract is Ownable, ISwapContract {
 
     event Swap(address from, address to, uint256 amount);
 
+    event RewardsCollection(
+        address feesToken,
+        uint256 rewards,
+        uint256 currentPriceLP
+    );
+
     event IssueLPTokensForFloat(
         address to,
         uint256 amountOfFloat,
         uint256 amountOfLP,
+        uint256 currentPriceLP,
         bytes32 txid
     );
 
@@ -53,11 +61,12 @@ contract SwapContract is Ownable, ISwapContract {
         address token,
         uint256 amountOfLP,
         uint256 amountOfFloat,
+        uint256 currentPriceLP,
         bytes32 txid
     );
 
     modifier priceCheck() {
-        uint256 beforePrice = getCurrentPriceLP();
+        uint256 beforePrice = currentExchangeRate;
         _;
         require(getCurrentPriceLP() >= beforePrice, "Invalid  LP price change");
     }
@@ -330,7 +339,7 @@ contract SwapContract is Ownable, ISwapContract {
         return used[_txid];
     }
 
-    /// @dev getCurrentPriceLP returns exchange rate of LP token.
+    /// @dev getCurrentPriceLP returns current exchange rate of LP token.
     function getCurrentPriceLP()
         public
         override
@@ -379,10 +388,9 @@ contract SwapContract is Ownable, ISwapContract {
     {
         uint256 nowPrice = getCurrentPriceLP();
         uint256 requiredFloat = _minerFees.mul(10000).div(withdrawalFeeBPS);
-        uint256 amountOfLPTokens = requiredFloat
-            .add(10)
-            .mul(priceDecimals)
-            .div(nowPrice);
+        uint256 amountOfLPTokens = requiredFloat.add(10).mul(priceDecimals).div(
+            nowPrice
+        );
         return (amountOfLPTokens, nowPrice);
     }
 
@@ -459,7 +467,13 @@ contract SwapContract is Ownable, ISwapContract {
         // Add float amount
         _addFloat(_token, amountOfFloat);
         _addUsedTx(_txid);
-        emit IssueLPTokensForFloat(to, amountOfFloat, amountOfLP, _txid);
+        emit IssueLPTokensForFloat(
+            to,
+            amountOfFloat,
+            amountOfLP,
+            nowPrice,
+            _txid
+        );
         return true;
     }
 
@@ -510,7 +524,13 @@ contract SwapContract is Ownable, ISwapContract {
                 "WBTC balance insufficient"
             );
         }
-        emit BurnLPTokensForFloat(to, amountOfLP, amountOfFloat, _txid);
+        emit BurnLPTokensForFloat(
+            to,
+            amountOfLP,
+            amountOfFloat,
+            nowPrice,
+            _txid
+        );
         return true;
     }
 
@@ -596,20 +616,18 @@ contract SwapContract is Ownable, ISwapContract {
         if (_rewardsAmount == 0) return;
         // The fee is always collected in the source token (it's left in the float on the origin chain).
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
-        // Reduce float pool on source token
-        floatAmountOf[_feesToken] = floatAmountOf[_feesToken].sub(
-            _rewardsAmount,
-            "float amount of _feesToken insufficient"
-        );
+        // Get current LP token price.
+        uint256 nowPrice = getCurrentPriceLP();
         // Add all fees into pool
         totalRewards[_feesToken] = totalRewards[_feesToken].add(_rewardsAmount);
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
         uint256 amountLPForNode = amountForNodes.mul(priceDecimals).div(
-            getCurrentPriceLP()
+            nowPrice
         );
         // Add minted LP tokens for Nodes
         lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
+        emit RewardsCollection(_feesToken, _rewardsAmount, nowPrice);
     }
 
     /// @dev _addUsedTx updates txhash list which is spent. (single hash)
