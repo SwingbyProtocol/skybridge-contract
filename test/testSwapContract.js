@@ -25,13 +25,24 @@ contract('Test for swap actions', function (accounts) {
 
         this.zeroFees = false
 
-        this.minerFees = new BN(100000)
+        this.minerFees = new BN(30000)
 
         this.totalSwapped = new BN(0)
 
+        this.floatAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
+
+        this.initialPriceLP = this.floatAmount
+
         this.swapAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
 
-        this.incomingAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
+        this.swapFees = this.swapAmount.mul(this.swapFeesBPS).div(new BN(10000))
+
+        this.incomingAmount = this.swapAmount.add(this.swapFees)
+
+        this.sampleTxs = [
+            "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204",
+            '0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e'
+        ]
 
         this.redeemedFloatTxIds = [
             "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
@@ -61,55 +72,41 @@ contract('Test for swap actions', function (accounts) {
         const txs = [
             sendTx1, sendbackTx2
         ]
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, txs, this.totalSwapped, rewards, this.redeemedFloatTxIds)
+        const send = await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, txs, this.totalSwapped, rewards, this.redeemedFloatTxIds)
+        expect(send.receipt.gasUsed).to.equal(170183)
         expect(await this.wbtcTest.balanceOf(this.swap.address)).to.bignumber.equal(new BN("0"))
         expect(await this.wbtcTest.balanceOf(sender)).to.bignumber.equal(tokens100)
         expect(await this.wbtcTest.balanceOf(receiver)).to.bignumber.equal(tokens400)
     })
 
     it('test collectSwapFeesForBTC', async function () {
-        let floatAmountOfWBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
-        // Send from TSS address
-        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfWBTC.toString('hex') + sender.slice(2), 64)
-        let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
-        // BTC == address(0)
-        await this.swap.recordIncomingFloat(this.wbtcTest.address, addressesAndAmountOfFloat, false, txid1)
-        // console.log(tx.receipt.gasUsed)
+        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(this.floatAmount.add(this.minerFees).toString('hex') + sender.slice(2), 64)
+        // Add 1 BTC float
+        await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, this.zeroFees, this.sampleTxs[0])
         const price = await this.swap.getCurrentPriceLP()
-        expect(price).to.bignumber.equal(floatAmountOfWBTC)
-        let rewardsAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
-        //let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
+        expect(price).to.bignumber.equal(this.initialPriceLP)
+        let rewardsAmount = this.swapFees.sub(this.minerFees)
         const tx = await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, this.incomingAmount, rewardsAmount)
-
-        //let txid3 = "0xbceaa7c52bcb637ddbb7dab980ec8e015f259b3aa4f8b4c4115fd1bcb4a5779c"
-        await this.swap.collectSwapFeesForBTC(ZERO_ADDRESS, this.incomingAmount, rewardsAmount)
+        expect(tx.receipt.gasUsed).to.equal(81424)
     })
 
     it('deposit BTC float', async function () {
-        let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
-        // Send from TSS address
-        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
-        let txid1 = "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204"
+        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(this.floatAmount.add(this.minerFees).toString('hex') + sender.slice(2), 64)
         // BTC == address(0)
-        await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, this.zeroFees, txid1)
-        // Mint LP token
-        // const tx = await this.swap.issueLPTokensForFloat(txid1)
-        // console.log(tx.receipt.gasUsed)
+        await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, this.zeroFees, this.sampleTxs[0])
         const price = await this.swap.getCurrentPriceLP()
-        const LP1 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price)
+        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(new BN(8))).div(price)
         const depositFees = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees))
 
-        // Second tx
-        let txid2 = "0x6a167c4b6750c3213320098178f913478fe50d3f75d5f0377ee7cec9a630ad9e"
-        await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, this.zeroFees, txid2)
-        // await this.swap.issueLPTokensForFloat(txid2)
-
+        const tx2 = await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, this.zeroFees, this.sampleTxs[1])
+        console.log(tx2.logs[0].args.depositFees.toString())
         const price2 = await this.swap.getCurrentPriceLP()
-        expect(price2).to.bignumber.equal(floatAmountOfBTC)
+        // LP token price is not changed.
+        expect(price2).to.bignumber.equal(this.initialPriceLP)
 
-        const LP2 = floatAmountOfBTC.mul(new BN(10).pow(new BN(8))).div(price2)
+        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(new BN(8))).div(price2)
         const depositFees2 = LP2.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees).add(LP2).sub(depositFees2))
     })

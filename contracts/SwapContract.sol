@@ -54,6 +54,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 amountOfFloat,
         uint256 amountOfLP,
         uint256 currentPriceLP,
+        uint256 depositFees,
         bytes32 txid
     );
 
@@ -62,6 +63,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 amountOfLP,
         uint256 amountOfFloat,
         uint256 currentPriceLP,
+        uint256 withdrawalFees,
         bytes32 txid
     );
 
@@ -443,10 +445,9 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        // (address token, bytes32 transaction) = _loadTx(_txid);
         require(_transaction != 0x0, "The transaction is not found");
-        // Define target address which is recorded bottom 20bytes on tx data
-        // Define amountLP which is recorded top 12bytes on tx data
+        // Define target address which is recorded on the tx data (20 bytes)
+        // Define amountOfFloat which is recorded top on tx data (12 bytes)
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
         // LP token price per BTC/WBTC changed
         uint256 nowPrice = getCurrentPriceLP();
@@ -472,6 +473,7 @@ contract SwapContract is Ownable, ISwapContract {
             amountOfFloat,
             amountOfLP,
             nowPrice,
+            depositFees,
             _txid
         );
         return true;
@@ -488,27 +490,25 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        // _token should be address(0) or WBTC_ADDR
-        // (address token, bytes32 transaction) = _loadTx(_txid);
         require(_transaction != 0x0, "The transaction is not found");
-        // Define target address which is recorded bottom 20bytes on tx data
-        // Define amountLP which is recorded top 12bytes on tx data
+        // Define target address which is recorded on the tx data (20bytes)
+        // Define amountLP which is recorded top on tx data (12bytes)
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
         // Calculate amountOfLP
         uint256 nowPrice = getCurrentPriceLP();
         // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
-        uint256 amountOfFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
+        uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             floatAmountOf[_token] >= amountOfFloat,
             "Pool balance insufficient."
         );
         require(
-            _minerFee <= amountOfFees,
+            _minerFee <= withdrawalFees,
             "amountOfFees.sub(_minerFee) is negative"
         );
         // Collect fees before remove float
-        _rewardsCollection(_token, amountOfFees.sub(_minerFee));
+        _rewardsCollection(_token, withdrawalFees.sub(_minerFee));
         // Remove float amount
         _removeFloat(_token, amountOfFloat);
         // Add txid for recording.
@@ -518,7 +518,7 @@ contract SwapContract is Ownable, ISwapContract {
             require(
                 IERC20(_token).transfer(
                     to,
-                    amountOfFloat.sub(amountOfFees).sub(_minerFee)
+                    amountOfFloat.sub(withdrawalFees).sub(_minerFee)
                 ),
                 "WBTC balance insufficient"
             );
@@ -530,6 +530,7 @@ contract SwapContract is Ownable, ISwapContract {
             amountOfLP,
             amountOfFloat,
             nowPrice,
+            withdrawalFees,
             _txid
         );
         return true;
@@ -553,14 +554,12 @@ contract SwapContract is Ownable, ISwapContract {
             .add(_amountOfFloat)
             .mul(2)
             .div(3);
-        if (_token == WBTC_ADDR) {
-            if (reserveA.add(_amountOfFloat) >= threshold) {
-                return 1; // BTC float insufficient
-            }
-        } else if (_token == address(0)) {
-            if (reserveB.add(_amountOfFloat) >= threshold) {
+        if (_token == address(0) && reserveA.add(_amountOfFloat) >= threshold) {
+            return 1; // BTC float insufficient
+        }
+        if (_token == WBTC_ADDR && reserveB.add(_amountOfFloat) >= threshold) {
                 return 2; // WBTC float insufficient
-            }
+        
         }
         return 0;
     }
