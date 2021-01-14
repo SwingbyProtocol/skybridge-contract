@@ -109,12 +109,12 @@ contract SwapContract is Ownable, ISwapContract {
      */
 
     /// @dev singleTransferERC20 sends tokens from contract.
-    /// @param _destToken Address of token.
-    /// @param _to Recevier address.
+    /// @param _destToken The address of target token.
+    /// @param _to The address of recipient.
     /// @param _amount The amount of tokens.
-    /// @param _totalSwapped the amount of swapped amount which is for send.
-    /// @param _rewardsAmount Value that should be paid as fees.
-    /// @param _redeemedFloatTxIds the txs which is for records txids.
+    /// @param _totalSwapped The amount of swap.
+    /// @param _rewardsAmount The fees that should be paid.
+    /// @param _redeemedFloatTxIds The txids which is for recording.
     function singleTransferERC20(
         address _destToken,
         address _to,
@@ -138,11 +138,11 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev multiTransferERC20TightlyPacked sends tokens from contract.
-    /// @param _destToken Address of token.
-    /// @param _addressesAndAmounts Recevier address and amounts.
-    /// @param _totalSwapped the amount of swapped amount which is for send.
-    /// @param _rewardsAmount Value that should be paid as fees.
-    /// @param _redeemedFloatTxIds the txs which is for records txids.
+    /// @param _destToken The address of target token.
+    /// @param _addressesAndAmounts The address of recipient and amount.
+    /// @param _totalSwapped The amount of swap.
+    /// @param _rewardsAmount The fees that should be paid.
+    /// @param _redeemedFloatTxIds The txids which is for recording.
     function multiTransferERC20TightlyPacked(
         address _destToken,
         bytes32[] memory _addressesAndAmounts,
@@ -173,9 +173,9 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev collectSwapFeesForBTC collectes fees on the case of swap WBTC to BTC.
-    /// @param _destToken Address of token.
-    /// @param _incomingAmount The spent amount of WBTC.
-    /// @param _rewardsAmount Value that should be paid as fees.
+    /// @param _destToken The address of target token.
+    /// @param _incomingAmount The spent amount. (WBTC)
+    /// @param _rewardsAmount The fees that should be paid.
     function collectSwapFeesForBTC(
         address _destToken,
         uint256 _incomingAmount,
@@ -192,10 +192,10 @@ contract SwapContract is Ownable, ISwapContract {
      */
 
     /// @dev recordIncomingFloat mints LP token.
-    /// @param _token Address of target token.
-    /// @param _addressesAndAmountOfFloat Recevier address and amounts.
-    /// @param _zerofee The flag of accept.
-    /// @param _txid the txs which is for records txids.
+    /// @param _token The address of target token.
+    /// @param _addressesAndAmountOfFloat The address of recipient and amount.
+    /// @param _zerofee The flag to accept zero fees.
+    /// @param _txid The txids which is for recording.
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
@@ -215,9 +215,9 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev recordOutcomingFloat burns LP token.
-    /// @param _token Address of target token.
-    /// @param _addressesAndAmountOfLPtoken Sender address and amounts.
-    /// @param _txid the txs which is for records txids.
+    /// @param _token The address of target token.
+    /// @param _addressesAndAmountOfLPtoken The address of recipient and amount.
+    /// @param _txid The txid which is for recording.
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
@@ -265,8 +265,8 @@ contract SwapContract is Ownable, ISwapContract {
      */
 
     /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
-    /// @param _minerFees The miner fees for sending BTCs.
-    /// @param _txid the txhash which is for recording.
+    /// @param _minerFees The miner fees of BTC transaction.
+    /// @param _txid The txid which is for recording.
     function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid)
         public
         override
@@ -283,12 +283,12 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev churn transfers contract ownership and set variables of next TSS validator set.
-    /// @param _newOwner Address of new Owner.
-    /// @param _rewardAddressAndAmounts Staker addresses and amounts.
-    /// @param _isRemoved The flags for remove node.
-    /// @param _churnedInCount The number of next N count.
-    /// @param _tssThreshold The number of next T.
-    /// @param _nodeRewardsRatio The number of next node rewards ratio.
+    /// @param _newOwner The address of new Owner.
+    /// @param _rewardAddressAndAmounts The reward addresses and amounts.
+    /// @param _isRemoved The flags to remove node.
+    /// @param _churnedInCount The number of next party size of TSS group.
+    /// @param _tssThreshold The number of next threshold.
+    /// @param _nodeRewardsRatio The number of rewards ratio for node owners
     /// @param _withdrawalFeeBPS The amount of wthdrawal fees.
     function churn(
         address _newOwner,
@@ -337,7 +337,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev isTxUsed sends rewards for Nodes.
-    /// @param _txid txid of incoming tx.
+    /// @param _txid The txid which is for recording.
     function isTxUsed(bytes32 _txid) public override view returns (bool) {
         return used[_txid];
     }
@@ -397,10 +397,10 @@ contract SwapContract is Ownable, ISwapContract {
         return (amountOfLPTokens, nowPrice);
     }
 
-    /// @dev getFloatReserve returns float reserves not current balances.
-    /// @param _tokenA Address of target tokenA.
-    /// @param _tokenB Address of target tokenB.
-    /// @param _mergeRewards The flag to merge collected rewards.
+    /// @dev getFloatReserve returns float reserves
+    /// @param _tokenA The address of target tokenA.
+    /// @param _tokenB The address of target tokenB.
+    /// @param _mergeRewards The flag to merge total rewards.
     function getFloatReserve(
         address _tokenA,
         address _tokenB,
@@ -435,10 +435,10 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev _issueLPTokensForFloat
-    /// @param _token Address of target token.
-    /// @param _transaction Recevier address and amounts.
-    /// @param _zerofee The flag of accept.
-    /// @param _txid the txs which is for records txids.
+    /// @param _token The address of target token.
+    /// @param _transaction The recevier address and amount.
+    /// @param _zerofee The flag to accept zero fees.
+    /// @param _txid The txid which is for recording.
     function _issueLPTokensForFloat(
         address _token,
         bytes32 _transaction,
@@ -481,9 +481,9 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev _burnLPTokensForFloat
-    /// @param _token Address of target token.
-    /// @param _transaction Sender address and amounts.
-    /// @param _txid the txs which is for records txids.
+    /// @param _token The address of target token.
+    /// @param _transaction The address of sender and amount.
+    /// @param _txid The txid which is for recording.
     function _burnLPTokensForFloat(
         address _token,
         bytes32 _transaction,
@@ -538,7 +538,7 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev _checkFlips checks whether the fees are activated.
-    /// @param _token Address of target token.
+    /// @param _token The address of target token.
     /// @param _amountOfFloat The amount of float.
     function _checkFlips(address _token, uint256 _amountOfFloat)
         internal
@@ -648,7 +648,7 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev _addNode updates a staker's info.
     /// @param _addr The address of staker.
     /// @param _data The data of staker.
-    /// @param _remove The flag for remove.
+    /// @param _remove The flag to remove node.
     function _addNode(
         address _addr,
         bytes32 _data,
