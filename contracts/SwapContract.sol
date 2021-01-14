@@ -46,6 +46,7 @@ contract SwapContract is Ownable, ISwapContract {
     event RewardsCollection(
         address feesToken,
         uint256 rewards,
+        uint256 amountLPTokensForNode,
         uint256 currentPriceLP
     );
 
@@ -554,12 +555,11 @@ contract SwapContract is Ownable, ISwapContract {
             .add(_amountOfFloat)
             .mul(2)
             .div(3);
-        if (_token == address(0) && reserveA.add(_amountOfFloat) >= threshold) {
+        if (_token == WBTC_ADDR && reserveB.add(_amountOfFloat) >= threshold) {
             return 1; // BTC float insufficient
         }
-        if (_token == WBTC_ADDR && reserveB.add(_amountOfFloat) >= threshold) {
-                return 2; // WBTC float insufficient
-        
+        if (_token == address(0) && reserveA.add(_amountOfFloat) >= threshold) {
+            return 2; // WBTC float insufficient
         }
         return 0;
     }
@@ -616,12 +616,19 @@ contract SwapContract is Ownable, ISwapContract {
         totalRewards[_feesToken] = totalRewards[_feesToken].add(_rewardsAmount);
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
-        uint256 amountLPForNode = amountForNodes.mul(priceDecimals).div(
+        uint256 amountLPTokensForNode = amountForNodes.mul(priceDecimals).div(
             nowPrice
         );
         // Add minted LP tokens for Nodes
-        lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
-        emit RewardsCollection(_feesToken, _rewardsAmount, nowPrice);
+        lockedLPTokensForNode = lockedLPTokensForNode.add(
+            amountLPTokensForNode
+        );
+        emit RewardsCollection(
+            _feesToken,
+            _rewardsAmount,
+            amountLPTokensForNode,
+            nowPrice
+        );
     }
 
     /// @dev _addUsedTx updates txhash list which is spent. (single hash)
