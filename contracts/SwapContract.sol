@@ -631,7 +631,7 @@ contract SwapContract is Ownable, ISwapContract {
         used[_txid] = true;
     }
 
-    /// @dev _addUsedTxs updates txhash list which is spent. (multiple hash)
+    /// @dev _addUsedTxs updates txhash list which is spent. (multiple hashes)
     /// @param _txids The array of txid.
     function _addUsedTxs(bytes32[] memory _txids) internal {
         for (uint256 i = 0; i < _txids.length; i++) {
