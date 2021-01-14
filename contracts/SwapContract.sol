@@ -76,9 +76,9 @@ contract SwapContract is Ownable, ISwapContract {
         address _wbtc,
         uint256 _existingBTCFloat
     ) public {
-        // burner = new Burner();
+        // Set lpToken address
         lpToken = _lpToken;
-        // Set initial price of LP token per BTC/WBTC.
+        // Set initial lpDecimals of LP token
         lpDecimals = 10**IERC20(lpToken).decimals();
         // Set WBTC address
         WBTC_ADDR = _wbtc;
@@ -94,7 +94,7 @@ contract SwapContract is Ownable, ISwapContract {
         initialExchangeRate = priceDecimals;
         // Set lockedLPTokensForNode
         lockedLPTokensForNode = 0;
-        // SEt whitelist
+        // Set whitelist addresses
         whitelist[WBTC_ADDR] = true;
         whitelist[lpToken] = true;
         whitelist[address(0)] = true;

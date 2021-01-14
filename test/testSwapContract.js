@@ -13,7 +13,7 @@ contract('Test for swap actions', function (accounts) {
 
         this.wbtcTest = await LPToken.new()
 
-        this.mint500Tokens = new BN(500).mul(new BN(10).pow(new BN(18)))
+        this.mint500wBTCs = new BN(500).mul(new BN(10).pow(new BN(8)))
 
         this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address, 0);
 
@@ -21,11 +21,15 @@ contract('Test for swap actions', function (accounts) {
 
         this.withdrawalFeeBPS = new BN(20);
 
+        this.swapFeesBPS = new BN(20);
+
         this.zeroFees = false
 
         this.minerFees = new BN(100000)
 
         this.totalSwapped = new BN(0)
+
+        this.swapAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
 
         this.incomingAmount = new BN(1).mul(new BN(10).pow(new BN(8)))
 
@@ -33,7 +37,6 @@ contract('Test for swap actions', function (accounts) {
             "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
             "0xce66450451e62b9b4c406d0a83b90a5036039673d2682d4ec292f375ae571382"
         ]
-
         await this.lpToken.transferOwnership(this.swap.address)
     });
 
@@ -43,27 +46,25 @@ contract('Test for swap actions', function (accounts) {
     })
 
     it('multi send test', async function () {
-        // swap contract receives 5000 tokens 
-        let amount1 = new BN(5000).mul(new BN(10).pow(new BN(8)))
-        await this.wbtcTest.mint(sender, amount1)
-        await this.wbtcTest.transfer(this.swap.address, amount1, {
+        // swap contract receives 500 tokens 
+        await this.wbtcTest.mint(sender, this.mint500wBTCs)
+        await this.wbtcTest.transfer(this.swap.address, this.mint500wBTCs, {
             from: sender
         })
-        let amount2 = new BN(1000).mul(new BN(10).pow(new BN(8)))
-        // swap contracct send back 1000 tokens
-        let amount3 = new BN(4000).mul(new BN(10).pow(new BN(8)))
+        let tokens100 = new BN(100).mul(new BN(10).pow(new BN(8)))
+        let tokens400 = new BN(400).mul(new BN(10).pow(new BN(8)))
 
-        let senbackTokens1 = "0x" + web3.utils.padLeft(amount2.toString('hex') + sender.slice(2), 64)
-        let senbackTokens2 = "0x" + web3.utils.padLeft(amount3.toString('hex') + receiver.slice(2), 64)
-        let rewardsAmount = "0x" + web3.utils.padLeft(new BN(1).mul(new BN(10).pow(new BN(8))).toString('hex'), 64)
+        let sendTx1 = "0x" + web3.utils.padLeft(tokens100.toString('hex') + sender.slice(2), 64)
+        let sendbackTx2 = "0x" + web3.utils.padLeft(tokens400.toString('hex') + receiver.slice(2), 64)
+        let rewards = tokens100.add(tokens400).mul(this.swapFeesBPS).div(new BN(10000))
         // 0x00000000000000174876e800Fb4d4830eE2AfA5E5c6FD2C2cE3a080B6634ae0e
         const txs = [
-            senbackTokens1, senbackTokens2
+            sendTx1, sendbackTx2
         ]
-        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, txs, this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
+        await this.swap.multiTransferERC20TightlyPacked(this.wbtcTest.address, txs, this.totalSwapped, rewards, this.redeemedFloatTxIds)
         expect(await this.wbtcTest.balanceOf(this.swap.address)).to.bignumber.equal(new BN("0"))
-        expect(await this.wbtcTest.balanceOf(sender)).to.bignumber.equal(amount2)
-        expect(await this.wbtcTest.balanceOf(receiver)).to.bignumber.equal(amount3)
+        expect(await this.wbtcTest.balanceOf(sender)).to.bignumber.equal(tokens100)
+        expect(await this.wbtcTest.balanceOf(receiver)).to.bignumber.equal(tokens400)
     })
 
     it('test collectSwapFeesForBTC', async function () {
