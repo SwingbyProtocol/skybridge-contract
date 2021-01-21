@@ -1,9 +1,10 @@
 {
   "name": "skybridge-contract",
   "version": "1.0.0",
-  "description": "",
+  "description": "## Environment - testrpc (ganache) - v2.4.0 - truffle - v5.1.54 - solc - v0.7.5 - web3 - v1.2.9",
   "main": "truffle-config.js",
   "directories": {
+    "doc": "docs",
     "test": "test"
   },
   "scripts": {
@@ -18,19 +19,20 @@
     "url": "git+https://github.com/SwingbyProtocol/skybridge-contract.git"
   },
   "author": "",
-  "license": "See LICENSE file",
+  "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://github.com/SwingbyProtocol/skybridge-contract/issues"
   },
   "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
   "dependencies": {
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
-    "@openzeppelin/contracts": "^3.3.0-rc.1",
-    "@openzeppelin/test-helpers": "^0.5.9",
-    "@truffle/hdwallet-provider": "^1.2.0",
-    "chai": "^4.2.0"
+    "@openzeppelin/contracts": "^3.3.0",
+    "@openzeppelin/test-helpers": "^0.5.10",
+    "@truffle/hdwallet-provider": "^1.2.1",
+    "chai": "^4.2.0",
+    "node-fetch": ">=2.6.1"
   },
   "devDependencies": {
-    "eslint": "^7.16.0"
+    "eslint": "^7.18.0"
   }
 }
