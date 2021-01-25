@@ -6,6 +6,7 @@ module.exports = async function (done) {
     // await deployer.deploy(LPToken)
     try {
         const swap = await SwapContract.deployed()
+        console.log("swapContract:", swap.address)
         await swap.transferOwnership(process.env.TSS)
     } catch (err) {
         console.log(err)
