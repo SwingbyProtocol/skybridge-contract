@@ -276,7 +276,7 @@ contract SwapContract is Ownable, ISwapContract {
         require(!isTxUsed(_txid), "The txid is already used");
         floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
             _minerFees,
-            "float amount insufficient"
+            "BTC float amount insufficient"
         );
         _addUsedTx(_txid);
         return true;
@@ -327,7 +327,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
         bytes32[] memory nodeList = getActiveNodes();
         if (nodeList.length > 100) {
-            revert("node size should be <= 100");
+            revert("Stored node size should be <= 100");
         }
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
@@ -446,7 +446,7 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        require(_transaction != 0x0, "The transaction is not found");
+        require(_transaction != 0x0, "The transaction is not valid");
         // Define target address which is recorded on the tx data (20 bytes)
         // Define amountOfFloat which is recorded top on tx data (12 bytes)
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
@@ -491,7 +491,7 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        require(_transaction != 0x0, "The transaction is not found");
+        require(_transaction != 0x0, "The transaction is not valid");
         // Define target address which is recorded on the tx data (20bytes)
         // Define amountLP which is recorded top on tx data (12bytes)
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
@@ -505,8 +505,8 @@ contract SwapContract is Ownable, ISwapContract {
             "Pool balance insufficient."
         );
         require(
-            _minerFee <= withdrawalFees,
-            "amountOfFees.sub(_minerFee) is negative"
+            withdrawalFees >= _minerFee,
+            "withdrawalFees must be greater than _minerFee"
         );
         // Collect fees before remove float
         _rewardsCollection(_token, withdrawalFees.sub(_minerFee));
