@@ -29,6 +29,7 @@ You have to start testrpc with 100 accounts and binding port `8545` before doing
 ```
 $ ganache-cli -a 100 -b 9000000
 ```
+```
 $ npm run test
 or 
 $ truffle test --network development
