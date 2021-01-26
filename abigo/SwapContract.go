@@ -27,7 +27,7 @@ var (
 )
 
 // SwapContractABI is the input ABI used to generate the binding from.
-const SwapContractABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wbtc\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"BurnLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"IssueLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"RecordIncomingFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"RecordOutcomingFloat\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"WBTC_ADDR\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"activeWBTCBalances\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"churnedInCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"depositFeesBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lockedLPTokensForNode\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lpToken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nodeRewardsRatio\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tssThreshold\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"whitelist\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawalFeeBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"_zerofee\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"depositFeeRate\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFees\",\"type\":\"uint256\"}],\"name\":\"getMinimumAmountOfLPTokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const SwapContractABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wbtc\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawalFees\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"BurnLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"depositFees\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"IssueLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feesToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewards\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountLPTokensForNode\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"}],\"name\":\"RewardsCollection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Swap\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"WBTC_ADDR\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"churnedInCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"depositFeesBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"lockedLPTokensForNode\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"lpToken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"nodeRewardsRatio\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tssThreshold\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"whitelist\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"withdrawalFeeBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"_zerofee\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFees\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"nowPrice\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"depositFeeRate\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFees\",\"type\":\"uint256\"}],\"name\":\"getMinimumAmountOfLPTokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_mergeRewards\",\"type\":\"bool\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true}]"
 
 // SwapContract is an auto generated Go binding around an Ethereum contract.
 type SwapContract struct {
@@ -202,37 +202,6 @@ func (_SwapContract *SwapContractCallerSession) WBTCADDR() (common.Address, erro
 	return _SwapContract.Contract.WBTCADDR(&_SwapContract.CallOpts)
 }
 
-// ActiveWBTCBalances is a free data retrieval call binding the contract method 0x3dd3c983.
-//
-// Solidity: function activeWBTCBalances() view returns(uint256)
-func (_SwapContract *SwapContractCaller) ActiveWBTCBalances(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "activeWBTCBalances")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// ActiveWBTCBalances is a free data retrieval call binding the contract method 0x3dd3c983.
-//
-// Solidity: function activeWBTCBalances() view returns(uint256)
-func (_SwapContract *SwapContractSession) ActiveWBTCBalances() (*big.Int, error) {
-	return _SwapContract.Contract.ActiveWBTCBalances(&_SwapContract.CallOpts)
-}
-
-// ActiveWBTCBalances is a free data retrieval call binding the contract method 0x3dd3c983.
-//
-// Solidity: function activeWBTCBalances() view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) ActiveWBTCBalances() (*big.Int, error) {
-	return _SwapContract.Contract.ActiveWBTCBalances(&_SwapContract.CallOpts)
-}
-
 // ChurnedInCount is a free data retrieval call binding the contract method 0x0089356f.
 //
 // Solidity: function churnedInCount() view returns(uint8)
@@ -328,7 +297,7 @@ func (_SwapContract *SwapContractCallerSession) GetActiveNodes() ([][32]byte, er
 
 // GetCurrentPriceLP is a free data retrieval call binding the contract method 0x45137e27.
 //
-// Solidity: function getCurrentPriceLP() view returns(uint256)
+// Solidity: function getCurrentPriceLP() view returns(uint256 nowPrice)
 func (_SwapContract *SwapContractCaller) GetCurrentPriceLP(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
 	err := _SwapContract.contract.Call(opts, &out, "getCurrentPriceLP")
@@ -345,14 +314,14 @@ func (_SwapContract *SwapContractCaller) GetCurrentPriceLP(opts *bind.CallOpts) 
 
 // GetCurrentPriceLP is a free data retrieval call binding the contract method 0x45137e27.
 //
-// Solidity: function getCurrentPriceLP() view returns(uint256)
+// Solidity: function getCurrentPriceLP() view returns(uint256 nowPrice)
 func (_SwapContract *SwapContractSession) GetCurrentPriceLP() (*big.Int, error) {
 	return _SwapContract.Contract.GetCurrentPriceLP(&_SwapContract.CallOpts)
 }
 
 // GetCurrentPriceLP is a free data retrieval call binding the contract method 0x45137e27.
 //
-// Solidity: function getCurrentPriceLP() view returns(uint256)
+// Solidity: function getCurrentPriceLP() view returns(uint256 nowPrice)
 func (_SwapContract *SwapContractCallerSession) GetCurrentPriceLP() (*big.Int, error) {
 	return _SwapContract.Contract.GetCurrentPriceLP(&_SwapContract.CallOpts)
 }
@@ -388,15 +357,15 @@ func (_SwapContract *SwapContractCallerSession) GetDepositFeeRate(_token common.
 	return _SwapContract.Contract.GetDepositFeeRate(&_SwapContract.CallOpts, _token, _amountOfFloat)
 }
 
-// GetFloatReserve is a free data retrieval call binding the contract method 0xec482729.
+// GetFloatReserve is a free data retrieval call binding the contract method 0x28bb89ed.
 //
-// Solidity: function getFloatReserve(address _tokenA, address _tokenB) view returns(uint256 reserveA, uint256 reserveB)
-func (_SwapContract *SwapContractCaller) GetFloatReserve(opts *bind.CallOpts, _tokenA common.Address, _tokenB common.Address) (struct {
+// Solidity: function getFloatReserve(address _tokenA, address _tokenB, bool _mergeRewards) view returns(uint256 reserveA, uint256 reserveB)
+func (_SwapContract *SwapContractCaller) GetFloatReserve(opts *bind.CallOpts, _tokenA common.Address, _tokenB common.Address, _mergeRewards bool) (struct {
 	ReserveA *big.Int
 	ReserveB *big.Int
 }, error) {
 	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "getFloatReserve", _tokenA, _tokenB)
+	err := _SwapContract.contract.Call(opts, &out, "getFloatReserve", _tokenA, _tokenB, _mergeRewards)
 
 	outstruct := new(struct {
 		ReserveA *big.Int
@@ -413,24 +382,24 @@ func (_SwapContract *SwapContractCaller) GetFloatReserve(opts *bind.CallOpts, _t
 
 }
 
-// GetFloatReserve is a free data retrieval call binding the contract method 0xec482729.
+// GetFloatReserve is a free data retrieval call binding the contract method 0x28bb89ed.
 //
-// Solidity: function getFloatReserve(address _tokenA, address _tokenB) view returns(uint256 reserveA, uint256 reserveB)
-func (_SwapContract *SwapContractSession) GetFloatReserve(_tokenA common.Address, _tokenB common.Address) (struct {
+// Solidity: function getFloatReserve(address _tokenA, address _tokenB, bool _mergeRewards) view returns(uint256 reserveA, uint256 reserveB)
+func (_SwapContract *SwapContractSession) GetFloatReserve(_tokenA common.Address, _tokenB common.Address, _mergeRewards bool) (struct {
 	ReserveA *big.Int
 	ReserveB *big.Int
 }, error) {
-	return _SwapContract.Contract.GetFloatReserve(&_SwapContract.CallOpts, _tokenA, _tokenB)
+	return _SwapContract.Contract.GetFloatReserve(&_SwapContract.CallOpts, _tokenA, _tokenB, _mergeRewards)
 }
 
-// GetFloatReserve is a free data retrieval call binding the contract method 0xec482729.
+// GetFloatReserve is a free data retrieval call binding the contract method 0x28bb89ed.
 //
-// Solidity: function getFloatReserve(address _tokenA, address _tokenB) view returns(uint256 reserveA, uint256 reserveB)
-func (_SwapContract *SwapContractCallerSession) GetFloatReserve(_tokenA common.Address, _tokenB common.Address) (struct {
+// Solidity: function getFloatReserve(address _tokenA, address _tokenB, bool _mergeRewards) view returns(uint256 reserveA, uint256 reserveB)
+func (_SwapContract *SwapContractCallerSession) GetFloatReserve(_tokenA common.Address, _tokenB common.Address, _mergeRewards bool) (struct {
 	ReserveA *big.Int
 	ReserveB *big.Int
 }, error) {
-	return _SwapContract.Contract.GetFloatReserve(&_SwapContract.CallOpts, _tokenA, _tokenB)
+	return _SwapContract.Contract.GetFloatReserve(&_SwapContract.CallOpts, _tokenA, _tokenB, _mergeRewards)
 }
 
 // GetMinimumAmountOfLPTokens is a free data retrieval call binding the contract method 0xba0b8e95.
@@ -839,6 +808,27 @@ func (_SwapContract *SwapContractTransactorSession) RecordOutcomingFloat(_token 
 	return _SwapContract.Contract.RecordOutcomingFloat(&_SwapContract.TransactOpts, _token, _addressesAndAmountOfLPtoken, _minerFee, _txid)
 }
 
+// RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
+//
+// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid) returns(bool)
+func (_SwapContract *SwapContractTransactor) RecordUTXOSweepMinerFee(opts *bind.TransactOpts, _minerFees *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _SwapContract.contract.Transact(opts, "recordUTXOSweepMinerFee", _minerFees, _txid)
+}
+
+// RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
+//
+// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid) returns(bool)
+func (_SwapContract *SwapContractSession) RecordUTXOSweepMinerFee(_minerFees *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _SwapContract.Contract.RecordUTXOSweepMinerFee(&_SwapContract.TransactOpts, _minerFees, _txid)
+}
+
+// RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
+//
+// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid) returns(bool)
+func (_SwapContract *SwapContractTransactorSession) RecordUTXOSweepMinerFee(_minerFees *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _SwapContract.Contract.RecordUTXOSweepMinerFee(&_SwapContract.TransactOpts, _minerFees, _txid)
+}
+
 // RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
 //
 // Solidity: function renounceOwnership() returns()
@@ -992,15 +982,18 @@ func (it *SwapContractBurnLPTokensForFloatIterator) Close() error {
 
 // SwapContractBurnLPTokensForFloat represents a BurnLPTokensForFloat event raised by the SwapContract contract.
 type SwapContractBurnLPTokensForFloat struct {
-	Token         common.Address
-	AmountOfFloat *big.Int
-	Txid          [32]byte
-	Raw           types.Log // Blockchain specific contextual infos
+	Token          common.Address
+	AmountOfLP     *big.Int
+	AmountOfFloat  *big.Int
+	CurrentPriceLP *big.Int
+	WithdrawalFees *big.Int
+	Txid           [32]byte
+	Raw            types.Log // Blockchain specific contextual infos
 }
 
-// FilterBurnLPTokensForFloat is a free log retrieval operation binding the contract event 0x2fd37a881f5b3a248d90ff6ece97ecfe502f7dd8a7c7faac6c41f0670f09b901.
+// FilterBurnLPTokensForFloat is a free log retrieval operation binding the contract event 0xa9da34e5e4a956b744307ae7611795634e8365951073bf049d76b64b2ae7a058.
 //
-// Solidity: event BurnLPTokensForFloat(address token, uint256 amountOfFloat, bytes32 txid)
+// Solidity: event BurnLPTokensForFloat(address token, uint256 amountOfLP, uint256 amountOfFloat, uint256 currentPriceLP, uint256 withdrawalFees, bytes32 txid)
 func (_SwapContract *SwapContractFilterer) FilterBurnLPTokensForFloat(opts *bind.FilterOpts) (*SwapContractBurnLPTokensForFloatIterator, error) {
 
 	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "BurnLPTokensForFloat")
@@ -1010,9 +1003,9 @@ func (_SwapContract *SwapContractFilterer) FilterBurnLPTokensForFloat(opts *bind
 	return &SwapContractBurnLPTokensForFloatIterator{contract: _SwapContract.contract, event: "BurnLPTokensForFloat", logs: logs, sub: sub}, nil
 }
 
-// WatchBurnLPTokensForFloat is a free log subscription operation binding the contract event 0x2fd37a881f5b3a248d90ff6ece97ecfe502f7dd8a7c7faac6c41f0670f09b901.
+// WatchBurnLPTokensForFloat is a free log subscription operation binding the contract event 0xa9da34e5e4a956b744307ae7611795634e8365951073bf049d76b64b2ae7a058.
 //
-// Solidity: event BurnLPTokensForFloat(address token, uint256 amountOfFloat, bytes32 txid)
+// Solidity: event BurnLPTokensForFloat(address token, uint256 amountOfLP, uint256 amountOfFloat, uint256 currentPriceLP, uint256 withdrawalFees, bytes32 txid)
 func (_SwapContract *SwapContractFilterer) WatchBurnLPTokensForFloat(opts *bind.WatchOpts, sink chan<- *SwapContractBurnLPTokensForFloat) (event.Subscription, error) {
 
 	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "BurnLPTokensForFloat")
@@ -1047,9 +1040,9 @@ func (_SwapContract *SwapContractFilterer) WatchBurnLPTokensForFloat(opts *bind.
 	}), nil
 }
 
-// ParseBurnLPTokensForFloat is a log parse operation binding the contract event 0x2fd37a881f5b3a248d90ff6ece97ecfe502f7dd8a7c7faac6c41f0670f09b901.
+// ParseBurnLPTokensForFloat is a log parse operation binding the contract event 0xa9da34e5e4a956b744307ae7611795634e8365951073bf049d76b64b2ae7a058.
 //
-// Solidity: event BurnLPTokensForFloat(address token, uint256 amountOfFloat, bytes32 txid)
+// Solidity: event BurnLPTokensForFloat(address token, uint256 amountOfLP, uint256 amountOfFloat, uint256 currentPriceLP, uint256 withdrawalFees, bytes32 txid)
 func (_SwapContract *SwapContractFilterer) ParseBurnLPTokensForFloat(log types.Log) (*SwapContractBurnLPTokensForFloat, error) {
 	event := new(SwapContractBurnLPTokensForFloat)
 	if err := _SwapContract.contract.UnpackLog(event, "BurnLPTokensForFloat", log); err != nil {
@@ -1128,15 +1121,18 @@ func (it *SwapContractIssueLPTokensForFloatIterator) Close() error {
 
 // SwapContractIssueLPTokensForFloat represents a IssueLPTokensForFloat event raised by the SwapContract contract.
 type SwapContractIssueLPTokensForFloat struct {
-	To         common.Address
-	AmountOfLP *big.Int
-	Txid       [32]byte
-	Raw        types.Log // Blockchain specific contextual infos
+	To             common.Address
+	AmountOfFloat  *big.Int
+	AmountOfLP     *big.Int
+	CurrentPriceLP *big.Int
+	DepositFees    *big.Int
+	Txid           [32]byte
+	Raw            types.Log // Blockchain specific contextual infos
 }
 
-// FilterIssueLPTokensForFloat is a free log retrieval operation binding the contract event 0xd5377acd1da14abdc995f8741078ac3f87544a172220fd646f3e104171d7ad5c.
+// FilterIssueLPTokensForFloat is a free log retrieval operation binding the contract event 0xdfaf4e23f7030adafec91a682e05bf9fb30c721f9cec3d8bcfae0459c5362db1.
 //
-// Solidity: event IssueLPTokensForFloat(address to, uint256 amountOfLP, bytes32 txid)
+// Solidity: event IssueLPTokensForFloat(address to, uint256 amountOfFloat, uint256 amountOfLP, uint256 currentPriceLP, uint256 depositFees, bytes32 txid)
 func (_SwapContract *SwapContractFilterer) FilterIssueLPTokensForFloat(opts *bind.FilterOpts) (*SwapContractIssueLPTokensForFloatIterator, error) {
 
 	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "IssueLPTokensForFloat")
@@ -1146,9 +1142,9 @@ func (_SwapContract *SwapContractFilterer) FilterIssueLPTokensForFloat(opts *bin
 	return &SwapContractIssueLPTokensForFloatIterator{contract: _SwapContract.contract, event: "IssueLPTokensForFloat", logs: logs, sub: sub}, nil
 }
 
-// WatchIssueLPTokensForFloat is a free log subscription operation binding the contract event 0xd5377acd1da14abdc995f8741078ac3f87544a172220fd646f3e104171d7ad5c.
+// WatchIssueLPTokensForFloat is a free log subscription operation binding the contract event 0xdfaf4e23f7030adafec91a682e05bf9fb30c721f9cec3d8bcfae0459c5362db1.
 //
-// Solidity: event IssueLPTokensForFloat(address to, uint256 amountOfLP, bytes32 txid)
+// Solidity: event IssueLPTokensForFloat(address to, uint256 amountOfFloat, uint256 amountOfLP, uint256 currentPriceLP, uint256 depositFees, bytes32 txid)
 func (_SwapContract *SwapContractFilterer) WatchIssueLPTokensForFloat(opts *bind.WatchOpts, sink chan<- *SwapContractIssueLPTokensForFloat) (event.Subscription, error) {
 
 	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "IssueLPTokensForFloat")
@@ -1183,9 +1179,9 @@ func (_SwapContract *SwapContractFilterer) WatchIssueLPTokensForFloat(opts *bind
 	}), nil
 }
 
-// ParseIssueLPTokensForFloat is a log parse operation binding the contract event 0xd5377acd1da14abdc995f8741078ac3f87544a172220fd646f3e104171d7ad5c.
+// ParseIssueLPTokensForFloat is a log parse operation binding the contract event 0xdfaf4e23f7030adafec91a682e05bf9fb30c721f9cec3d8bcfae0459c5362db1.
 //
-// Solidity: event IssueLPTokensForFloat(address to, uint256 amountOfLP, bytes32 txid)
+// Solidity: event IssueLPTokensForFloat(address to, uint256 amountOfFloat, uint256 amountOfLP, uint256 currentPriceLP, uint256 depositFees, bytes32 txid)
 func (_SwapContract *SwapContractFilterer) ParseIssueLPTokensForFloat(log types.Log) (*SwapContractIssueLPTokensForFloat, error) {
 	event := new(SwapContractIssueLPTokensForFloat)
 	if err := _SwapContract.contract.UnpackLog(event, "IssueLPTokensForFloat", log); err != nil {
@@ -1348,9 +1344,9 @@ func (_SwapContract *SwapContractFilterer) ParseOwnershipTransferred(log types.L
 	return event, nil
 }
 
-// SwapContractRecordIncomingFloatIterator is returned from FilterRecordIncomingFloat and is used to iterate over the raw logs and unpacked data for RecordIncomingFloat events raised by the SwapContract contract.
-type SwapContractRecordIncomingFloatIterator struct {
-	Event *SwapContractRecordIncomingFloat // Event containing the contract specifics and raw log
+// SwapContractRewardsCollectionIterator is returned from FilterRewardsCollection and is used to iterate over the raw logs and unpacked data for RewardsCollection events raised by the SwapContract contract.
+type SwapContractRewardsCollectionIterator struct {
+	Event *SwapContractRewardsCollection // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1364,7 +1360,7 @@ type SwapContractRecordIncomingFloatIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *SwapContractRecordIncomingFloatIterator) Next() bool {
+func (it *SwapContractRewardsCollectionIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1373,7 +1369,7 @@ func (it *SwapContractRecordIncomingFloatIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(SwapContractRecordIncomingFloat)
+			it.Event = new(SwapContractRewardsCollection)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1388,7 +1384,7 @@ func (it *SwapContractRecordIncomingFloatIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(SwapContractRecordIncomingFloat)
+		it.Event = new(SwapContractRewardsCollection)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1404,43 +1400,44 @@ func (it *SwapContractRecordIncomingFloatIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *SwapContractRecordIncomingFloatIterator) Error() error {
+func (it *SwapContractRewardsCollectionIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *SwapContractRecordIncomingFloatIterator) Close() error {
+func (it *SwapContractRewardsCollectionIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// SwapContractRecordIncomingFloat represents a RecordIncomingFloat event raised by the SwapContract contract.
-type SwapContractRecordIncomingFloat struct {
-	Token                     common.Address
-	AddressesAndAmountOfFloat [32]byte
-	Txid                      [32]byte
-	Raw                       types.Log // Blockchain specific contextual infos
+// SwapContractRewardsCollection represents a RewardsCollection event raised by the SwapContract contract.
+type SwapContractRewardsCollection struct {
+	FeesToken             common.Address
+	Rewards               *big.Int
+	AmountLPTokensForNode *big.Int
+	CurrentPriceLP        *big.Int
+	Raw                   types.Log // Blockchain specific contextual infos
 }
 
-// FilterRecordIncomingFloat is a free log retrieval operation binding the contract event 0xca4f426a42769728281918f8be94ebe8c276ed71f129e6d3ac98f0252a971557.
+// FilterRewardsCollection is a free log retrieval operation binding the contract event 0xe3debe835f6848edc082b32a1d729781d3bfcd7e14422d80bcaa6794d3816b2f.
 //
-// Solidity: event RecordIncomingFloat(address token, bytes32 addressesAndAmountOfFloat, bytes32 txid)
-func (_SwapContract *SwapContractFilterer) FilterRecordIncomingFloat(opts *bind.FilterOpts) (*SwapContractRecordIncomingFloatIterator, error) {
+// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 amountLPTokensForNode, uint256 currentPriceLP)
+func (_SwapContract *SwapContractFilterer) FilterRewardsCollection(opts *bind.FilterOpts) (*SwapContractRewardsCollectionIterator, error) {
 
-	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "RecordIncomingFloat")
+	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "RewardsCollection")
 	if err != nil {
 		return nil, err
 	}
-	return &SwapContractRecordIncomingFloatIterator{contract: _SwapContract.contract, event: "RecordIncomingFloat", logs: logs, sub: sub}, nil
+	return &SwapContractRewardsCollectionIterator{contract: _SwapContract.contract, event: "RewardsCollection", logs: logs, sub: sub}, nil
 }
 
-// WatchRecordIncomingFloat is a free log subscription operation binding the contract event 0xca4f426a42769728281918f8be94ebe8c276ed71f129e6d3ac98f0252a971557.
+// WatchRewardsCollection is a free log subscription operation binding the contract event 0xe3debe835f6848edc082b32a1d729781d3bfcd7e14422d80bcaa6794d3816b2f.
 //
-// Solidity: event RecordIncomingFloat(address token, bytes32 addressesAndAmountOfFloat, bytes32 txid)
-func (_SwapContract *SwapContractFilterer) WatchRecordIncomingFloat(opts *bind.WatchOpts, sink chan<- *SwapContractRecordIncomingFloat) (event.Subscription, error) {
+// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 amountLPTokensForNode, uint256 currentPriceLP)
+func (_SwapContract *SwapContractFilterer) WatchRewardsCollection(opts *bind.WatchOpts, sink chan<- *SwapContractRewardsCollection) (event.Subscription, error) {
 
-	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "RecordIncomingFloat")
+	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "RewardsCollection")
 	if err != nil {
 		return nil, err
 	}
@@ -1450,8 +1447,8 @@ func (_SwapContract *SwapContractFilterer) WatchRecordIncomingFloat(opts *bind.W
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(SwapContractRecordIncomingFloat)
-				if err := _SwapContract.contract.UnpackLog(event, "RecordIncomingFloat", log); err != nil {
+				event := new(SwapContractRewardsCollection)
+				if err := _SwapContract.contract.UnpackLog(event, "RewardsCollection", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1472,21 +1469,21 @@ func (_SwapContract *SwapContractFilterer) WatchRecordIncomingFloat(opts *bind.W
 	}), nil
 }
 
-// ParseRecordIncomingFloat is a log parse operation binding the contract event 0xca4f426a42769728281918f8be94ebe8c276ed71f129e6d3ac98f0252a971557.
+// ParseRewardsCollection is a log parse operation binding the contract event 0xe3debe835f6848edc082b32a1d729781d3bfcd7e14422d80bcaa6794d3816b2f.
 //
-// Solidity: event RecordIncomingFloat(address token, bytes32 addressesAndAmountOfFloat, bytes32 txid)
-func (_SwapContract *SwapContractFilterer) ParseRecordIncomingFloat(log types.Log) (*SwapContractRecordIncomingFloat, error) {
-	event := new(SwapContractRecordIncomingFloat)
-	if err := _SwapContract.contract.UnpackLog(event, "RecordIncomingFloat", log); err != nil {
+// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 amountLPTokensForNode, uint256 currentPriceLP)
+func (_SwapContract *SwapContractFilterer) ParseRewardsCollection(log types.Log) (*SwapContractRewardsCollection, error) {
+	event := new(SwapContractRewardsCollection)
+	if err := _SwapContract.contract.UnpackLog(event, "RewardsCollection", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
 	return event, nil
 }
 
-// SwapContractRecordOutcomingFloatIterator is returned from FilterRecordOutcomingFloat and is used to iterate over the raw logs and unpacked data for RecordOutcomingFloat events raised by the SwapContract contract.
-type SwapContractRecordOutcomingFloatIterator struct {
-	Event *SwapContractRecordOutcomingFloat // Event containing the contract specifics and raw log
+// SwapContractSwapIterator is returned from FilterSwap and is used to iterate over the raw logs and unpacked data for Swap events raised by the SwapContract contract.
+type SwapContractSwapIterator struct {
+	Event *SwapContractSwap // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1500,7 +1497,7 @@ type SwapContractRecordOutcomingFloatIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *SwapContractRecordOutcomingFloatIterator) Next() bool {
+func (it *SwapContractSwapIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1509,7 +1506,7 @@ func (it *SwapContractRecordOutcomingFloatIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(SwapContractRecordOutcomingFloat)
+			it.Event = new(SwapContractSwap)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1524,7 +1521,7 @@ func (it *SwapContractRecordOutcomingFloatIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(SwapContractRecordOutcomingFloat)
+		it.Event = new(SwapContractSwap)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1540,43 +1537,43 @@ func (it *SwapContractRecordOutcomingFloatIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *SwapContractRecordOutcomingFloatIterator) Error() error {
+func (it *SwapContractSwapIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *SwapContractRecordOutcomingFloatIterator) Close() error {
+func (it *SwapContractSwapIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// SwapContractRecordOutcomingFloat represents a RecordOutcomingFloat event raised by the SwapContract contract.
-type SwapContractRecordOutcomingFloat struct {
-	Token                       common.Address
-	AddressesAndAmountOfLPtoken [32]byte
-	Txid                        [32]byte
-	Raw                         types.Log // Blockchain specific contextual infos
+// SwapContractSwap represents a Swap event raised by the SwapContract contract.
+type SwapContractSwap struct {
+	From   common.Address
+	To     common.Address
+	Amount *big.Int
+	Raw    types.Log // Blockchain specific contextual infos
 }
 
-// FilterRecordOutcomingFloat is a free log retrieval operation binding the contract event 0x788c3182cd0ba438408070faa1e9e534fb5045dfdbd58e42fa88c246cdf362d2.
+// FilterSwap is a free log retrieval operation binding the contract event 0xea368a40e9570069bb8e6511d668293ad2e1f03b0d982431fd223de9f3b70ca6.
 //
-// Solidity: event RecordOutcomingFloat(address token, bytes32 addressesAndAmountOfLPtoken, bytes32 txid)
-func (_SwapContract *SwapContractFilterer) FilterRecordOutcomingFloat(opts *bind.FilterOpts) (*SwapContractRecordOutcomingFloatIterator, error) {
+// Solidity: event Swap(address from, address to, uint256 amount)
+func (_SwapContract *SwapContractFilterer) FilterSwap(opts *bind.FilterOpts) (*SwapContractSwapIterator, error) {
 
-	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "RecordOutcomingFloat")
+	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "Swap")
 	if err != nil {
 		return nil, err
 	}
-	return &SwapContractRecordOutcomingFloatIterator{contract: _SwapContract.contract, event: "RecordOutcomingFloat", logs: logs, sub: sub}, nil
+	return &SwapContractSwapIterator{contract: _SwapContract.contract, event: "Swap", logs: logs, sub: sub}, nil
 }
 
-// WatchRecordOutcomingFloat is a free log subscription operation binding the contract event 0x788c3182cd0ba438408070faa1e9e534fb5045dfdbd58e42fa88c246cdf362d2.
+// WatchSwap is a free log subscription operation binding the contract event 0xea368a40e9570069bb8e6511d668293ad2e1f03b0d982431fd223de9f3b70ca6.
 //
-// Solidity: event RecordOutcomingFloat(address token, bytes32 addressesAndAmountOfLPtoken, bytes32 txid)
-func (_SwapContract *SwapContractFilterer) WatchRecordOutcomingFloat(opts *bind.WatchOpts, sink chan<- *SwapContractRecordOutcomingFloat) (event.Subscription, error) {
+// Solidity: event Swap(address from, address to, uint256 amount)
+func (_SwapContract *SwapContractFilterer) WatchSwap(opts *bind.WatchOpts, sink chan<- *SwapContractSwap) (event.Subscription, error) {
 
-	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "RecordOutcomingFloat")
+	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "Swap")
 	if err != nil {
 		return nil, err
 	}
@@ -1586,8 +1583,8 @@ func (_SwapContract *SwapContractFilterer) WatchRecordOutcomingFloat(opts *bind.
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(SwapContractRecordOutcomingFloat)
-				if err := _SwapContract.contract.UnpackLog(event, "RecordOutcomingFloat", log); err != nil {
+				event := new(SwapContractSwap)
+				if err := _SwapContract.contract.UnpackLog(event, "Swap", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1608,12 +1605,12 @@ func (_SwapContract *SwapContractFilterer) WatchRecordOutcomingFloat(opts *bind.
 	}), nil
 }
 
-// ParseRecordOutcomingFloat is a log parse operation binding the contract event 0x788c3182cd0ba438408070faa1e9e534fb5045dfdbd58e42fa88c246cdf362d2.
+// ParseSwap is a log parse operation binding the contract event 0xea368a40e9570069bb8e6511d668293ad2e1f03b0d982431fd223de9f3b70ca6.
 //
-// Solidity: event RecordOutcomingFloat(address token, bytes32 addressesAndAmountOfLPtoken, bytes32 txid)
-func (_SwapContract *SwapContractFilterer) ParseRecordOutcomingFloat(log types.Log) (*SwapContractRecordOutcomingFloat, error) {
-	event := new(SwapContractRecordOutcomingFloat)
-	if err := _SwapContract.contract.UnpackLog(event, "RecordOutcomingFloat", log); err != nil {
+// Solidity: event Swap(address from, address to, uint256 amount)
+func (_SwapContract *SwapContractFilterer) ParseSwap(log types.Log) (*SwapContractSwap, error) {
+	event := new(SwapContractSwap)
+	if err := _SwapContract.contract.UnpackLog(event, "Swap", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
