@@ -13,7 +13,6 @@ contract SwapContract is Ownable, ISwapContract {
     address public WBTC_ADDR;
     address public lpToken;
 
-    // Whitelisted token addresses
     mapping(address => bool) public whitelist;
 
     uint8 public churnedInCount;
@@ -28,14 +27,14 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private initialExchangeRate;
     uint256 private lpDecimals;
 
-    // Nodes
-    mapping(address => bytes32) private nodes;
-    mapping(address => bool) private isInList;
-    address[] private nodeAddrs;
-    // Token address -> amount
     mapping(address => uint256) private totalRewards;
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used;
+
+    // Node lists
+    mapping(address => bytes32) private nodes;
+    mapping(address => bool) private isInList;
+    address[] private nodeAddrs;
 
     /**
      * Events
@@ -172,7 +171,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev collectSwapFeesForBTC collectes fees on the case of swap WBTC to BTC.
+    /// @dev collectSwapFeesForBTC collects fees in the case of swap WBTC to BTC.
     /// @param _destToken The address of target token.
     /// @param _incomingAmount The spent amount. (WBTC)
     /// @param _minerFee The miner fees of BTC transaction.
@@ -289,7 +288,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev churn transfers contract ownership and set variables of next TSS validator set.
+    /// @dev churn transfers contract ownership and set variables of the next TSS validator set.
     /// @param _newOwner The address of new Owner.
     /// @param _rewardAddressAndAmounts The reward addresses and amounts.
     /// @param _isRemoved The flags to remove node.
@@ -349,7 +348,7 @@ contract SwapContract is Ownable, ISwapContract {
         return used[_txid];
     }
 
-    /// @dev getCurrentPriceLP returns current exchange rate of LP token.
+    /// @dev getCurrentPriceLP returns the current exchange rate of LP token.
     function getCurrentPriceLP()
         public
         override
@@ -387,7 +386,6 @@ contract SwapContract is Ownable, ISwapContract {
             depositFeeRate = _token == address(0) ? depositFeesBPS : 0;
         }
     }
-    
 
     /// @dev getFloatReserve returns float reserves
     /// @param _tokenA The address of target tokenA.
@@ -442,9 +440,8 @@ contract SwapContract is Ownable, ISwapContract {
         // Define target address which is recorded on the tx data (20 bytes)
         // Define amountOfFloat which is recorded top on tx data (12 bytes)
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
-        // LP token price per BTC/WBTC changed
+        // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
-        // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
         uint256 depositFees = depositFeeRate != 0
@@ -454,7 +451,7 @@ contract SwapContract is Ownable, ISwapContract {
         if (_zerofee && depositFees != 0) {
             revert();
         }
-        //Send LP tokens to LP
+        // Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
         // Add deposit fees
         lockedLPTokensForNode = lockedLPTokensForNode.add(depositFees);
@@ -488,14 +485,14 @@ contract SwapContract is Ownable, ISwapContract {
         // Define target address which is recorded on the tx data (20bytes)
         // Define amountLP which is recorded top on tx data (12bytes)
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
-        // Calculate amountOfLP
+        // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
-        // Calculate amountOfFloat
+        // Calculate the amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
         uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             floatAmountOf[_token] >= amountOfFloat,
-            "Pool balance insufficient."
+            "The float balance insufficient."
         );
         // Collect fees before remove float
         _rewardsCollection(_token, withdrawalFees);
@@ -553,14 +550,14 @@ contract SwapContract is Ownable, ISwapContract {
         return 0;
     }
 
-    /// @dev _addFloat updates one side of float.
+    /// @dev _addFloat updates one side of the float.
     /// @param _token The address of target token.
     /// @param _amount The amount of float.
     function _addFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
     }
 
-    /// @dev _removeFloat remove Float.
+    /// @dev _removeFloat remove one side of the float.
     /// @param _token The address of target token.
     /// @param _amount The amount of float.
     function _removeFloat(address _token, uint256 _amount) internal {
@@ -620,13 +617,13 @@ contract SwapContract is Ownable, ISwapContract {
         );
     }
 
-    /// @dev _addUsedTx updates txhash list which is spent. (single hash)
+    /// @dev _addUsedTx updates txid list which is spent. (single hash)
     /// @param _txid The array of txid.
     function _addUsedTx(bytes32 _txid) internal {
         used[_txid] = true;
     }
 
-    /// @dev _addUsedTxs updates txhash list which is spent. (multiple hashes)
+    /// @dev _addUsedTxs updates txid list which is spent. (multiple hashes)
     /// @param _txids The array of txid.
     function _addUsedTxs(bytes32[] memory _txids) internal {
         for (uint256 i = 0; i < _txids.length; i++) {
@@ -657,7 +654,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev _splitToValues returns address and amount of staked swingby
+    /// @dev _splitToValues returns address and amount of staked SWINGBYs
     /// @param _data The info of a staker.
     function _splitToValues(bytes32 _data)
         internal
