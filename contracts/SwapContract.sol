@@ -504,12 +504,8 @@ contract SwapContract is Ownable, ISwapContract {
             floatAmountOf[_token] >= amountOfFloat,
             "Pool balance insufficient."
         );
-        require(
-            withdrawalFees >= _minerFee,
-            "withdrawalFees must be greater than _minerFee"
-        );
         // Collect fees before remove float
-        _rewardsCollection(_token, withdrawalFees.sub(_minerFee));
+        _rewardsCollection(_token, withdrawalFees);
         // Remove float amount
         _removeFloat(_token, amountOfFloat);
         // Add txid for recording.
