@@ -22,6 +22,7 @@ interface ISwapContract {
     function collectSwapFeesForBTC(
         address _destToken,
         uint256 _incomingAmount,
+        uint256 _minerFee,
         uint256 _rewardsAmount
     ) external returns (bool);
 
@@ -41,7 +42,7 @@ interface ISwapContract {
 
     function distributeNodeRewards() external returns (bool);
 
-    function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid)
+    function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
         external
         returns (bool);
 

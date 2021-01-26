@@ -175,14 +175,20 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev collectSwapFeesForBTC collectes fees on the case of swap WBTC to BTC.
     /// @param _destToken The address of target token.
     /// @param _incomingAmount The spent amount. (WBTC)
+    /// @param _minerFee The miner fees of BTC transaction.
     /// @param _rewardsAmount The fees that should be paid.
     function collectSwapFeesForBTC(
         address _destToken,
         uint256 _incomingAmount,
+        uint256 _minerFee,
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        _swap(WBTC_ADDR, address(0), _incomingAmount.sub(_rewardsAmount));
+        _swap(
+            WBTC_ADDR,
+            address(0),
+            _incomingAmount.sub(_minerFee).sub(_rewardsAmount)
+        );
         _rewardsCollection(_destToken, _rewardsAmount);
         return true;
     }
@@ -217,6 +223,7 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev recordOutcomingFloat burns LP token.
     /// @param _token The address of target token.
     /// @param _addressesAndAmountOfLPtoken The address of recipient and amount.
+    /// @param _minerFee The miner fees of BTC transaction.
     /// @param _txid The txid which is for recording.
     function recordOutcomingFloat(
         address _token,
@@ -265,9 +272,9 @@ contract SwapContract is Ownable, ISwapContract {
      */
 
     /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
-    /// @param _minerFees The miner fees of BTC transaction.
+    /// @param _minerFee The miner fees of BTC transaction.
     /// @param _txid The txid which is for recording.
-    function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid)
+    function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
         public
         override
         onlyOwner
@@ -275,7 +282,7 @@ contract SwapContract is Ownable, ISwapContract {
     {
         require(!isTxUsed(_txid), "The txid is already used");
         floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
-            _minerFees,
+            _minerFee,
             "BTC float amount insufficient"
         );
         _addUsedTx(_txid);
@@ -483,6 +490,7 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev _burnLPTokensForFloat
     /// @param _token The address of target token.
     /// @param _transaction The address of sender and amount.
+    /// @param _minerFee The miner fees of BTC transaction.
     /// @param _txid The txid which is for recording.
     function _burnLPTokensForFloat(
         address _token,
