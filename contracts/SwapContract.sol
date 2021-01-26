@@ -387,22 +387,7 @@ contract SwapContract is Ownable, ISwapContract {
             depositFeeRate = _token == address(0) ? depositFeesBPS : 0;
         }
     }
-
-    /// @dev getMinimumAmountOfLPTokens returns the minimum amount of LP Token.
-    /// @param _minerFees The amount of miner Fees (BTC).
-    function getMinimumAmountOfLPTokens(uint256 _minerFees)
-        public
-        override
-        view
-        returns (uint256, uint256)
-    {
-        uint256 nowPrice = getCurrentPriceLP();
-        uint256 requiredFloat = _minerFees.mul(10000).div(withdrawalFeeBPS);
-        uint256 amountOfLPTokens = requiredFloat.add(10).mul(priceDecimals).div(
-            nowPrice
-        );
-        return (amountOfLPTokens, nowPrice);
-    }
+    
 
     /// @dev getFloatReserve returns float reserves
     /// @param _tokenA The address of target tokenA.
