@@ -65,7 +65,7 @@ module.exports = {
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
-      gasPrice: 10000000000
+      gasPrice: 93000000000
     },
     mainnet: {
       provider: () => new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847`),

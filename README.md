@@ -1,9 +1,10 @@
 # skybridge-contract
 
 ## Environment
-- testrpc (ganache) - v2.4.0
+- testrpc (ganache-cli) - v2.4.0
 - truffle - v5.1.54
 - solc - v0.7.5
+- nodejs - v14.8.0
 - web3 - v1.2.9
 
 ## Deploy contract
@@ -25,6 +26,9 @@ $ npn run build
 
 ## Test 
 You have to start testrpc with 100 accounts and binding port `8545` before doing test
+```
+$ ganache-cli -a 100 -b 9000000
+```
 ```
 $ npm run test
 or 

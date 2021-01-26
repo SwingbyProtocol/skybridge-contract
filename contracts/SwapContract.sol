@@ -13,20 +13,20 @@ contract SwapContract is Ownable, ISwapContract {
     address public WBTC_ADDR;
     address public lpToken;
 
+    // Whitelisted token addresses
+    mapping(address => bool) public whitelist;
+
     uint8 public churnedInCount;
     uint8 public tssThreshold;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
 
-    uint256 public activeWBTCBalances;
     uint256 public lockedLPTokensForNode;
 
     uint256 private priceDecimals;
-    uint256 private currentExchangeRate;
+    uint256 private initialExchangeRate;
     uint256 private lpDecimals;
-    // Support tokens
-    mapping(address => bool) public whitelist;
 
     // Nodes
     mapping(address => bytes32) private nodes;
@@ -41,23 +41,30 @@ contract SwapContract is Ownable, ISwapContract {
      * Events
      */
 
-    event RecordIncomingFloat(
-        address token,
-        bytes32 addressesAndAmountOfFloat,
-        bytes32 txid
+    event Swap(address from, address to, uint256 amount);
+
+    event RewardsCollection(
+        address feesToken,
+        uint256 rewards,
+        uint256 amountLPTokensForNode,
+        uint256 currentPriceLP
     );
 
-    event IssueLPTokensForFloat(address to, uint256 amountOfLP, bytes32 txid);
-
-    event RecordOutcomingFloat(
-        address token,
-        bytes32 addressesAndAmountOfLPtoken,
+    event IssueLPTokensForFloat(
+        address to,
+        uint256 amountOfFloat,
+        uint256 amountOfLP,
+        uint256 currentPriceLP,
+        uint256 depositFees,
         bytes32 txid
     );
 
     event BurnLPTokensForFloat(
         address token,
+        uint256 amountOfLP,
         uint256 amountOfFloat,
+        uint256 currentPriceLP,
+        uint256 withdrawalFees,
         bytes32 txid
     );
 
@@ -72,9 +79,9 @@ contract SwapContract is Ownable, ISwapContract {
         address _wbtc,
         uint256 _existingBTCFloat
     ) public {
-        // burner = new Burner();
+        // Set lpToken address
         lpToken = _lpToken;
-        // Set initial price of LP token per BTC/WBTC.
+        // Set initial lpDecimals of LP token
         lpDecimals = 10**IERC20(lpToken).decimals();
         // Set WBTC address
         WBTC_ADDR = _wbtc;
@@ -86,11 +93,11 @@ contract SwapContract is Ownable, ISwapContract {
         withdrawalFeeBPS = 20;
         // Set priceDecimals
         priceDecimals = 10**8;
-        // Set currentExchangeRate
-        currentExchangeRate = priceDecimals;
+        // Set initialExchangeRate
+        initialExchangeRate = priceDecimals;
         // Set lockedLPTokensForNode
         lockedLPTokensForNode = 0;
-        // SEt whitelist
+        // Set whitelist addresses
         whitelist[WBTC_ADDR] = true;
         whitelist[lpToken] = true;
         whitelist[address(0)] = true;
@@ -101,13 +108,13 @@ contract SwapContract is Ownable, ISwapContract {
      * Transfer part
      */
 
-    /// @dev singleTransferERC20 function sends tokens from contract.
-    /// @param _destToken Address of token.
-    /// @param _to Recevier address.
+    /// @dev singleTransferERC20 sends tokens from contract.
+    /// @param _destToken The address of target token.
+    /// @param _to The address of recipient.
     /// @param _amount The amount of tokens.
-    /// @param _totalSwapped the amount of swapped amount which is for send.
-    /// @param _rewardsAmount Value that should be paid as fees.
-    /// @param _redeemedFloatTxIds the txs which is for records txids.
+    /// @param _totalSwapped The amount of swap.
+    /// @param _rewardsAmount The fees that should be paid.
+    /// @param _redeemedFloatTxIds The txids which is for recording.
     function singleTransferERC20(
         address _destToken,
         address _to,
@@ -122,23 +129,20 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _totalSwapped,
-                "activeWBTCBalances insufficient"
-            );
+            _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
         _rewardsCollection(_destToken, _rewardsAmount);
-        _addTxidUsed(_redeemedFloatTxIds);
+        _addUsedTxs(_redeemedFloatTxIds);
         require(IERC20(_destToken).transfer(_to, _amount));
         return true;
     }
 
-    /// @dev multiTransferERC20TightlyPacked function sends tokens from contract.
-    /// @param _destToken Address of token.
-    /// @param _addressesAndAmounts Recevier address and amounts.
-    /// @param _totalSwapped the amount of swapped amount which is for send.
-    /// @param _rewardsAmount Value that should be paid as fees.
-    /// @param _redeemedFloatTxIds the txs which is for records txids.
+    /// @dev multiTransferERC20TightlyPacked sends tokens from contract.
+    /// @param _destToken The address of target token.
+    /// @param _addressesAndAmounts The address of recipient and amount.
+    /// @param _totalSwapped The amount of swap.
+    /// @param _rewardsAmount The fees that should be paid.
+    /// @param _redeemedFloatTxIds The txids which is for recording.
     function multiTransferERC20TightlyPacked(
         address _destToken,
         bytes32[] memory _addressesAndAmounts,
@@ -152,13 +156,10 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _totalSwapped,
-                "activeWBTCBalances insufficient"
-            );
+            _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
         _rewardsCollection(_destToken, _rewardsAmount);
-        _addTxidUsed(_redeemedFloatTxIds);
+        _addUsedTxs(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             require(
                 IERC20(_destToken).transfer(
@@ -171,17 +172,17 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev collectSwapFeesForBTC function collectes fees on BTC.
-    /// @param _destToken Address of token.
-    /// @param _incomingAmount spent amount of BTC.
-    /// @param _rewardsAmount Value that should be paid as fees.
+    /// @dev collectSwapFeesForBTC collectes fees on the case of swap WBTC to BTC.
+    /// @param _destToken The address of target token.
+    /// @param _incomingAmount The spent amount. (WBTC)
+    /// @param _rewardsAmount The fees that should be paid.
     function collectSwapFeesForBTC(
         address _destToken,
         uint256 _incomingAmount,
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        activeWBTCBalances = activeWBTCBalances.add(_incomingAmount);
+        _swap(WBTC_ADDR, address(0), _incomingAmount.sub(_rewardsAmount));
         _rewardsCollection(_destToken, _rewardsAmount);
         return true;
     }
@@ -190,11 +191,11 @@ contract SwapContract is Ownable, ISwapContract {
      * Float part
      */
 
-    /// @dev recordIncomingFloat function mint LP token.
-    /// @param _token Address of target token.
-    /// @param _addressesAndAmountOfFloat Recevier address and amounts.
-    /// @param _zerofee The flag of accept.
-    /// @param _txid the txs which is for records txids.
+    /// @dev recordIncomingFloat mints LP token.
+    /// @param _token The address of target token.
+    /// @param _addressesAndAmountOfFloat The address of recipient and amount.
+    /// @param _zerofee The flag to accept zero fees.
+    /// @param _txid The txids which is for recording.
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
@@ -213,10 +214,10 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev recordOutcomingFloat function burn LP token.
-    /// @param _token Address of target token.
-    /// @param _addressesAndAmountOfLPtoken Sender address and amounts.
-    /// @param _txid the txs which is for records txids.
+    /// @dev recordOutcomingFloat burns LP token.
+    /// @param _token The address of target token.
+    /// @param _addressesAndAmountOfLPtoken The address of recipient and amount.
+    /// @param _txid The txid which is for recording.
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
@@ -228,7 +229,6 @@ contract SwapContract is Ownable, ISwapContract {
             _burnLPTokensForFloat(
                 _token,
                 _addressesAndAmountOfLPtoken,
-                withdrawalFeeBPS,
                 _minerFee,
                 _txid
             )
@@ -236,7 +236,7 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev distributeNodeRewards function sends rewards for Nodes.
+    /// @dev distributeNodeRewards sends rewards for Nodes.
     function distributeNodeRewards() external override returns (bool) {
         // Reduce Gas
         uint256 rewardLPsForNodes = lockedLPTokensForNode;
@@ -260,13 +260,35 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev churn function transfer contract ownership and set variables.
-    /// @param _newOwner Address of new Owner.
-    /// @param _rewardAddressAndAmounts Staker addresses and amounts.
-    /// @param _isRemoved The flags for remove node.
-    /// @param _churnedInCount The number of next N count.
-    /// @param _tssThreshold The number of next T.
-    /// @param _nodeRewardsRatio The number of next node rewards ratio.
+    /**
+     * Life cycle part
+     */
+
+    /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
+    /// @param _minerFees The miner fees of BTC transaction.
+    /// @param _txid The txid which is for recording.
+    function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid)
+        public
+        override
+        onlyOwner
+        returns (bool)
+    {
+        require(!isTxUsed(_txid), "The txid is already used");
+        floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
+            _minerFees,
+            "BTC float amount insufficient"
+        );
+        _addUsedTx(_txid);
+        return true;
+    }
+
+    /// @dev churn transfers contract ownership and set variables of next TSS validator set.
+    /// @param _newOwner The address of new Owner.
+    /// @param _rewardAddressAndAmounts The reward addresses and amounts.
+    /// @param _isRemoved The flags to remove node.
+    /// @param _churnedInCount The number of next party size of TSS group.
+    /// @param _tssThreshold The number of next threshold.
+    /// @param _nodeRewardsRatio The number of rewards ratio for node owners
     /// @param _withdrawalFeeBPS The amount of wthdrawal fees.
     function churn(
         address _newOwner,
@@ -305,7 +327,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
         bytes32[] memory nodeList = getActiveNodes();
         if (nodeList.length > 100) {
-            revert("node size should be <= 100");
+            revert("Stored node size should be <= 100");
         }
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
@@ -314,18 +336,35 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev isTxUsed function sends rewards for Nodes.
-    /// @param _txid txid of incoming tx.
+    /// @dev isTxUsed sends rewards for Nodes.
+    /// @param _txid The txid which is for recording.
     function isTxUsed(bytes32 _txid) public override view returns (bool) {
         return used[_txid];
     }
 
-    /// @dev getCurrentPriceLP function returns exchange rate of LP token.
-    function getCurrentPriceLP() public override view returns (uint256) {
-        return currentExchangeRate;
+    /// @dev getCurrentPriceLP returns current exchange rate of LP token.
+    function getCurrentPriceLP()
+        public
+        override
+        view
+        returns (uint256 nowPrice)
+    {
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            WBTC_ADDR,
+            true
+        );
+        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
+        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
+        nowPrice = totalLPs == 0
+            ? initialExchangeRate
+            : (reserveA.add(reserveB)).mul(lpDecimals).div(
+                totalLPs.add(lockedLPTokensForNode)
+            );
+        return nowPrice;
     }
 
-    /// @dev getDepositFeeRate function returns deposit fees rate
+    /// @dev getDepositFeeRate returns deposit fees rate
     /// @param _token The address of target token.
     /// @param _amountOfFloat The amount of float.
     function getDepositFeeRate(address _token, uint256 _amountOfFloat)
@@ -342,7 +381,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
     }
 
-    /// @dev getMinimumAmountOfLPTokens function returns the minimum amount of LP Token.
+    /// @dev getMinimumAmountOfLPTokens returns the minimum amount of LP Token.
     /// @param _minerFees The amount of miner Fees (BTC).
     function getMinimumAmountOfLPTokens(uint256 _minerFees)
         public
@@ -350,17 +389,7 @@ contract SwapContract is Ownable, ISwapContract {
         view
         returns (uint256, uint256)
     {
-        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
-            address(0),
-            WBTC_ADDR
-        );
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
-        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
-        uint256 nowPrice = totalLPs == 0
-            ? currentExchangeRate
-            : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.add(lockedLPTokensForNode)
-            );
+        uint256 nowPrice = getCurrentPriceLP();
         uint256 requiredFloat = _minerFees.mul(10000).div(withdrawalFeeBPS);
         uint256 amountOfLPTokens = requiredFloat.add(10).mul(priceDecimals).div(
             nowPrice
@@ -368,20 +397,24 @@ contract SwapContract is Ownable, ISwapContract {
         return (amountOfLPTokens, nowPrice);
     }
 
-    /// @dev getFloatReserve function returns float reserves not current balances.
-    function getFloatReserve(address _tokenA, address _tokenB)
-        public
-        override
-        view
-        returns (uint256 reserveA, uint256 reserveB)
-    {
-        (reserveA, reserveB) = (
-            floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
-            floatAmountOf[_tokenB].add(totalRewards[_tokenB])
-        );
+    /// @dev getFloatReserve returns float reserves
+    /// @param _tokenA The address of target tokenA.
+    /// @param _tokenB The address of target tokenB.
+    /// @param _mergeRewards The flag to merge total rewards.
+    function getFloatReserve(
+        address _tokenA,
+        address _tokenB,
+        bool _mergeRewards
+    ) public override view returns (uint256 reserveA, uint256 reserveB) {
+        (reserveA, reserveB) = _mergeRewards
+            ? (
+                floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
+                floatAmountOf[_tokenB].add(totalRewards[_tokenB])
+            )
+            : (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
     }
 
-    /// @dev getActiveNodes function returns active nodes list (stakes and amount)
+    /// @dev getActiveNodes returns active nodes list (stakes and amount)
     function getActiveNodes() public override view returns (bytes32[] memory) {
         uint256 nodeCount = 0;
         uint256 count = 0;
@@ -402,10 +435,10 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev _issueLPTokensForFloat
-    /// @param _token Address of target token.
-    /// @param _transaction Recevier address and amounts.
-    /// @param _zerofee The flag of accept.
-    /// @param _txid the txs which is for records txids.
+    /// @param _token The address of target token.
+    /// @param _transaction The recevier address and amount.
+    /// @param _zerofee The flag to accept zero fees.
+    /// @param _txid The txid which is for recording.
     function _issueLPTokensForFloat(
         address _token,
         bytes32 _transaction,
@@ -413,13 +446,12 @@ contract SwapContract is Ownable, ISwapContract {
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        // (address token, bytes32 transaction) = _loadTx(_txid);
-        require(_transaction != 0x0, "The transaction is not found");
-        // Define target address which is recorded bottom 20bytes on tx data
-        // Define amountLP which is recorded top 12bytes on tx data
+        require(_transaction != 0x0, "The transaction is not valid");
+        // Define target address which is recorded on the tx data (20 bytes)
+        // Define amountOfFloat which is recorded top on tx data (12 bytes)
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
         // LP token price per BTC/WBTC changed
-        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
+        uint256 nowPrice = getCurrentPriceLP();
         // Calculate amount of LP token
         uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
         uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
@@ -436,66 +468,77 @@ contract SwapContract is Ownable, ISwapContract {
         lockedLPTokensForNode = lockedLPTokensForNode.add(depositFees);
         // Add float amount
         _addFloat(_token, amountOfFloat);
-        used[_txid] = true;
-        emit IssueLPTokensForFloat(to, amountOfLP, _txid);
+        _addUsedTx(_txid);
+        emit IssueLPTokensForFloat(
+            to,
+            amountOfFloat,
+            amountOfLP,
+            nowPrice,
+            depositFees,
+            _txid
+        );
         return true;
     }
 
     /// @dev _burnLPTokensForFloat
-    /// @param _token Address of target token.
-    /// @param _transaction Sender address and amounts.
-    /// @param _withdrawalFeeBPS The amount of withdrawal fees.
-    /// @param _txid the txs which is for records txids.
+    /// @param _token The address of target token.
+    /// @param _transaction The address of sender and amount.
+    /// @param _txid The txid which is for recording.
     function _burnLPTokensForFloat(
         address _token,
         bytes32 _transaction,
-        uint256 _withdrawalFeeBPS,
         uint256 _minerFee,
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
-        // _token should be address(0) or WBTC_ADDR
-        // (address token, bytes32 transaction) = _loadTx(_txid);
-        require(_transaction != 0x0, "The transaction is not found");
-        // Define target address which is recorded bottom 20bytes on tx data
-        // Define amountLP which is recorded top 12bytes on tx data
+        require(_transaction != 0x0, "The transaction is not valid");
+        // Define target address which is recorded on the tx data (20bytes)
+        // Define amountLP which is recorded top on tx data (12bytes)
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
         // Calculate amountOfLP
-        uint256 nowPrice = _updateFloatPool(address(0), WBTC_ADDR);
+        uint256 nowPrice = getCurrentPriceLP();
         // Calculate amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
-        uint256 amountOfFees = amountOfFloat.mul(_withdrawalFeeBPS).div(10000);
+        uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             floatAmountOf[_token] >= amountOfFloat,
             "Pool balance insufficient."
         );
         require(
-            _minerFee <= amountOfFees,
-            "amountOfFees.sub(_minerFee) is negative"
+            withdrawalFees >= _minerFee,
+            "withdrawalFees must be greater than _minerFee"
         );
-        // Burn LP tokens
-        require(IBurnableToken(lpToken).burn(amountOfLP));
+        // Collect fees before remove float
+        _rewardsCollection(_token, withdrawalFees.sub(_minerFee));
         // Remove float amount
         _removeFloat(_token, amountOfFloat);
-        // Collect fees
-        _rewardsCollection(_token, amountOfFees.sub(_minerFee));
-        used[_txid] = true;
+        // Add txid for recording.
+        _addUsedTx(_txid);
         // WBTC transfer if token address is WBTC_ADDR
         if (_token == WBTC_ADDR) {
             require(
                 IERC20(_token).transfer(
                     to,
-                    amountOfFloat.sub(amountOfFees).sub(_minerFee)
+                    amountOfFloat.sub(withdrawalFees).sub(_minerFee)
                 ),
                 "WBTC balance insufficient"
             );
         }
-        emit BurnLPTokensForFloat(to, amountOfFloat, _txid);
+        // Burn LP tokens
+        require(IBurnableToken(lpToken).burn(amountOfLP));
+        emit BurnLPTokensForFloat(
+            to,
+            amountOfLP,
+            amountOfFloat,
+            nowPrice,
+            withdrawalFees,
+            _txid
+        );
         return true;
     }
 
-    /// @dev _checkFlips
-    /// @param _token Address of target token.
+    /// @dev _checkFlips checks whether the fees are activated.
+    /// @param _token The address of target token.
     /// @param _amountOfFloat The amount of float.
     function _checkFlips(address _token, uint256 _amountOfFloat)
         internal
@@ -504,60 +547,28 @@ contract SwapContract is Ownable, ISwapContract {
     {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
-            WBTC_ADDR
+            WBTC_ADDR,
+            true
         );
-        if (activeWBTCBalances > reserveA.add(reserveB)) {
-            return 0;
-        }
-        // BTC balance == balance of BTC float + balance of WBTC float - balance of WBTC
-        uint256 balBTC = reserveA.add(reserveB).sub(activeWBTCBalances);
         uint256 threshold = reserveA
             .add(reserveB)
             .add(_amountOfFloat)
             .mul(2)
             .div(3);
-        if (_token == WBTC_ADDR) {
-            if (activeWBTCBalances.add(_amountOfFloat) >= threshold) {
-                return 1; // BTC float insufficient
-            }
-        } else if (_token == address(0)) {
-            if (balBTC.add(_amountOfFloat) >= threshold) {
-                return 2; // WBTC float insufficient
-            }
+        if (_token == WBTC_ADDR && reserveB.add(_amountOfFloat) >= threshold) {
+            return 1; // BTC float insufficient
+        }
+        if (_token == address(0) && reserveA.add(_amountOfFloat) >= threshold) {
+            return 2; // WBTC float insufficient
         }
         return 0;
     }
 
-    /// @dev _updateFloatPool updates float balances.
-    /// @param _tokenA Address of target tokenA.
-    /// @param _tokenB Address of target tokenB.
-    function _updateFloatPool(address _tokenA, address _tokenB)
-        internal
-        returns (uint256)
-    {
-        // Reduce gas cost.
-        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
-            _tokenA,
-            _tokenB
-        );
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
-        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
-        currentExchangeRate = totalLPs == 0
-            ? currentExchangeRate
-            : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.add(lockedLPTokensForNode)
-            );
-        return currentExchangeRate;
-    }
-
-    /// @dev _addFloat updates Float.
+    /// @dev _addFloat updates one side of float.
     /// @param _token The address of target token.
     /// @param _amount The amount of float.
     function _addFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
-        if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.add(_amount);
-        }
     }
 
     /// @dev _removeFloat remove Float.
@@ -568,15 +579,28 @@ contract SwapContract is Ownable, ISwapContract {
             _amount,
             "float amount insufficient"
         );
-        if (_token == WBTC_ADDR) {
-            activeWBTCBalances = activeWBTCBalances.sub(
-                _amount,
-                "activeWBTCBalances insufficient"
-            );
-        }
     }
 
-    /// @dev _rewardsCollection collects rewards.
+    /// @dev _swap collects swap amount to change float.
+    /// @param _sourceToken The address of source token
+    /// @param _destToken The address of target token.
+    /// @param _swapAmount The amount of swap.
+    function _swap(
+        address _sourceToken,
+        address _destToken,
+        uint256 _swapAmount
+    ) internal {
+        floatAmountOf[_destToken] = floatAmountOf[_destToken].sub(
+            _swapAmount,
+            "float amount of _destToken insufficient"
+        );
+        floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
+            _swapAmount
+        );
+        emit Swap(_sourceToken, _destToken, _swapAmount);
+    }
+
+    /// @dev _rewardsCollection collects tx rewards.
     /// @param _destToken The address of target token.
     /// @param _rewardsAmount The amount of rewards.
     function _rewardsCollection(address _destToken, uint256 _rewardsAmount)
@@ -586,29 +610,45 @@ contract SwapContract is Ownable, ISwapContract {
         if (_rewardsAmount == 0) return;
         // The fee is always collected in the source token (it's left in the float on the origin chain).
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
+        // Get current LP token price.
+        uint256 nowPrice = getCurrentPriceLP();
         // Add all fees into pool
         totalRewards[_feesToken] = totalRewards[_feesToken].add(_rewardsAmount);
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
-        uint256 amountLPForNode = amountForNodes.mul(priceDecimals).div(
-            getCurrentPriceLP()
+        uint256 amountLPTokensForNode = amountForNodes.mul(priceDecimals).div(
+            nowPrice
         );
         // Add minted LP tokens for Nodes
-        lockedLPTokensForNode = lockedLPTokensForNode.add(amountLPForNode);
+        lockedLPTokensForNode = lockedLPTokensForNode.add(
+            amountLPTokensForNode
+        );
+        emit RewardsCollection(
+            _feesToken,
+            _rewardsAmount,
+            amountLPTokensForNode,
+            nowPrice
+        );
     }
 
-    /// @dev _addTxidUsed updates a spent txhash.
-    /// @param _txs The array of txid.
-    function _addTxidUsed(bytes32[] memory _txs) internal {
-        for (uint256 i = 0; i < _txs.length; i++) {
-            used[_txs[i]] = true;
+    /// @dev _addUsedTx updates txhash list which is spent. (single hash)
+    /// @param _txid The array of txid.
+    function _addUsedTx(bytes32 _txid) internal {
+        used[_txid] = true;
+    }
+
+    /// @dev _addUsedTxs updates txhash list which is spent. (multiple hashes)
+    /// @param _txids The array of txid.
+    function _addUsedTxs(bytes32[] memory _txids) internal {
+        for (uint256 i = 0; i < _txids.length; i++) {
+            used[_txids[i]] = true;
         }
     }
 
-    /// @dev _addNode updates a Staker.
+    /// @dev _addNode updates a staker's info.
     /// @param _addr The address of staker.
     /// @param _data The data of staker.
-    /// @param _remove The flag for remove.
+    /// @param _remove The flag to remove node.
     function _addNode(
         address _addr,
         bytes32 _data,
@@ -628,8 +668,8 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev _splitToValues returns address and amount of stakes
-    /// @param _data The data of staker.
+    /// @dev _splitToValues returns address and amount of staked swingby
+    /// @param _data The info of a staker.
     function _splitToValues(bytes32 _data)
         internal
         pure

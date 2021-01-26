@@ -32,8 +32,6 @@ interface ISwapContract {
         bytes32 _txid
     ) external returns (bool);
 
-    // function issueLPTokensForFloat(bytes32 _txid) external returns (bool);
-
     function recordOutcomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfLPtoken,
@@ -41,9 +39,11 @@ interface ISwapContract {
         bytes32 _txid
     ) external returns (bool);
 
-    // function burnLPTokensForFloat(bytes32 _txid) external returns (bool);
-
     function distributeNodeRewards() external returns (bool);
+
+    function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid)
+        external
+        returns (bool);
 
     function churn(
         address _newOwner,
@@ -64,9 +64,11 @@ interface ISwapContract {
         view
         returns (uint256);
 
-    function getFloatReserve(address _tokenA, address _tokenB)
-        external
-        returns (uint256 reserveA, uint256 reserveB);
+    function getFloatReserve(
+        address _tokenA,
+        address _tokenB,
+        bool _mergeRewards
+    ) external returns (uint256 reserveA, uint256 reserveB);
 
     function getActiveNodes() external returns (bytes32[] memory);
 
