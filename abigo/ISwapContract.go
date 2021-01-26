@@ -27,7 +27,7 @@ var (
 )
 
 // ISwapContractABI is the input ABI used to generate the binding from.
-const ISwapContractABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"_zerofee\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFees\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_mergeRewards\",\"type\":\"bool\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFees\",\"type\":\"uint256\"}],\"name\":\"getMinimumAmountOfLPTokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const ISwapContractABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"_zerofee\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_mergeRewards\",\"type\":\"bool\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // ISwapContract is an auto generated Go binding around an Ethereum contract.
 type ISwapContract struct {
@@ -233,38 +233,6 @@ func (_ISwapContract *ISwapContractCallerSession) GetDepositFeeRate(_token commo
 	return _ISwapContract.Contract.GetDepositFeeRate(&_ISwapContract.CallOpts, _token, _amountOfFloat)
 }
 
-// GetMinimumAmountOfLPTokens is a free data retrieval call binding the contract method 0xba0b8e95.
-//
-// Solidity: function getMinimumAmountOfLPTokens(uint256 _minerFees) view returns(uint256, uint256)
-func (_ISwapContract *ISwapContractCaller) GetMinimumAmountOfLPTokens(opts *bind.CallOpts, _minerFees *big.Int) (*big.Int, *big.Int, error) {
-	var out []interface{}
-	err := _ISwapContract.contract.Call(opts, &out, "getMinimumAmountOfLPTokens", _minerFees)
-
-	if err != nil {
-		return *new(*big.Int), *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	out1 := *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-
-	return out0, out1, err
-
-}
-
-// GetMinimumAmountOfLPTokens is a free data retrieval call binding the contract method 0xba0b8e95.
-//
-// Solidity: function getMinimumAmountOfLPTokens(uint256 _minerFees) view returns(uint256, uint256)
-func (_ISwapContract *ISwapContractSession) GetMinimumAmountOfLPTokens(_minerFees *big.Int) (*big.Int, *big.Int, error) {
-	return _ISwapContract.Contract.GetMinimumAmountOfLPTokens(&_ISwapContract.CallOpts, _minerFees)
-}
-
-// GetMinimumAmountOfLPTokens is a free data retrieval call binding the contract method 0xba0b8e95.
-//
-// Solidity: function getMinimumAmountOfLPTokens(uint256 _minerFees) view returns(uint256, uint256)
-func (_ISwapContract *ISwapContractCallerSession) GetMinimumAmountOfLPTokens(_minerFees *big.Int) (*big.Int, *big.Int, error) {
-	return _ISwapContract.Contract.GetMinimumAmountOfLPTokens(&_ISwapContract.CallOpts, _minerFees)
-}
-
 // IsTxUsed is a free data retrieval call binding the contract method 0xe6ca2084.
 //
 // Solidity: function isTxUsed(bytes32 _txid) view returns(bool)
@@ -317,25 +285,25 @@ func (_ISwapContract *ISwapContractTransactorSession) Churn(_newOwner common.Add
 	return _ISwapContract.Contract.Churn(&_ISwapContract.TransactOpts, _newOwner, _rewardAddressAndAmounts, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x64399a7f.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x8006cc3e.
 //
-// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _rewardsAmount) returns(bool)
-func (_ISwapContract *ISwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _destToken common.Address, _incomingAmount *big.Int, _rewardsAmount *big.Int) (*types.Transaction, error) {
-	return _ISwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _destToken, _incomingAmount, _rewardsAmount)
+// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount) returns(bool)
+func (_ISwapContract *ISwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int) (*types.Transaction, error) {
+	return _ISwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _destToken, _incomingAmount, _minerFee, _rewardsAmount)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x64399a7f.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x8006cc3e.
 //
-// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _rewardsAmount) returns(bool)
-func (_ISwapContract *ISwapContractSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _rewardsAmount *big.Int) (*types.Transaction, error) {
-	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _destToken, _incomingAmount, _rewardsAmount)
+// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount) returns(bool)
+func (_ISwapContract *ISwapContractSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int) (*types.Transaction, error) {
+	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _destToken, _incomingAmount, _minerFee, _rewardsAmount)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x64399a7f.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x8006cc3e.
 //
-// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _rewardsAmount) returns(bool)
-func (_ISwapContract *ISwapContractTransactorSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _rewardsAmount *big.Int) (*types.Transaction, error) {
-	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _destToken, _incomingAmount, _rewardsAmount)
+// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount) returns(bool)
+func (_ISwapContract *ISwapContractTransactorSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int) (*types.Transaction, error) {
+	return _ISwapContract.Contract.CollectSwapFeesForBTC(&_ISwapContract.TransactOpts, _destToken, _incomingAmount, _minerFee, _rewardsAmount)
 }
 
 // DistributeNodeRewards is a paid mutator transaction binding the contract method 0xe9e9bf6a.
@@ -466,23 +434,23 @@ func (_ISwapContract *ISwapContractTransactorSession) RecordOutcomingFloat(_toke
 
 // RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
 //
-// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid) returns(bool)
-func (_ISwapContract *ISwapContractTransactor) RecordUTXOSweepMinerFee(opts *bind.TransactOpts, _minerFees *big.Int, _txid [32]byte) (*types.Transaction, error) {
-	return _ISwapContract.contract.Transact(opts, "recordUTXOSweepMinerFee", _minerFees, _txid)
+// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid) returns(bool)
+func (_ISwapContract *ISwapContractTransactor) RecordUTXOSweepMinerFee(opts *bind.TransactOpts, _minerFee *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _ISwapContract.contract.Transact(opts, "recordUTXOSweepMinerFee", _minerFee, _txid)
 }
 
 // RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
 //
-// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid) returns(bool)
-func (_ISwapContract *ISwapContractSession) RecordUTXOSweepMinerFee(_minerFees *big.Int, _txid [32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.RecordUTXOSweepMinerFee(&_ISwapContract.TransactOpts, _minerFees, _txid)
+// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid) returns(bool)
+func (_ISwapContract *ISwapContractSession) RecordUTXOSweepMinerFee(_minerFee *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.RecordUTXOSweepMinerFee(&_ISwapContract.TransactOpts, _minerFee, _txid)
 }
 
 // RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
 //
-// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFees, bytes32 _txid) returns(bool)
-func (_ISwapContract *ISwapContractTransactorSession) RecordUTXOSweepMinerFee(_minerFees *big.Int, _txid [32]byte) (*types.Transaction, error) {
-	return _ISwapContract.Contract.RecordUTXOSweepMinerFee(&_ISwapContract.TransactOpts, _minerFees, _txid)
+// Solidity: function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid) returns(bool)
+func (_ISwapContract *ISwapContractTransactorSession) RecordUTXOSweepMinerFee(_minerFee *big.Int, _txid [32]byte) (*types.Transaction, error) {
+	return _ISwapContract.Contract.RecordUTXOSweepMinerFee(&_ISwapContract.TransactOpts, _minerFee, _txid)
 }
 
 // SingleTransferERC20 is a paid mutator transaction binding the contract method 0x0d63aca7.
