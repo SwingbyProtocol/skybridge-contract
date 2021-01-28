@@ -20,16 +20,14 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
-
     uint256 public lockedLPTokensForNode;
+    uint256 public initialExchangeRate;
 
     uint256 private priceDecimals;
-    uint256 private initialExchangeRate;
     uint256 private lpDecimals;
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used;
-
     // Node lists
     mapping(address => bytes32) private nodes;
     mapping(address => bool) private isInList;
@@ -69,7 +67,7 @@ contract SwapContract is Ownable, ISwapContract {
     modifier priceCheck() {
         uint256 beforePrice = getCurrentPriceLP();
         _;
-        require(getCurrentPriceLP() >= beforePrice, "Invalid  LP price change");
+        require(getCurrentPriceLP() >= beforePrice, "Invalid LPT price");
     }
 
     constructor(
@@ -499,17 +497,20 @@ contract SwapContract is Ownable, ISwapContract {
                 "The float balance insufficient."
             );
         }
-        // Remove float amount
-        _removeFloat(_token, amountOfFloat.sub(_minerFee));
         // Collect fees before remove float
         _rewardsCollection(_token, withdrawalFees);
+        // Remove float amount
+        _removeFloat(_token, amountOfFloat.sub(_minerFee));
         // Add txid for recording.
         _addUsedTx(_txid);
         // WBTC transfer if token address is WBTC_ADDR
         if (_token == WBTC_ADDR) {
             // _minerFee should be zero
             require(
-                IERC20(_token).transfer(to, amountOfFloat.sub(withdrawalFees).sub(_minerFee)),
+                IERC20(_token).transfer(
+                    to,
+                    amountOfFloat.sub(withdrawalFees).sub(_minerFee)
+                ),
                 "WBTC balance insufficient"
             );
         }
@@ -565,7 +566,7 @@ contract SwapContract is Ownable, ISwapContract {
     function _removeFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].sub(
             _amount,
-            "float amount insufficient"
+            "_removeFloat: float amount insufficient"
         );
     }
 
@@ -580,7 +581,7 @@ contract SwapContract is Ownable, ISwapContract {
     ) internal {
         floatAmountOf[_destToken] = floatAmountOf[_destToken].sub(
             _swapAmount,
-            "float amount of _destToken insufficient"
+            "_swap: float amount insufficient"
         );
         floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
             _swapAmount
