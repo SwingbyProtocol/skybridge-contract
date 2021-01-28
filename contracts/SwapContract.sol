@@ -27,7 +27,6 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private initialExchangeRate;
     uint256 private lpDecimals;
 
-    mapping(address => uint256) private totalRewards;
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used;
 
@@ -357,8 +356,7 @@ contract SwapContract is Ownable, ISwapContract {
     {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
-            WBTC_ADDR,
-            true
+            WBTC_ADDR
         );
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
@@ -390,18 +388,13 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev getFloatReserve returns float reserves
     /// @param _tokenA The address of target tokenA.
     /// @param _tokenB The address of target tokenB.
-    /// @param _mergeRewards The flag to merge total rewards.
-    function getFloatReserve(
-        address _tokenA,
-        address _tokenB,
-        bool _mergeRewards
-    ) public override view returns (uint256 reserveA, uint256 reserveB) {
-        (reserveA, reserveB) = _mergeRewards
-            ? (
-                floatAmountOf[_tokenA].add(totalRewards[_tokenA]),
-                floatAmountOf[_tokenB].add(totalRewards[_tokenB])
-            )
-            : (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
+    function getFloatReserve(address _tokenA, address _tokenB)
+        public
+        override
+        view
+        returns (uint256 reserveA, uint256 reserveB)
+    {
+        (reserveA, reserveB) = (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
     }
 
     /// @dev getActiveNodes returns active nodes list (stakes and amount)
@@ -490,23 +483,33 @@ contract SwapContract is Ownable, ISwapContract {
         // Calculate the amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
         uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
-        require(
-            floatAmountOf[_token] >= amountOfFloat,
-            "The float balance insufficient."
+
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            WBTC_ADDR
         );
+        if (_token == address(0)) {
+            require(
+                reserveA >= amountOfFloat.sub(_minerFee),
+                "The float balance insufficient."
+            );
+        } else if (_token == WBTC_ADDR) {
+            require(
+                reserveB >= amountOfFloat.sub(_minerFee),
+                "The float balance insufficient."
+            );
+        }
+        // Remove float amount
+        _removeFloat(_token, amountOfFloat.sub(_minerFee));
         // Collect fees before remove float
         _rewardsCollection(_token, withdrawalFees);
-        // Remove float amount
-        _removeFloat(_token, amountOfFloat);
         // Add txid for recording.
         _addUsedTx(_txid);
         // WBTC transfer if token address is WBTC_ADDR
         if (_token == WBTC_ADDR) {
+            // _minerFee should be zero
             require(
-                IERC20(_token).transfer(
-                    to,
-                    amountOfFloat.sub(withdrawalFees).sub(_minerFee)
-                ),
+                IERC20(_token).transfer(to, amountOfFloat.sub(withdrawalFees).sub(_minerFee)),
                 "WBTC balance insufficient"
             );
         }
@@ -533,8 +536,7 @@ contract SwapContract is Ownable, ISwapContract {
     {
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
-            WBTC_ADDR,
-            true
+            WBTC_ADDR
         );
         uint256 threshold = reserveA
             .add(reserveB)
@@ -599,7 +601,9 @@ contract SwapContract is Ownable, ISwapContract {
         // Get current LP token price.
         uint256 nowPrice = getCurrentPriceLP();
         // Add all fees into pool
-        totalRewards[_feesToken] = totalRewards[_feesToken].add(_rewardsAmount);
+        floatAmountOf[_feesToken] = floatAmountOf[_feesToken].add(
+            _rewardsAmount
+        );
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
         uint256 amountLPTokensForNode = amountForNodes.mul(priceDecimals).div(

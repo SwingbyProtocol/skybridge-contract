@@ -65,11 +65,9 @@ interface ISwapContract {
         view
         returns (uint256);
 
-    function getFloatReserve(
-        address _tokenA,
-        address _tokenB,
-        bool _mergeRewards
-    ) external returns (uint256 reserveA, uint256 reserveB);
+    function getFloatReserve(address _tokenA, address _tokenB)
+        external
+        returns (uint256 reserveA, uint256 reserveB);
 
     function getActiveNodes() external returns (bytes32[] memory);
 }

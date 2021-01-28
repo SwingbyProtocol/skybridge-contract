@@ -313,7 +313,7 @@ contract('Test for swap actions', function (accounts) {
 
         await this.lpToken.transfer(this.swap.address, LP1.sub(depositFeesLP1).add(LP2))
 
-        const floats = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address, false)
+        const floats = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // console.log(floats[0].toString(), floats[1].toString())
         // float 100060000 + 100000000
 
@@ -328,7 +328,7 @@ contract('Test for swap actions', function (accounts) {
         // LP price is 1.00067890 BTC/WBTC
         // console.log(price5.toString())
 
-        const floats2 = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address, false)
+        const floats2 = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
         // console.log(floats2[0].toString(), floats2[1].toString())
 
         // console.log('Hold LPT', LP1.sub(depositFeesLP1).add(LP2).sub(result[0]).toString())
