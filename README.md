@@ -16,7 +16,7 @@ $ truffle migrate --network {development/goerli}
 ```
 2. Change the owner of SwapContract to TSS address
 ```
-$ TSS=<The TSS wallet address> truffle exec scripts/transferSwapContractOwnership.js --network {development/goerli} 
+$ TSS={The TSS wallet address} truffle exec scripts/moveSCOwner.js --network {development/goerli} 
 ```
 
 ## Build contract
