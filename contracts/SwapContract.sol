@@ -127,7 +127,12 @@ contract SwapContract is Ownable, ISwapContract {
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
-        _rewardsCollection(_destToken, _rewardsAmount);
+        if (_destToken != lpToken) {
+            address _feesToken = _destToken == WBTC_ADDR
+                ? address(0)
+                : WBTC_ADDR;
+            _rewardsCollection(_feesToken, _rewardsAmount);
+        }
         _addUsedTxs(_redeemedFloatTxIds);
         require(IERC20(_destToken).transfer(_to, _amount));
         return true;
@@ -154,7 +159,12 @@ contract SwapContract is Ownable, ISwapContract {
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
         }
-        _rewardsCollection(_destToken, _rewardsAmount);
+        if (_destToken != lpToken) {
+            address _feesToken = _destToken == WBTC_ADDR
+                ? address(0)
+                : WBTC_ADDR;
+            _rewardsCollection(_feesToken, _rewardsAmount);
+        }
         _addUsedTxs(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             require(
@@ -185,7 +195,7 @@ contract SwapContract is Ownable, ISwapContract {
             address(0),
             _incomingAmount.sub(_minerFee).sub(_rewardsAmount)
         );
-        _rewardsCollection(_destToken, _rewardsAmount);
+        _rewardsCollection(WBTC_ADDR, _rewardsAmount);
         return true;
     }
 
@@ -590,15 +600,12 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev _rewardsCollection collects tx rewards.
-    /// @param _destToken The address of target token.
+    /// @param _feesToken The token address for collection fees.
     /// @param _rewardsAmount The amount of rewards.
-    function _rewardsCollection(address _destToken, uint256 _rewardsAmount)
+    function _rewardsCollection(address _feesToken, uint256 _rewardsAmount)
         internal
     {
-        if (_destToken == lpToken) return;
         if (_rewardsAmount == 0) return;
-        // The fee is always collected in the source token (it's left in the float on the origin chain).
-        address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
         // Get current LP token price.
         uint256 nowPrice = getCurrentPriceLP();
         // Add all fees into pool

@@ -339,7 +339,8 @@ contract('Test for swap actions', function (accounts) {
         await this.swap.recordOutcomingFloat(ZERO_ADDRESS, AmountLP2, this.minerFees, this.sampleTxs[3])
         const price6 = await this.swap.getCurrentPriceLP()
         // LP price is 1.00195627 BTC/WBTC
-        // console.log(price6.toString())
+        const amt = await floats2[0].mul(this.withdrawalFeeBPS).div(10000)
+        console.log(amt.toString())
         const floats3 = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
 
         expect(floats3[0]).to.bignumber.equal('30001')
