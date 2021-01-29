@@ -125,14 +125,16 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
-        if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
-            _swap(address(0), WBTC_ADDR, _totalSwapped);
-        } else if (_totalSwapped == 0) {
-            _feesToken = WBTC_ADDR;
+        if (_destToken == WBTC_ADDR) {
+            if (_totalSwapped > 0) {
+                _swap(address(0), WBTC_ADDR, _totalSwapped);
+            } else if (_totalSwapped == 0) {
+                _feesToken = WBTC_ADDR;
+            }
+        } else if (_destToken == lpToken) {
+            _feesToken = lpToken;
         }
-        if (_destToken != lpToken) {
-            _rewardsCollection(_feesToken, _rewardsAmount);
-        }
+        _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
         require(IERC20(_destToken).transfer(_to, _amount));
         return true;
@@ -157,14 +159,16 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
-        if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
-            _swap(address(0), WBTC_ADDR, _totalSwapped);
-        } else if (_totalSwapped == 0) {
-            _feesToken = WBTC_ADDR;
+        if (_destToken == WBTC_ADDR) {
+            if (_totalSwapped > 0) {
+                _swap(address(0), WBTC_ADDR, _totalSwapped);
+            } else if (_totalSwapped == 0) {
+                _feesToken = WBTC_ADDR;
+            }
+        } else if (_destToken == lpToken) {
+            _feesToken = lpToken;
         }
-        if (_destToken != lpToken) {
-            _rewardsCollection(_feesToken, _rewardsAmount);
-        }
+        _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
             require(
@@ -611,6 +615,10 @@ contract SwapContract is Ownable, ISwapContract {
         internal
     {
         if (_rewardsAmount == 0) return;
+        if (_feesToken == lpToken) {
+            lockedLPTokensForNode = lockedLPTokensForNode.add(_rewardsAmount);
+            return;
+        }
         // Get current LP token price.
         uint256 nowPrice = getCurrentPriceLP();
         // Add all fees into pool
