@@ -125,13 +125,13 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         address _feesToken = address(0);
-        if (_destToken == lpToken) {
-            _feesToken = lpToken;
-        }
         if (_totalSwapped > 0) {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = WBTC_ADDR;
+        }
+        if (_destToken == lpToken) {
+            _feesToken = lpToken;
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
@@ -157,14 +157,14 @@ contract SwapContract is Ownable, ISwapContract {
             _destToken != address(0),
             "_destToken should not be address(0)"
         );
-       address _feesToken = address(0);
-        if (_destToken == lpToken) {
-            _feesToken = lpToken;
-        }
+        address _feesToken = address(0);
         if (_totalSwapped > 0) {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = WBTC_ADDR;
+        }
+        if (_destToken == lpToken) {
+            _feesToken = lpToken;
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
