@@ -514,19 +514,19 @@ contract SwapContract is Ownable, ISwapContract {
         );
         if (_token == address(0)) {
             require(
-                reserveA >= amountOfFloat.sub(_minerFee),
+                reserveA >= amountOfFloat.sub(withdrawalFees),
                 "The float balance insufficient."
             );
         } else if (_token == WBTC_ADDR) {
             require(
-                reserveB >= amountOfFloat.sub(_minerFee),
+                reserveB >= amountOfFloat.sub(withdrawalFees),
                 "The float balance insufficient."
             );
         }
         // Collect fees before remove float
         _rewardsCollection(_token, withdrawalFees);
         // Remove float amount
-        _removeFloat(_token, amountOfFloat.sub(_minerFee));
+        _removeFloat(_token, amountOfFloat);
         // Add txid for recording.
         _addUsedTx(_txid);
         // WBTC transfer if token address is WBTC_ADDR

@@ -342,7 +342,7 @@ contract('Test for swap actions', function (accounts) {
         const amt = await floats2[0].mul(this.withdrawalFeeBPS).div(new BN(10000))
         // console.log(amt.toString())
         const floats3 = await this.swap.getFloatReserve(ZERO_ADDRESS, this.wbtcTest.address)
-        const remain = amt.add(this.minerFees).add(new BN(1))
+        const remain = amt.add(new BN(1))
         expect(floats3[0]).to.bignumber.equal(remain)
     })
 
