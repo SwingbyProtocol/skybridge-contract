@@ -21,6 +21,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
     uint256 public lockedLPTokensForNode;
+    uint256 public feesLPTokensForNode;
     uint256 public initialExchangeRate;
 
     uint256 private priceDecimals;
@@ -93,6 +94,8 @@ contract SwapContract is Ownable, ISwapContract {
         initialExchangeRate = priceDecimals;
         // Set lockedLPTokensForNode
         lockedLPTokensForNode = 0;
+        // Set feesLPTokensForNode
+        feesLPTokensForNode = 0;
         // Set whitelist addresses
         whitelist[WBTC_ADDR] = true;
         whitelist[lpToken] = true;
@@ -259,8 +262,13 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev distributeNodeRewards sends rewards for Nodes.
     function distributeNodeRewards() external override returns (bool) {
         // Reduce Gas
-        uint256 rewardLPsForNodes = lockedLPTokensForNode;
-        require(rewardLPsForNodes > 0, "totalRewardLPsForNode is not positive");
+        uint256 rewardLPTsForNodes = lockedLPTokensForNode.add(
+            feesLPTokensForNode
+        );
+        require(
+            rewardLPTsForNodes > 0,
+            "totalRewardLPsForNode is not positive"
+        );
         bytes32[] memory nodeList = getActiveNodes();
         uint256 totalStaked = 0;
         for (uint256 i = 0; i < nodeList.length; i++) {
@@ -268,15 +276,17 @@ contract SwapContract is Ownable, ISwapContract {
                 uint256(uint96(bytes12(nodeList[i])))
             );
         }
+        IBurnableToken(lpToken).mint(address(this),lockedLPTokensForNode);
         for (uint256 i = 0; i < nodeList.length; i++) {
-            IBurnableToken(lpToken).mint(
+            IBurnableToken(lpToken).transfer(
                 address(uint160(uint256(nodeList[i]))),
-                rewardLPsForNodes
+                rewardLPTsForNodes
                     .mul(uint256(uint96(bytes12(nodeList[i]))))
                     .div(totalStaked)
             );
         }
         lockedLPTokensForNode = 0;
+        feesLPTokensForNode = 0;
         return true;
     }
 
@@ -614,7 +624,7 @@ contract SwapContract is Ownable, ISwapContract {
     {
         if (_rewardsAmount == 0) return;
         if (_feesToken == lpToken) {
-            lockedLPTokensForNode = lockedLPTokensForNode.add(_rewardsAmount);
+            feesLPTokensForNode = feesLPTokensForNode.add(_rewardsAmount);
             emit RewardsCollection(_feesToken, _rewardsAmount, 0, 0);
             return;
         }
