@@ -615,6 +615,7 @@ contract SwapContract is Ownable, ISwapContract {
         if (_rewardsAmount == 0) return;
         if (_feesToken == lpToken) {
             lockedLPTokensForNode = lockedLPTokensForNode.add(_rewardsAmount);
+            emit RewardsCollection(_feesToken, _rewardsAmount, 0, 0);
             return;
         }
         // Get current LP token price.
