@@ -61,7 +61,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 amountOfLP,
         uint256 amountOfFloat,
         uint256 currentPriceLP,
-        uint256 withdrawalFees,
+        uint256 withdrawal,
         bytes32 txid
     );
 
@@ -507,7 +507,11 @@ contract SwapContract is Ownable, ISwapContract {
         // Calculate the amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
         uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
-
+        require(
+            amountOfFloat.sub(withdrawalFees) >= _minerFee,
+            "Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
+        );
+        uint256 withdrawal = amountOfFloat.sub(withdrawalFees).sub(_minerFee);
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
             address(0),
             WBTC_ADDR
@@ -533,10 +537,7 @@ contract SwapContract is Ownable, ISwapContract {
         if (_token == WBTC_ADDR) {
             // _minerFee should be zero
             require(
-                IERC20(_token).transfer(
-                    to,
-                    amountOfFloat.sub(withdrawalFees).sub(_minerFee)
-                ),
+                IERC20(_token).transfer(to, withdrawal),
                 "WBTC balance insufficient"
             );
         }
@@ -547,7 +548,7 @@ contract SwapContract is Ownable, ISwapContract {
             amountOfLP,
             amountOfFloat,
             nowPrice,
-            withdrawalFees,
+            withdrawal,
             _txid
         );
         return true;
