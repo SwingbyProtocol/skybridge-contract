@@ -197,11 +197,10 @@ contract SwapContract is Ownable, ISwapContract {
         require(_destToken == address(0), "_destToken should be address(0)");
         address _feesToken = WBTC_ADDR;
         if (_incomingAmount > 0) {
-            _swap(
-                WBTC_ADDR,
-                address(0),
-                _incomingAmount.sub(_minerFee).sub(_rewardsAmount)
+            uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
+                _minerFee
             );
+            _swap(WBTC_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
         }
@@ -276,7 +275,7 @@ contract SwapContract is Ownable, ISwapContract {
                 uint256(uint96(bytes12(nodeList[i])))
             );
         }
-        IBurnableToken(lpToken).mint(address(this),lockedLPTokensForNode);
+        IBurnableToken(lpToken).mint(address(this), lockedLPTokensForNode);
         for (uint256 i = 0; i < nodeList.length; i++) {
             IBurnableToken(lpToken).transfer(
                 address(uint160(uint256(nodeList[i]))),
