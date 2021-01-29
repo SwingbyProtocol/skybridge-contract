@@ -124,13 +124,13 @@ contract SwapContract is Ownable, ISwapContract {
             _destToken != address(0),
             "_destToken should not be address(0)"
         );
+        address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
+        } else if (_totalSwapped == 0) {
+            _feesToken = WBTC_ADDR;
         }
         if (_destToken != lpToken) {
-            address _feesToken = _destToken == WBTC_ADDR
-                ? address(0)
-                : WBTC_ADDR;
             _rewardsCollection(_feesToken, _rewardsAmount);
         }
         _addUsedTxs(_redeemedFloatTxIds);
@@ -156,13 +156,13 @@ contract SwapContract is Ownable, ISwapContract {
             _destToken != address(0),
             "_destToken should not be address(0)"
         );
+        address _feesToken = _destToken == WBTC_ADDR ? address(0) : WBTC_ADDR;
         if (_destToken == WBTC_ADDR && _totalSwapped > 0) {
             _swap(address(0), WBTC_ADDR, _totalSwapped);
+        } else if (_totalSwapped == 0) {
+            _feesToken = WBTC_ADDR;
         }
         if (_destToken != lpToken) {
-            address _feesToken = _destToken == WBTC_ADDR
-                ? address(0)
-                : WBTC_ADDR;
             _rewardsCollection(_feesToken, _rewardsAmount);
         }
         _addUsedTxs(_redeemedFloatTxIds);
@@ -190,12 +190,17 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 _rewardsAmount
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
-        _swap(
-            WBTC_ADDR,
-            address(0),
-            _incomingAmount.sub(_minerFee).sub(_rewardsAmount)
-        );
-        _rewardsCollection(WBTC_ADDR, _rewardsAmount);
+        address _feesToken = WBTC_ADDR;
+        if (_incomingAmount > 0) {
+            _swap(
+                WBTC_ADDR,
+                address(0),
+                _incomingAmount.sub(_minerFee).sub(_rewardsAmount)
+            );
+        } else if (_incomingAmount == 0) {
+            _feesToken = address(0);
+        }
+        _rewardsCollection(_feesToken, _rewardsAmount);
         return true;
     }
 
