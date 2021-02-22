@@ -406,8 +406,8 @@ func (_SwapContract *SwapContractCaller) GetFloatReserve(opts *bind.CallOpts, _t
 		return *outstruct, err
 	}
 
-	outstruct.ReserveA = out[0].(*big.Int)
-	outstruct.ReserveB = out[1].(*big.Int)
+	outstruct.ReserveA = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.ReserveB = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
 
 	return *outstruct, err
 
