@@ -7,8 +7,8 @@ const SwapContract = artifacts.require("SwapContract");
 module.exports = async function (done) {
     // await deployer.deploy(LPToken)
     try {
-        const swap = await SwapContract.at("0x9bdfe9d2ec5a0eb9e9b6df935b34e5da04c497d5")
-        const res = await swap.getActiveNodes.call({ gas: 200000 })
+        const swap = await SwapContract.at(process.env.WALLET)
+        const res = await swap.getActiveNodes.call({ gas: 300000 })
         const val = new BN(1).mul(new BN(10).pow(new BN(8)))
         const result = res.map((stake) => {
             const amount = web3.utils.hexToNumber(stake.slice(0, 26))
