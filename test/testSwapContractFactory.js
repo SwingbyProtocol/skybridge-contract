@@ -16,11 +16,13 @@ contract('SwapFactory', function (accounts) {
 
         this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
 
+        this.wbtcTest = await LPToken.new()
+
         this.factory = await SwapContractFactory.new();
     });
 
     it('Deploy new contracts and checking the owner', async function () {
-        const sc = await this.factory.deployNewContracts(receiver, WBTC_ADDR, 0)
+        const sc = await this.factory.deployNewContracts(receiver, this.wbtcTest.address, 0)
         const newLPToken = await LPToken.at(sc.receipt.logs[0].args.lpToken)
         const newSwapContract = await SwapContract.at(sc.receipt.logs[0].args.swapContract)
 

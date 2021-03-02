@@ -4,7 +4,7 @@ const LPToken = artifacts.require("LPToken");
 let WBTC_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
 
 module.exports = async function (deployer, net) {
-  if (net == "deployment") {
+  if (net == "development") {
     return
   }
   if (net == "goerli") {
