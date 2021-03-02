@@ -4,6 +4,8 @@ const { ZERO_ADDRESS } = constants;
 
 const LPToken = artifacts.require('LPToken');
 
+const tokenDecimals = 18
+
 contract('LPToken', function (accounts) {
     const [sender, receiver] = accounts
     const name = "Swingby BTC LP Token";
@@ -30,7 +32,7 @@ contract('LPToken', function (accounts) {
 
     it('has 8 decimals', async function () {
         decimals = await this.token.decimals()
-        expect(decimals.toString()).to.equal("8");
+        expect(decimals).to.bignumber.equal(new BN(tokenDecimals));
     });
 
     it('reverts when minting tokens from not owner', async function () {
