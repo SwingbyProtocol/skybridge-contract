@@ -77,8 +77,8 @@ module.exports = {
       gasPrice: 93000000000
     },
     bsc_testnet: {
-      provider: () => new HDWalletProvider(mnemonic, `https://dataseed1.binance.org`),
-      network_id: 1,       // Ropsten's id
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,       // Ropsten's id
       gas: 5500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
@@ -87,7 +87,7 @@ module.exports = {
     },
     bsc: {
       provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed.binance.org`),
-      network_id: 1,       // Ropsten's id
+      network_id: 56,       // Ropsten's id
       gas: 3000000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
