@@ -10,9 +10,10 @@ contract SwapContractFactory {
     function deployNewContracts(
         address _owner,
         address _wbtc,
+        uint8   _decimals,
         uint256 _existingBTCFloat
     ) external returns (address) {
-        LPToken lpToken = new LPToken();
+        LPToken lpToken = new LPToken(_decimals);
         SwapContract sc = new SwapContract(
             address(lpToken),
             _wbtc,

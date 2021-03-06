@@ -5,18 +5,22 @@ const { ZERO_ADDRESS } = constants;
 const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
 
-contract('Test for churn and float', function (accounts) {
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
+
+contract(`Test for churn and float decimals=${TOKEN_DECIMALS}`, function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
+        this.lpToken = await LPToken.new(TOKEN_DECIMALS)
 
-        this.lpToken = await LPToken.new()
+        this.btctTest = await LPToken.new(TOKEN_DECIMALS)
 
-        this.btctTest = await LPToken.new()
+        this.btctDecimals = await this.btctTest.decimals()
+
+        this.mintValue = new BN(500).mul(new BN(10).pow(this.btctDecimals))
 
         this.totalSwapped = new BN(0)
 

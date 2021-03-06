@@ -4,7 +4,7 @@ const { ZERO_ADDRESS } = constants;
 
 const LPToken = artifacts.require('LPToken');
 
-const tokenDecimals = 18
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 
 contract('LPToken', function (accounts) {
     const [sender, receiver] = accounts
@@ -15,9 +15,9 @@ contract('LPToken', function (accounts) {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(8)))
+        this.token = await LPToken.new(TOKEN_DECIMALS)
 
-        this.token = await LPToken.new();
+        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(TOKEN_DECIMALS)))
 
         await this.token.mint(sender, this.mintValue)
     });
@@ -30,9 +30,9 @@ contract('LPToken', function (accounts) {
         expect(await this.token.symbol()).to.equal(symbol);
     });
 
-    it('has 8 decimals', async function () {
+    it('has right decimals', async function () {
         decimals = await this.token.decimals()
-        expect(decimals).to.bignumber.equal(new BN(tokenDecimals));
+        expect(decimals).to.bignumber.equal(new BN(TOKEN_DECIMALS));
     });
 
     it('reverts when minting tokens from not owner', async function () {

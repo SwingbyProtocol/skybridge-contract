@@ -5,13 +5,15 @@ const { ZERO_ADDRESS } = constants;
 const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
 
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
+
 contract('Test for swap actions', function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
-        this.lpToken = await LPToken.new()
+        this.lpToken = await LPToken.new(TOKEN_DECIMALS)
 
-        this.btctTest = await LPToken.new()
+        this.btctTest = await LPToken.new(TOKEN_DECIMALS)
 
         this.btctDecimals = await this.btctTest.decimals()
 

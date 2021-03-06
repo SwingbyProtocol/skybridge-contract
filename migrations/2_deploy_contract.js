@@ -16,7 +16,7 @@ module.exports = async function (deployer, net) {
   if (net == "bsc_testnet") {
     BTCT_ADDR = "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8"
   }
-  await deployer.deploy(LPToken)
+  await deployer.deploy(LPToken, 18)
   const lpToken = await LPToken.deployed()
   await deployer.deploy(SwapContract, lpToken.address, BTCT_ADDR, 0);
   const swapContract = await SwapContract.deployed()
