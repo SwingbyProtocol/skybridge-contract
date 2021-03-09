@@ -1,6 +1,6 @@
 const SwapContract = artifacts.require("SwapContract");
 const LPToken = artifacts.require("LPToken");
-const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 8
 
 module.exports = async function (deployer, net) {
   if (net == "development") {
