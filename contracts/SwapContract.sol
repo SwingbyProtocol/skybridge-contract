@@ -24,7 +24,7 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 public feesLPTokensForNode;
     uint256 public initialExchangeRate;
 
-    uint256 private priceDecimals;
+    uint256 private convertScale;
     uint256 private lpDecimals;
 
     mapping(address => uint256) private floatAmountOf;
@@ -90,10 +90,10 @@ contract SwapContract is Ownable, ISwapContract {
         depositFeesBPS = 50;
         // Set withdrawalFeeBPS
         withdrawalFeeBPS = 20;
-        // Set priceDecimals
-        priceDecimals = 10**IERC20(_btct).decimals();
+        // Set convertScale
+        convertScale = 10**(IERC20(_btct).decimals() - 8);
         // Set initialExchangeRate
-        initialExchangeRate = priceDecimals;
+        initialExchangeRate = lpDecimals;
         // Set lockedLPTokensForNode
         lockedLPTokensForNode = 0;
         // Set feesLPTokensForNode
@@ -140,7 +140,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
-        require(IERC20(_destToken).transfer(_to, _amount));
+        _safeTransfer(_destToken, _to, _amount);
         return true;
     }
 
@@ -174,12 +174,10 @@ contract SwapContract is Ownable, ISwapContract {
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
-            require(
-                IERC20(_destToken).transfer(
-                    address(uint160(uint256(_addressesAndAmounts[i]))),
-                    uint256(uint96(bytes12(_addressesAndAmounts[i])))
-                ),
-                "Batch transfer error"
+            _safeTransfer(
+                _destToken,
+                address(uint160(uint256(_addressesAndAmounts[i]))),
+                uint256(uint96(bytes12(_addressesAndAmounts[i])))
             );
         }
         return true;
@@ -458,7 +456,7 @@ contract SwapContract is Ownable, ISwapContract {
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
         // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
-        uint256 amountOfLP = amountOfFloat.mul(priceDecimals).div(nowPrice);
+        uint256 amountOfLP = amountOfFloat.mul(lpDecimals).div(nowPrice);
         uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
         uint256 depositFees =
             depositFeeRate != 0 ? amountOfLP.mul(depositFeeRate).div(10000) : 0;
@@ -503,7 +501,7 @@ contract SwapContract is Ownable, ISwapContract {
         // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
         // Calculate the amountOfFloat
-        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(priceDecimals);
+        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(lpDecimals);
         uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             amountOfFloat.sub(withdrawalFees) >= _minerFee,
@@ -532,10 +530,7 @@ contract SwapContract is Ownable, ISwapContract {
         // BTCT transfer if token address is BTCT_ADDR
         if (_token == BTCT_ADDR) {
             // _minerFee should be zero
-            require(
-                IERC20(_token).transfer(to, withdrawal),
-                "BTCT balance insufficient"
-            );
+            _safeTransfer(_token, to, withdrawal);
         }
         // Burn LP tokens
         require(IBurnableToken(lpToken).burn(amountOfLP));
@@ -607,6 +602,21 @@ contract SwapContract is Ownable, ISwapContract {
         emit Swap(_sourceToken, _destToken, _swapAmount);
     }
 
+    /// @dev _safeTransfer executes tranfer erc20 tokens
+    /// @param _token The address of target token
+    /// @param _to The address of receiver.
+    /// @param _amount The amount of transfer.
+    function _safeTransfer(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        if (_token == BTCT_ADDR) {
+            _amount = _amount.mul(convertScale);
+        }
+        require(IERC20(_token).transfer(_to, _amount));
+    }
+
     /// @dev _rewardsCollection collects tx rewards.
     /// @param _feesToken The token address for collection fees.
     /// @param _rewardsAmount The amount of rewards.
@@ -628,7 +638,7 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
         uint256 amountLPTokensForNode =
-            amountForNodes.mul(priceDecimals).div(nowPrice);
+            amountForNodes.mul(lpDecimals).div(nowPrice);
         // Add minted LP tokens for Nodes
         lockedLPTokensForNode = lockedLPTokensForNode.add(
             amountLPTokensForNode

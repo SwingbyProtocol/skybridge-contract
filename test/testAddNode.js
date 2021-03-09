@@ -7,14 +7,14 @@ const SwapContract = artifacts.require('SwapContract');
 
 const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 
-contract(`Test for churn and float decimals=${TOKEN_DECIMALS}`, function (accounts) {
+contract(`Test for churn and float btctDecimals=${TOKEN_DECIMALS}`, function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
-        this.lpToken = await LPToken.new(TOKEN_DECIMALS)
+        this.lpToken = await LPToken.new(8)
 
         this.btctTest = await LPToken.new(TOKEN_DECIMALS)
 
@@ -93,13 +93,13 @@ contract(`Test for churn and float decimals=${TOKEN_DECIMALS}`, function (accoun
         expect(getNode2.length).to.equal(100)
 
 
-        let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
+        let floatAmountOfBTC = new BN(10).pow(new BN(8))
 
-        await this.btctTest.mint(this.swap.address, floatAmountOfBTC)
+        await this.btctTest.mint(this.swap.address, floatAmountOfBTC.mul(new BN(10).pow(new BN(10))))
 
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.1 WBTC)
-        let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
+        let rewardsAmount = "0x" + web3.utils.padLeft(new BN(10).pow(new BN(7)).toString('hex'), 64)
         await this.swap.multiTransferERC20TightlyPacked(this.btctTest.address, [swapTx], this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
 
@@ -175,7 +175,7 @@ contract(`Test for churn and float decimals=${TOKEN_DECIMALS}`, function (accoun
 
         let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
 
-        await this.btctTest.mint(this.swap.address, floatAmountOfBTC)
+        await this.btctTest.mint(this.swap.address, floatAmountOfBTC.mul(new BN(10).pow(new BN(10))))
 
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.1 WBTC)

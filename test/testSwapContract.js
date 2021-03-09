@@ -11,11 +11,15 @@ contract('Test for swap actions', function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
-        this.lpToken = await LPToken.new(TOKEN_DECIMALS)
+        this.lpToken = await LPToken.new(8)
+
+        this.lptDecimals = await this.lpToken.decimals()
 
         this.btctTest = await LPToken.new(TOKEN_DECIMALS)
 
         this.btctDecimals = await this.btctTest.decimals()
+
+        this.convertScale = new BN(10).pow(this.btctDecimals.sub(this.lptDecimals))
 
         this.mint500wBTCs = new BN(500).mul(new BN(10).pow(this.btctDecimals))
 
@@ -41,7 +45,7 @@ contract('Test for swap actions', function (accounts) {
 
         this.incomingAmount = this.swapAmount.add(this.swapFees)
 
-        this.initialPriceLP = this.floatAmount
+        this.initialPriceLP = new BN(10).pow(this.lptDecimals)
 
         this.sampleTxs = [
             "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204",
@@ -70,8 +74,8 @@ contract('Test for swap actions', function (accounts) {
         await this.btctTest.transfer(this.swap.address, this.mint500wBTCs, {
             from: sender
         })
-        let tokens100 = new BN(100).mul(new BN(10).pow(this.btctDecimals))
-        let tokens400 = new BN(400).mul(new BN(10).pow(this.btctDecimals))
+        let tokens100 = new BN(100).mul(new BN(10).pow(this.lptDecimals))
+        let tokens400 = new BN(400).mul(new BN(10).pow(this.lptDecimals))
 
         let sendTx1 = "0x" + web3.utils.padLeft(tokens100.toString('hex') + sender.slice(2), 64)
         let sendbackTx2 = "0x" + web3.utils.padLeft(tokens400.toString('hex') + receiver.slice(2), 64)
@@ -82,8 +86,8 @@ contract('Test for swap actions', function (accounts) {
         ]
         await this.swap.multiTransferERC20TightlyPacked(this.btctTest.address, txs, new BN(0), rewards, this.redeemedFloatTxIds)
         expect(await this.btctTest.balanceOf(this.swap.address)).to.bignumber.equal(new BN("0"))
-        expect(await this.btctTest.balanceOf(sender)).to.bignumber.equal(tokens100)
-        expect(await this.btctTest.balanceOf(receiver)).to.bignumber.equal(tokens400)
+        expect(await this.btctTest.balanceOf(sender)).to.bignumber.equal(tokens100.mul(new BN(10).pow(new BN(10))))
+        expect(await this.btctTest.balanceOf(receiver)).to.bignumber.equal(tokens400.mul(new BN(10).pow(new BN(10))))
     })
 
     it('test collectSwapFeesForBTC', async function () {
@@ -101,7 +105,7 @@ contract('Test for swap actions', function (accounts) {
         // BTC == address(0)
         await this.swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, this.zeroFees, this.sampleTxs[0])
         const price = await this.swap.getCurrentPriceLP()
-        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price)
+        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price)
         const depositFees = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees))
@@ -111,7 +115,7 @@ contract('Test for swap actions', function (accounts) {
         // LP token price is not changed.
         expect(price2).to.bignumber.equal(this.initialPriceLP)
 
-        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price2)
+        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price2)
         const depositFees2 = LP2.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees).add(LP2).sub(depositFees2))
     })
@@ -128,7 +132,7 @@ contract('Test for swap actions', function (accounts) {
         const price = await this.swap.getCurrentPriceLP()
         expect(price).to.bignumber.equal(this.initialPriceLP)
 
-        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price)
+        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price)
         const depositFees = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees))
@@ -154,7 +158,7 @@ contract('Test for swap actions', function (accounts) {
         // Get price of LP token -> 1.00067890 BTC/WBTC
         const price3 = await this.swap.getCurrentPriceLP()
 
-        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price3)
+        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price3)
         // const depositFees2 = LP2.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees).add(LP2))
 
@@ -173,7 +177,7 @@ contract('Test for swap actions', function (accounts) {
         // Get price of LP token -> 1.00101847 BTC/WBTC
         const price4 = await this.swap.getCurrentPriceLP()
         // console.log(price4.toString())
-        const LP3 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price4)
+        const LP3 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price4)
         // const depositFees3 = LP3.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees).add(LP2).add(LP3))
     })
@@ -186,7 +190,7 @@ contract('Test for swap actions', function (accounts) {
 
         const price = await this.swap.getCurrentPriceLP()
         expect(price).to.bignumber.equal(this.initialPriceLP)
-        const LP1 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price)
+        const LP1 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price)
         const depositFees = LP1.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees))
     })
@@ -203,7 +207,7 @@ contract('Test for swap actions', function (accounts) {
         const price = await this.swap.getCurrentPriceLP()
         expect(price).to.bignumber.equal(this.initialPriceLP)
 
-        const LP1 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price)
+        const LP1 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price)
         const depositFees = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees))
@@ -214,7 +218,7 @@ contract('Test for swap actions', function (accounts) {
 
         await this.btctTest.mint(this.swap.address, this.swapAmount)
 
-        let swapTx = "0x" + web3.utils.padLeft(this.swapAmount.toString('hex') + sender.slice(2), 64)
+        let swapTx = "0x" + web3.utils.padLeft(this.swapAmount.div(new BN(10).pow(new BN(10))).toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.002 WBTC)
         let rewardsAmount = "0x" + web3.utils.padLeft(this.swapFees.toString('hex'), 64)
         await this.swap.multiTransferERC20TightlyPacked(this.btctTest.address, [swapTx], new BN(0), rewardsAmount, this.redeemedFloatTxIds)
@@ -231,7 +235,7 @@ contract('Test for swap actions', function (accounts) {
 
         const price3 = await this.swap.getCurrentPriceLP()
         // Get price of LP token -> 1.00067890 BTC/WBTC
-        const LP2 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price3)
+        const LP2 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price3)
         const depositFees2 = LP2.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees).add(LP2).sub(depositFees2))
 
@@ -247,7 +251,7 @@ contract('Test for swap actions', function (accounts) {
         // Get price of LP token -> 1.00101847 BTC/WBTC
         const price4 = await this.swap.getCurrentPriceLP()
         //console.log(price4.toString())
-        const LP3 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price4)
+        const LP3 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price4)
         const depositFees3 = LP3.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFees).add(LP2).sub(depositFees2).add(LP3).sub(depositFees3))
     })
@@ -264,7 +268,7 @@ contract('Test for swap actions', function (accounts) {
         const price1 = await this.swap.getCurrentPriceLP()
         expect(price1).to.bignumber.equal(this.initialPriceLP)
 
-        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price1)
+        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price1)
         const depositFeesLP1 = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
@@ -292,7 +296,7 @@ contract('Test for swap actions', function (accounts) {
         const price1 = await this.swap.getCurrentPriceLP()
         expect(price1).to.bignumber.equal(this.initialPriceLP)
 
-        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price1)
+        const LP1 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price1)
         const depositFeesLP1 = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
@@ -312,7 +316,7 @@ contract('Test for swap actions', function (accounts) {
         // Get price of LP token -> 1.00033977 BTC/WBTC
         const price2 = await this.swap.getCurrentPriceLP()
         // Calculate amount of LP token
-        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.btctDecimals)).div(price2)
+        const LP2 = this.floatAmount.add(this.minerFees).mul(new BN(10).pow(this.lptDecimals)).div(price2)
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2))
 
         await this.lpToken.transfer(this.swap.address, LP1.sub(depositFeesLP1).add(LP2))
@@ -337,7 +341,7 @@ contract('Test for swap actions', function (accounts) {
 
         // console.log('Hold LPT', LP1.sub(depositFeesLP1).add(LP2).sub(result[0]).toString())
 
-        const amountMAXWithdrawBTCfloatLP = floats2[0].mul(new BN(10).pow(this.btctDecimals)).div(price5)
+        const amountMAXWithdrawBTCfloatLP = floats2[0].mul(new BN(10).pow(this.lptDecimals)).div(price5)
         //console.log('max', amountMAXBTCfloatLP.toString())
         const AmountLP2 = "0x" + web3.utils.padLeft(amountMAXWithdrawBTCfloatLP.toString('hex') + sender.slice(2), 64)
         await this.swap.recordOutcomingFloat(ZERO_ADDRESS, AmountLP2, this.minerFees, this.sampleTxs[3])
@@ -355,13 +359,15 @@ contract('Test for swap actions', function (accounts) {
         // Set miner fees = 0
         this.minerFees = new BN(0)
 
-        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(this.floatAmount.toString('hex') + sender.slice(2), 64)
+        let inputFloatAmount = this.floatAmount.div(new BN(10).pow(new BN(10)))
+
+        let addressesAndAmountOfFloat = "0x" + web3.utils.padLeft(inputFloatAmount.toString('hex') + sender.slice(2), 64)
         // BTC == address(0)
         await this.swap.recordIncomingFloat(this.btctTest.address, addressesAndAmountOfFloat, this.zeroFees, this.sampleTxs[0])
 
         const price1 = await this.swap.getCurrentPriceLP()
         expect(price1).to.bignumber.equal(this.initialPriceLP)
-        const LP1 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price1)
+        const LP1 = inputFloatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price1)
         const depositFeesLP1 = LP1.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
 
@@ -376,13 +382,13 @@ contract('Test for swap actions', function (accounts) {
         await this.swap.recordOutcomingFloat(this.btctTest.address, addressesAndAmountLPToken, this.minerFees, this.sampleTxs[1])
 
         const price2 = await this.swap.getCurrentPriceLP()
-        const floatAmount = await LP1.sub(depositFeesLP1).mul(new BN(10).pow(this.btctDecimals)).div(price2)
+        const floatAmount = await LP1.sub(depositFeesLP1).mul(new BN(10).pow(this.lptDecimals)).div(price2)
         const withdrawalFees = await floatAmount.mul(this.withdrawalFeeBPS).div(new BN(10000))
 
         expect(price2).to.bignumber.equal(this.initialPriceLP)
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal('0')
         expect(await this.lpToken.balanceOf(this.swap.address)).to.bignumber.equal('0')
-        expect(await this.btctTest.balanceOf(sender)).to.bignumber.equal(floatAmount.sub(withdrawalFees))
+        expect(await this.btctTest.balanceOf(sender)).to.bignumber.equal(floatAmount.sub(withdrawalFees).mul(new BN(10).pow(new BN(10))))
     })
 
     it('withdraw WBTC float after fees are collected', async function () {
@@ -400,7 +406,7 @@ contract('Test for swap actions', function (accounts) {
         const price1 = await this.swap.getCurrentPriceLP()
         expect(price1).to.bignumber.equal(this.initialPriceLP)
 
-        const LP1 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price1)
+        const LP1 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price1)
         const depositFeesLP1 = LP1.mul(this.depositFeesBPS).div(new BN(10000))
 
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1))
@@ -410,7 +416,7 @@ contract('Test for swap actions', function (accounts) {
          */
 
         // fees are collected. (0.002 WBTC)
-        let swapTx = "0x" + web3.utils.padLeft(this.swapAmount.toString('hex') + receiver.slice(2), 64)
+        let swapTx = "0x" + web3.utils.padLeft(this.swapAmount.div(new BN(10).pow(new BN(10))).toString('hex') + receiver.slice(2), 64)
         let rewardsAmount = this.swapFees  // only BTC to WBTC
 
         await this.btctTest.mint(this.swap.address, this.swapAmount)
@@ -426,7 +432,7 @@ contract('Test for swap actions', function (accounts) {
         const price2 = await this.swap.getCurrentPriceLP()
         // console.log(price2.toString())
         // Calculate amount of LP token
-        const LP2 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price2)
+        const LP2 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price2)
         //const depositFeesLP2 = LP2.mul(this.depositFeesBPS).div(new BN(10000))
         expect(await this.lpToken.balanceOf(sender)).to.bignumber.equal(LP1.sub(depositFeesLP1).add(LP2))
 
@@ -437,11 +443,11 @@ contract('Test for swap actions', function (accounts) {
         // console.log(floats[0].toString(), floats[1].toString())
         // float 100000000 + 100000000
 
-        const requiredAmountOfWBTC = LP2.mul(price2).div(new BN(10).pow(this.btctDecimals))
+        const requiredAmountOfWBTC = LP2.mul(price2).div(new BN(10).pow(this.lptDecimals))
         const withdrawalFees = await requiredAmountOfWBTC.mul(this.withdrawalFeeBPS).div(new BN(10000))
         // console.log(requiredAmountOfWBTC.toString())
 
-        await this.btctTest.mint(this.swap.address, requiredAmountOfWBTC)
+        await this.btctTest.mint(this.swap.address, requiredAmountOfWBTC.mul(new BN(10).pow(new BN(10))))
 
         const AmountLP = "0x" + web3.utils.padLeft(LP2.toString('hex') + sender.slice(2), 64)
 
@@ -454,7 +460,7 @@ contract('Test for swap actions', function (accounts) {
         // LP price is 1.00135732 BTC/WBTC
         // console.log(price3.toString())
 
-        expect(await this.btctTest.balanceOf(sender)).to.bignumber.equal(requiredAmountOfWBTC.sub(withdrawalFees))
+        expect(await this.btctTest.balanceOf(sender)).to.bignumber.equal(requiredAmountOfWBTC.sub(withdrawalFees).mul(this.convertScale))
 
         // console.log('Hold LPT', LP1.sub(depositFeesLP1).toString())
 
@@ -474,9 +480,9 @@ contract('Test for swap actions', function (accounts) {
 
         const price4 = await this.swap.getCurrentPriceLP()
 
-        const LP3 = this.floatAmount.mul(new BN(10).pow(this.btctDecimals)).div(price4)
+        const LP3 = this.floatAmount.mul(new BN(10).pow(this.lptDecimals)).div(price4)
 
-        const amountMAXWithdrawWBTCfloatLP = floats2[1].mul(new BN(10).pow(this.btctDecimals)).div(price4)
+        const amountMAXWithdrawWBTCfloatLP = floats2[1].mul(new BN(10).pow(this.lptDecimals)).div(price4)
         // console.log('max', amountMAXWithdrawWBTCfloatLP.toString())
 
         // Send all LPT
@@ -484,7 +490,7 @@ contract('Test for swap actions', function (accounts) {
 
         const AmountLP2 = "0x" + web3.utils.padLeft(amountMAXWithdrawWBTCfloatLP.toString('hex') + sender.slice(2), 64)
 
-        await this.btctTest.mint(this.swap.address, floats2[1])
+        await this.btctTest.mint(this.swap.address, floats2[1].mul(this.convertScale))
 
         await this.swap.recordOutcomingFloat(this.btctTest.address, AmountLP2, this.minerFees, this.sampleTxs[4])
         const price5 = await this.swap.getCurrentPriceLP()
