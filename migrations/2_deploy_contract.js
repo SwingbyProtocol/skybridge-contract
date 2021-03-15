@@ -1,21 +1,24 @@
 const SwapContract = artifacts.require("SwapContract");
 const LPToken = artifacts.require("LPToken");
-
-let WBTC_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 8
 
 module.exports = async function (deployer, net) {
-  if (net == "deployment") {
+  if (net == "development") {
     return
   }
+  let BTCT_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
   if (net == "goerli") {
-    WBTC_ADDR = "0xEb47a21C1fC00D1E863019906df1771b80DBE182"
+    BTCT_ADDR = "0xEb47a21C1fC00D1E863019906df1771b80DBE182"
   }
   if (net == "mainnet") {
-    WBTC_ADDR = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+    BTCT_ADDR = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
   }
-  await deployer.deploy(LPToken)
+  if (net == "bsc_testnet") {
+    BTCT_ADDR = "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8"
+  }
+  await deployer.deploy(LPToken, TOKEN_DECIMALS)
   const lpToken = await LPToken.deployed()
-  await deployer.deploy(SwapContract, lpToken.address, WBTC_ADDR, 0);
+  await deployer.deploy(SwapContract, lpToken.address, BTCT_ADDR, 0);
   const swapContract = await SwapContract.deployed()
   await lpToken.transferOwnership(swapContract.address)
 };

@@ -7,6 +7,8 @@ const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
 const SwapContractFactory = artifacts.require('SwapContractFactory');
 
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
+
 contract('SwapFactory', function (accounts) {
     const [sender, receiver] = accounts;
 
@@ -14,13 +16,17 @@ contract('SwapFactory', function (accounts) {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
+        this.btctTest = await LPToken.new(TOKEN_DECIMALS)
+
+        this.btctDecimals = await this.btctTest.decimals()
+
+        this.mintValue = new BN(500).mul(new BN(10).pow(this.btctDecimals))
 
         this.factory = await SwapContractFactory.new();
     });
 
     it('Deploy new contracts and checking the owner', async function () {
-        const sc = await this.factory.deployNewContracts(receiver, WBTC_ADDR, 0)
+        const sc = await this.factory.deployNewContracts(receiver, this.btctTest.address, TOKEN_DECIMALS, 0)
         const newLPToken = await LPToken.at(sc.receipt.logs[0].args.lpToken)
         const newSwapContract = await SwapContract.at(sc.receipt.logs[0].args.swapContract)
 

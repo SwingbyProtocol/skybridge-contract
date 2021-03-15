@@ -5,26 +5,28 @@ const { ZERO_ADDRESS } = constants;
 const LPToken = artifacts.require('LPToken');
 const SwapContract = artifacts.require('SwapContract');
 
-contract('Test for churn and float', function (accounts) {
+const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
+
+contract(`Test for churn and float btctDecimals=${TOKEN_DECIMALS}`, function (accounts) {
     const [sender, receiver] = accounts;
 
     beforeEach(async function () {
         // The bundled BN library is the same one web3 uses under the hood
         this.value = new BN(1);
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(18)))
+        this.lpToken = await LPToken.new(8)
 
-        this.lpToken = await LPToken.new()
+        this.btctTest = await LPToken.new(TOKEN_DECIMALS)
 
-        this.wbtcTest = await LPToken.new()
+        this.btctDecimals = await this.btctTest.decimals()
 
-        this.WBTC_ADDR = this.wbtcTest.address
+        this.mintValue = new BN(500).mul(new BN(10).pow(this.btctDecimals))
 
         this.totalSwapped = new BN(0)
 
         this.withdrawalFeeBPS = new BN(20)
 
-        this.swap = await SwapContract.new(this.lpToken.address, this.wbtcTest.address, 0);
+        this.swap = await SwapContract.new(this.lpToken.address, this.btctTest.address, 0);
 
         this.redeemedFloatTxIds = [
             "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
@@ -91,14 +93,14 @@ contract('Test for churn and float', function (accounts) {
         expect(getNode2.length).to.equal(100)
 
 
-        let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
+        let floatAmountOfBTC = new BN(10).pow(new BN(8))
 
-        await this.wbtcTest.mint(this.swap.address, floatAmountOfBTC)
+        await this.btctTest.mint(this.swap.address, floatAmountOfBTC.mul(new BN(10).pow(new BN(10))))
 
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.1 WBTC)
-        let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
+        let rewardsAmount = "0x" + web3.utils.padLeft(new BN(10).pow(new BN(7)).toString('hex'), 64)
+        await this.swap.multiTransferERC20TightlyPacked(this.btctTest.address, [swapTx], this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
 
         const distribute = await this.swap.distributeNodeRewards()
@@ -173,17 +175,20 @@ contract('Test for churn and float', function (accounts) {
 
         let floatAmountOfBTC = new BN(1).mul(new BN(10).pow(new BN(8)))
 
-        await this.wbtcTest.mint(this.swap.address, floatAmountOfBTC)
+        await this.btctTest.mint(this.swap.address, floatAmountOfBTC.mul(new BN(10).pow(new BN(10))))
 
         let swapTx = "0x" + web3.utils.padLeft(floatAmountOfBTC.toString('hex') + sender.slice(2), 64)
         // fees are collected. (0.1 WBTC)
         let rewardsAmount = "0x" + web3.utils.padLeft(new BN("1").mul(new BN(10).pow(new BN(5))).toString('hex'), 64)
-        await this.swap.multiTransferERC20TightlyPacked(this.WBTC_ADDR, [swapTx], this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
+        await this.swap.multiTransferERC20TightlyPacked(this.btctTest.address, [swapTx], this.totalSwapped, rewardsAmount, this.redeemedFloatTxIds)
         // Second deposit tx
 
         const distribute = await this.swap.distributeNodeRewards()
         // Gas 2413235 gas
+        const remainTokens = await this.swap.lockedLPTokensForNode()
+        //console.log(remainTokens.toString())
         // console.log(distribute.receipt.cumulativeGasUsed)
+        expect(remainTokens).to.bignumber.equal(new BN(0))
 
         rewardAddressAndAmounts = []
         isRemoved = []
