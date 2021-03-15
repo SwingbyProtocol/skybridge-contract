@@ -27,13 +27,16 @@
   "dependencies": {
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
     "@openzeppelin/contracts": "^3.4.1",
-    "@openzeppelin/test-helpers": "^0.5.10",
     "@truffle/hdwallet-provider": "^1.2.3",
     "chai": "^4.3.4",
     "elliptic": ">=6.5.4",
-    "node-fetch": ">=2.6.1"
+    "ethers": "^5.0.32",
+    "install": "^0.13.0",
+    "node-fetch": ">=2.6.1",
+    "npm": "^7.6.3"
   },
   "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.10",
     "eslint": "^7.22.0"
   }
 }
