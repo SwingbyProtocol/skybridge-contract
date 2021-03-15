@@ -27,7 +27,7 @@ var (
 )
 
 // SwapContractFactoryABI is the input ABI used to generate the binding from.
-const SwapContractFactoryABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"lpToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"swapContract\",\"type\":\"address\"}],\"name\":\"Deployed\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wbtc\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"name\":\"deployNewContracts\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const SwapContractFactoryABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"lpToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"swapContract\",\"type\":\"address\"}],\"name\":\"Deployed\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wbtc\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"_decimals\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"name\":\"deployNewContracts\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // SwapContractFactory is an auto generated Go binding around an Ethereum contract.
 type SwapContractFactory struct {
@@ -171,25 +171,25 @@ func (_SwapContractFactory *SwapContractFactoryTransactorRaw) Transact(opts *bin
 	return _SwapContractFactory.Contract.contract.Transact(opts, method, params...)
 }
 
-// DeployNewContracts is a paid mutator transaction binding the contract method 0x2c8f401d.
+// DeployNewContracts is a paid mutator transaction binding the contract method 0xdf201596.
 //
-// Solidity: function deployNewContracts(address _owner, address _wbtc, uint256 _existingBTCFloat) returns(address)
-func (_SwapContractFactory *SwapContractFactoryTransactor) DeployNewContracts(opts *bind.TransactOpts, _owner common.Address, _wbtc common.Address, _existingBTCFloat *big.Int) (*types.Transaction, error) {
-	return _SwapContractFactory.contract.Transact(opts, "deployNewContracts", _owner, _wbtc, _existingBTCFloat)
+// Solidity: function deployNewContracts(address _owner, address _wbtc, uint8 _decimals, uint256 _existingBTCFloat) returns(address)
+func (_SwapContractFactory *SwapContractFactoryTransactor) DeployNewContracts(opts *bind.TransactOpts, _owner common.Address, _wbtc common.Address, _decimals uint8, _existingBTCFloat *big.Int) (*types.Transaction, error) {
+	return _SwapContractFactory.contract.Transact(opts, "deployNewContracts", _owner, _wbtc, _decimals, _existingBTCFloat)
 }
 
-// DeployNewContracts is a paid mutator transaction binding the contract method 0x2c8f401d.
+// DeployNewContracts is a paid mutator transaction binding the contract method 0xdf201596.
 //
-// Solidity: function deployNewContracts(address _owner, address _wbtc, uint256 _existingBTCFloat) returns(address)
-func (_SwapContractFactory *SwapContractFactorySession) DeployNewContracts(_owner common.Address, _wbtc common.Address, _existingBTCFloat *big.Int) (*types.Transaction, error) {
-	return _SwapContractFactory.Contract.DeployNewContracts(&_SwapContractFactory.TransactOpts, _owner, _wbtc, _existingBTCFloat)
+// Solidity: function deployNewContracts(address _owner, address _wbtc, uint8 _decimals, uint256 _existingBTCFloat) returns(address)
+func (_SwapContractFactory *SwapContractFactorySession) DeployNewContracts(_owner common.Address, _wbtc common.Address, _decimals uint8, _existingBTCFloat *big.Int) (*types.Transaction, error) {
+	return _SwapContractFactory.Contract.DeployNewContracts(&_SwapContractFactory.TransactOpts, _owner, _wbtc, _decimals, _existingBTCFloat)
 }
 
-// DeployNewContracts is a paid mutator transaction binding the contract method 0x2c8f401d.
+// DeployNewContracts is a paid mutator transaction binding the contract method 0xdf201596.
 //
-// Solidity: function deployNewContracts(address _owner, address _wbtc, uint256 _existingBTCFloat) returns(address)
-func (_SwapContractFactory *SwapContractFactoryTransactorSession) DeployNewContracts(_owner common.Address, _wbtc common.Address, _existingBTCFloat *big.Int) (*types.Transaction, error) {
-	return _SwapContractFactory.Contract.DeployNewContracts(&_SwapContractFactory.TransactOpts, _owner, _wbtc, _existingBTCFloat)
+// Solidity: function deployNewContracts(address _owner, address _wbtc, uint8 _decimals, uint256 _existingBTCFloat) returns(address)
+func (_SwapContractFactory *SwapContractFactoryTransactorSession) DeployNewContracts(_owner common.Address, _wbtc common.Address, _decimals uint8, _existingBTCFloat *big.Int) (*types.Transaction, error) {
+	return _SwapContractFactory.Contract.DeployNewContracts(&_SwapContractFactory.TransactOpts, _owner, _wbtc, _decimals, _existingBTCFloat)
 }
 
 // Fallback is a paid mutator transaction binding the contract fallback function.
