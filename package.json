@@ -26,13 +26,14 @@
   "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
   "dependencies": {
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
-    "@openzeppelin/contracts": "^3.3.0",
+    "@openzeppelin/contracts": "^3.4.1",
     "@openzeppelin/test-helpers": "^0.5.10",
-    "@truffle/hdwallet-provider": "^1.2.1",
-    "chai": "^4.2.0",
+    "@truffle/hdwallet-provider": "^1.2.3",
+    "chai": "^4.3.4",
+    "elliptic": ">=6.5.4",
     "node-fetch": ">=2.6.1"
   },
   "devDependencies": {
-    "eslint": "^7.18.0"
+    "eslint": "^7.22.0"
   }
 }
