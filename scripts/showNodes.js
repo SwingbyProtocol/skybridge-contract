@@ -8,7 +8,7 @@ module.exports = async function (done) {
     // await deployer.deploy(LPToken)
     try {
         const swap = await SwapContract.at(process.env.WALLET)
-        const res = await swap.getActiveNodes.call({ gas: 300000 })
+        const res = await swap.getActiveNodes.call({ gas: 500000, gasPrice: 1 * 10 ** 9 })
         const val = new BN(1).mul(new BN(10).pow(new BN(8)))
         const result = res.map((stake) => {
             const amount = web3.utils.hexToNumber(stake.slice(0, 26))
