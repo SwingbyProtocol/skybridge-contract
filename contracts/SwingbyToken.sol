@@ -5,6 +5,6 @@ import "./BurnableToken.sol";
 
 contract SwingbyToken is BurnableToken {
     constructor() {
-        _initialize("SWINGBY token", "SWINGBY", 18, 1 * 10**26, true);
+        _initialize("SWINGBY token", "SWINGBY", 18, 0, true);
     }
 }
