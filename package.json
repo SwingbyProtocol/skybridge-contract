@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@openzeppelin/test-helpers": "^0.5.10",
-    "eslint": "^7.22.0"
+    "eslint": "^7.22.0",
+    "hardhat": "^2.4.3"
   }
 }
