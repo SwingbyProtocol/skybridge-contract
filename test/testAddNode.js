@@ -1,5 +1,5 @@
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
-const { expect } = require('chai');
+const { expect, assert} = require('chai');
 const { BigNumber } = require('ethers');
 const { ZERO_ADDRESS } = constants;
 const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
@@ -56,7 +56,7 @@ describe("Adding a node", () => {
     });//beforeEach
 
     // You can nest describe calls to create subsections.
-    describe(`Test for churn and float btctDecimals=${TOKEN_DECIMALS}`, () => {
+    describe("testAddNode", () => {
         let accounts
         let rewardAddressAndAmounts = []
         let isRemoved = []
@@ -72,10 +72,11 @@ describe("Adding a node", () => {
             expect(await lpToken.owner()).to.equal(swap.address)
         });
 
-        describe('adds 100 nodes into swap contract then remove 12 nodes', async () => {
-            //Need to break these up to avoid timeouts
-            it('Configure Node1', async () => {
-                for (i = 0; i < 100; i++) {
+        //Reduced the total number of nodes by 1/2 to make sure to avoid timeout issues
+        describe(`Test for churn and float btctDecimals=${TOKEN_DECIMALS}`, async () => {
+           
+            it('Adds 50 nodes nodes, tests for duplicates, and then removes 6', async () => {
+                for (i = 0; i < 50; i++) {
                     let staked = new BigNumber.from(1500000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
                     let addressesAndAmountStaked =web3.utils.padLeft(staked._hex + accounts[i].address.slice(2), 64)
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
@@ -92,14 +93,14 @@ describe("Adding a node", () => {
                 let getNode1 = await swap.getActiveNodes()
                 //Below prints the 100 node addresses
                 //console.log("Node1: ", await swap.getActiveNodes())
-                expect(getNode1.length).to.equal(100)
-            });
-
-            it('Configure Node2', async () => {
+                //expect(getNode1.length).to.equal(50)
+                assert.equal(getNode1.length, 50, "Nodes have been added")      
+            
+                //ensure duplicate addresses are not listed as a node twice
                 rewardAddressAndAmounts = []
                 isRemoved = []
 
-                for (i = 0; i < 100; i++) {
+                for (i = 0; i < 50; i++) {
                     let staked = new BigNumber.from(1500000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
                     let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + accounts[i].address.slice(2), 64)
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
@@ -113,27 +114,23 @@ describe("Adding a node", () => {
                 // console.log(tx2.receipt.cumulativeGasUsed)
                 // Gas cost 306494 => 1284578 gas
                 let getNode2 = await swap.getActiveNodes()
-                expect(getNode2.length).to.equal(100)
-            })
-            it('Configure Node3', async () => {
-                let floatAmountOfBTC = new BigNumber.from(10).pow(new BigNumber.from(8))
+                //expect(getNode2.length).to.equal(50)
+                assert.equal(getNode2.length, 50, "Nodes have not been duplicated")
 
+                let floatAmountOfBTC = new BigNumber.from(10).pow(new BigNumber.from(8))
                 
                 await btctTest.mint(swap.address, floatAmountOfBTC.mul(new BigNumber.from(10).pow(new BigNumber.from(10))))
 
                 //Cannot pass parameters to BigNumber.toString(), there is a built in _hex attribute, no need to prepend "0x" as it is included
                 let swapTx = web3.utils.padLeft(floatAmountOfBTC._hex + sender.address.slice(2), 64)
-                console.log("swapTx: ", swapTx)
-
+                //console.log("swapTx: ", swapTx)
 
                 // fees are collected. (0.1 WBTC)\
                 let number = new BigNumber.from(10).pow(new BigNumber.from(7))
                 //console.log(web3.utils.padLeft(number._hex, 64))
                 let rewardsAmount = web3.utils.padLeft(number._hex, 64)
-                console.log("rewardsAmount: ", rewardsAmount)
-
-                
-                
+                //console.log("rewardsAmount: ", rewardsAmount)
+ 
                 await swap.multiTransferERC20TightlyPacked(btctTest.address, [swapTx], totalSwapped, rewardsAmount, redeemedFloatTxIds)
                 // Second deposit tx
 
@@ -144,34 +141,113 @@ describe("Adding a node", () => {
                 rewardAddressAndAmounts = []
                 isRemoved = []
 
-                for (i = 0; i < 12; i++) {
+                for (i = 0; i < 6; i++) {
                     let staked = new BigNumber.from(500000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
                     let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + accounts[i].address.slice(2), 64)
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
                     isRemoved.push(true)
                 }
-                console.log("rewardAddressAndAmounts", rewardAddressAndAmounts)
-                console.log("isRemoved", isRemoved)
+                //console.log("rewardAddressAndAmounts", rewardAddressAndAmounts)
+                //console.log("isRemoved", isRemoved)
                 const tx3 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
                     value: 0,
                     gasPrice: 2 * 10 ** 6
                 })
 
                 let getNode3 = await swap.getActiveNodes()
-                console.log("getNode3: ", getNode3)//this is showing 0 nodes for some reason
-                expect(getNode3.length).to.equal(100 - 12)
-                
+                //console.log("getNode3: ", getNode3)//this is showing 0 nodes for some reason
+                //expect(getNode3.length).to.equal(50 - 6)
+                assert.equal(getNode3.length, 50 - 6, "Nodes have been removed correctly")
                 await expectRevert(
-                    this.swap.distributeNodeRewards(),
+                    swap.distributeNodeRewards(),
                     'totalRewardLPsForNode is not positive',
                 );
                 //console.log(tx3.receipt.cumulativeGasUsed)
                 // Gas cost 51700 => 867293 gas
 
             })
-        });
-        it('adds 60 nodes into swap contract then update 100 nodes', async () => {
+            
+            it('adds 30 nodes into swap contract then update 50 nodes', async () => {
+                rewardAddressAndAmounts = []
+                isRemoved = []
+                for (i = 0; i < 30; i++) {
+                    let staked = new BigNumber.from(3000000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
+                    let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + accounts[i].address.slice(2), 64)
+                    rewardAddressAndAmounts.push(addressesAndAmountStaked)
+                    isRemoved.push(false)
+                }
+                const tx1 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                    value: 0,
+                    //gas: 9000000,//cannot override gas
+                    gasPrice: 2 * 10 ** 6
+                })
+                //console.log(tx1.receipt.cumulativeGasUsed)
+                // Gas cost 4615206 gas
+                let getNode1 = await swap.getActiveNodes()
+                expect(getNode1.length).to.equal(30)
 
+                for (i = 0; i < 30; i++) {
+                    let staked = new BigNumber.from(1500000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
+                    let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + accounts[i].address.slice(2), 64)
+                    rewardAddressAndAmounts.push(addressesAndAmountStaked)
+                    isRemoved.push(false)
+                }
+                const tx2 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                    value: 0,
+                    gasPrice: 2 * 10 ** 6
+                })
+        
+                // console.log(tx2.receipt.cumulativeGasUsed)
+                // Gas cost 784326 gas
+                let getNode2 = await swap.getActiveNodes()
+                expect(getNode2.length).to.equal(30)
+        
+        
+                let floatAmountOfBTC = new BigNumber.from(1).mul(new BigNumber.from(10).pow(new BigNumber.from(8)))
+        
+                await btctTest.mint(swap.address, floatAmountOfBTC.mul(new BigNumber.from(10).pow(new BigNumber.from(10))))
+        
+                let swapTx =web3.utils.padLeft(floatAmountOfBTC._hex + sender.address.slice(2), 64)
+                // fees are collected. (0.1 WBTC)
+                let rewardsAmount = web3.utils.padLeft(new BigNumber.from("1").mul(new BigNumber.from(10).pow(new BigNumber.from(5)))._hex, 64)
+                await swap.multiTransferERC20TightlyPacked(btctTest.address, [swapTx], totalSwapped, rewardsAmount, redeemedFloatTxIds)
+                // Second deposit tx
+        
+                const distribute = await swap.distributeNodeRewards()
+                // Gas 2413235 gas
+                const remainTokens = await swap.lockedLPTokensForNode()
+                //console.log(remainTokens.toString())
+                // console.log(distribute.receipt.cumulativeGasUsed)
+                //expect(remainTokens).to.bignumber.equal(new BigNumber.from(0))
+                expect (new BigNumber.from(remainTokens)).equal(new BigNumber.from(0))
+        
+                rewardAddressAndAmounts = []
+                isRemoved = []
+        
+                for (i = 0; i < 50; i++) {
+                    let staked = new BigNumber.from(500000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
+                    let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + accounts[i].address.slice(2), 64)
+                    rewardAddressAndAmounts.push(addressesAndAmountStaked)
+                    isRemoved.push(false)
+                }
+                const tx3 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                    value: 0,
+                    gasPrice: 2 * 10 ** 6
+                })
+        
+                let getNode3 = await swap.getActiveNodes()
+                expect(getNode3.length).to.equal(50)
+        
+                await expectRevert(
+                    swap.distributeNodeRewards(),
+                    'totalRewardLPsForNode is not positive',
+                );
+                // console.log(tx3.receipt.cumulativeGasUsed)
+                // Gas cost 784326 gas
+    
+            });
         });
+        
+        
     });
 });
