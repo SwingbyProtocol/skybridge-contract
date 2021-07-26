@@ -1,3 +1,4 @@
+
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const { expect, assert} = require('chai');
 const { BigNumber } = require('ethers');
@@ -8,8 +9,7 @@ const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 //Web3 init
 //const LPToken = artifacts.require('LPToken');
 //const SwapContract = artifacts.require('SwapContract');
-let test;
-describe("Adding a node", () => {
+describe("Testing Node Functions...", () => {
 
 
     let LPTokenFactory, SwapContractFactory, sender, receiver
@@ -56,7 +56,7 @@ describe("Adding a node", () => {
     });//beforeEach
 
     // You can nest describe calls to create subsections.
-    describe("testAddNode", () => {
+    describe("Node Functions", () => {
         let accounts
         let rewardAddressAndAmounts = []
         let isRemoved = []

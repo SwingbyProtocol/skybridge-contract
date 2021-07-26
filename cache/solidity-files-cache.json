@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/mnt/c/pr0/SWINGBY/DEV/contracts/BurnableToken.sol": {
-      "lastModificationDate": 1626805195094,
-      "contentHash": "41d5933377550cbc0edfcd6c982d33a2",
+      "lastModificationDate": 1627321263674,
+      "contentHash": "4151fc65a4ed115c1796a61bb0aa50a3",
       "sourceName": "contracts/BurnableToken.sol",
       "solcConfig": {
         "version": "0.7.3",
@@ -285,8 +285,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/LPToken.sol": {
-      "lastModificationDate": 1626805195103,
-      "contentHash": "f1f86bbe323fa0033212b8d1e085b0bf",
+      "lastModificationDate": 1627321251318,
+      "contentHash": "b05f26be30aee370a29c2ed0398b1229",
       "sourceName": "contracts/LPToken.sol",
       "solcConfig": {
         "version": "0.7.3",

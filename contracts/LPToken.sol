@@ -8,3 +8,4 @@ contract LPToken is BurnableToken {
         _initialize("Swingby BTC LP Token", "sbBTC", _decimals, 0, true);
     }
 }
+

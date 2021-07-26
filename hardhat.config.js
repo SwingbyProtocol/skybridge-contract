@@ -17,7 +17,7 @@ require("@nomiclabs/hardhat-truffle5");
 const mnemonic = "4d777ee25c2bb753c12597e8f35a2eedb90ece9bc5682f335e0e2c2fdc8d5674"
 
 module.exports = {
-  defaultNetwork: "localhost",
+  defaultNetwork: "development",
   solidity: {
     version: "0.7.3",
     settings: {
@@ -28,7 +28,14 @@ module.exports = {
     }
   },
   networks: {
+    development: {
+      url: "http://127.0.0.1:8545"
+    },
     hardhat: {
+      //run tests on fork of mainnet 
+      forking: {
+        url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847"
+      }
     },
     goerli: {
       url: "https://goerli.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
