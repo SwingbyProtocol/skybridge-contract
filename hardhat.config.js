@@ -12,12 +12,23 @@ require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-truffle5");
 
 
+require("hardhat-watcher");
+
 //const mnemonic = process.env.SEED
 //I had to use a correctly formated private key, I could not get this to compile with process.env.SEED
 const mnemonic = "4d777ee25c2bb753c12597e8f35a2eedb90ece9bc5682f335e0e2c2fdc8d5674"
 
 module.exports = {
   defaultNetwork: "development",
+  watcher: {
+    compilation: { //npx hardhat watch compilation -- auto compile on change
+      tasks: ["compile"],
+    },
+    test: {//npx hardhat watch test -- run test when a file is saved
+      tasks: [{ command: 'test', params: { testFiles: ['./test/testSwapContract.js'] }}], //test this file
+      files: ['./test/testSwapContract.js'] //test when this file is saved
+    }
+  },
   solidity: {
     version: "0.7.3",
     settings: {

@@ -29,6 +29,7 @@
     "@openzeppelin/contracts": "^3.4.1",
     "@truffle/hdwallet-provider": "^1.2.3",
     "elliptic": ">=6.5.4",
+    "hardhat-watcher": "^2.1.1",
     "install": "^0.13.0",
     "node-fetch": ">=2.6.1",
     "npm": "^7.6.3"
