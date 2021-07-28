@@ -15,7 +15,9 @@ require("@nomiclabs/hardhat-truffle5");
 require("hardhat-watcher");
 
 //const mnemonic = process.env.SEED
-//I had to use a correctly formated private key, I could not get this to compile with process.env.SEED
+
+//This requires a private key rather than a memonic, this is a private key to a throw away account so this can compile, but it should be stored in a local secret.json file
+//It could then be accessed below using secret.key 
 const mnemonic = "4d777ee25c2bb753c12597e8f35a2eedb90ece9bc5682f335e0e2c2fdc8d5674"
 
 module.exports = {
@@ -25,8 +27,8 @@ module.exports = {
       tasks: ["compile"],
     },
     test: {//npx hardhat watch test -- run test when a file is saved
-      tasks: [{ command: 'test', params: { testFiles: ['./test/testSwapContract.js'] }}], //test this file
-      files: ['./test/testSwapContract.js'] //test when this file is saved
+      tasks: [{ command: 'test', params: { testFiles: ['./test/testSwapContractFactory.js'] }}], //test this file
+      files: ['./test/testSwapContractFactory.js'] //test when this file is saved
     }
   },
   solidity: {

@@ -1,36 +1,61 @@
-const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
-const { expect } = require('chai');
+const { constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { expect, assert } = require('chai');
+const { BigNumber } = require('ethers');
 const { ZERO_ADDRESS } = constants;
-const WBTC_ADDR = "0xEb47a21C1fC00D1E863019906df1771b80DBE182"
-
-const LPToken = artifacts.require('LPToken');
-const SwapContract = artifacts.require('SwapContract');
-const SwapContractFactory = artifacts.require('SwapContractFactory');
-
 const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 
-contract('SwapFactory', function (accounts) {
-    const [sender, receiver] = accounts;
 
-    beforeEach(async function () {
+//Web3 init
+//const LPToken = artifacts.require('LPToken');
+//const SwapContract = artifacts.require('SwapContract');
+describe("Contract: SwapFactory", () => {
+
+
+    let LPTokenFactory, SwapContractFactory, SwapContract, factory, sender, receiver, accounts
+
+    let value, btctTest, mintValue, btctDecimals
+
+
+    beforeEach(async () => {
         // The bundled BN library is the same one web3 uses under the hood
-        this.value = new BN(1);
+        [sender, receiver, ...addrs] = await ethers.getSigners();
+        //this contains all of the account objects, access address string -> accounts[n].address
+        accounts = [sender, receiver, ...addrs]
 
-        this.btctTest = await LPToken.new(TOKEN_DECIMALS)
+        LPToken = await ethers.getContractFactory("LPToken");
+        SwapContractFactory = await ethers.getContractFactory("SwapContractFactory");
+        SwapContract = await ethers.getContractFactory("SwapContract");
 
-        this.btctDecimals = await this.btctTest.decimals()
+        value = new BigNumber.from(1)
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(this.btctDecimals))
+        btctTest = await LPToken.deploy(TOKEN_DECIMALS)
 
-        this.factory = await SwapContractFactory.new();
-    });
+        btctDecimals = await btctTest.decimals()
 
-    it('Deploy new contracts and checking the owner', async function () {
-        const sc = await this.factory.deployNewContracts(receiver, this.btctTest.address, TOKEN_DECIMALS, 0)
-        const newLPToken = await LPToken.at(sc.receipt.logs[0].args.lpToken)
-        const newSwapContract = await SwapContract.at(sc.receipt.logs[0].args.swapContract)
+        mintValue = new BigNumber.from(500).mul(new BigNumber.from(10).pow(new BigNumber.from(TOKEN_DECIMALS)))
 
-        expect(await newLPToken.getOwner()).to.equal(newSwapContract.address)
-        expect(await newSwapContract.owner()).to.equal(receiver)
+        factory = await SwapContractFactory.deploy()
+
     })
-})
+
+    // You can nest describe calls to create subsections.
+    describe("Deploy New Contracts", () => {
+        it('checks the owner after deployment', async () => {
+            const sc = await factory.connect(receiver).deployNewContracts(receiver.address, btctTest.address, TOKEN_DECIMALS, 0)
+            const receipt = await sc.wait()
+
+            //get existing contract address -- condensed to separate consts for readability 
+            const lpTokenAddress = receipt.events[receipt.events.length - 1].args.lpToken
+            const swapContractAddress = receipt.events[receipt.events.length - 1].args.swapContract
+
+            const newLPToken = await LPToken.attach(lpTokenAddress) //equivilant to truffle .at() method
+            const newSwapContract = await SwapContract.attach(swapContractAddress)
+            
+
+            expect(await newLPToken.getOwner()).to.equal(newSwapContract.address)
+            expect(await newSwapContract.owner()).to.equal(receiver.address)
+
+
+        });
+    });
+});
