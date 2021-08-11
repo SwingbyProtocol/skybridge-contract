@@ -122,6 +122,7 @@ module.exports = {
     },
   },
   plugins: [
-    "@chainsafe/truffle-plugin-abigen"
+    "@chainsafe/truffle-plugin-abigen",
+    "truffle-contract-size" /*compile first, then run: truffle run contract-size*/
   ]
 };

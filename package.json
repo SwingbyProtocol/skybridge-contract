@@ -32,7 +32,8 @@
     "hardhat-watcher": "^2.1.1",
     "install": "^0.13.0",
     "node-fetch": ">=2.6.1",
-    "npm": "^7.6.3"
+    "npm": "^7.6.3",
+    "truffle-contract-size": "^2.0.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
