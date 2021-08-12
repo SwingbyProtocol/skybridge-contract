@@ -7,6 +7,9 @@ import "./interfaces/ISwapContract.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
+//skypools - needed for address => tokenBalance
+import "./LPToken.sol";
+
 contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
@@ -33,6 +36,9 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => bytes32) private nodes;
     mapping(address => bool) private isInList;
     address[] private nodeAddrs;
+
+    //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
+    mapping(address => mapping(address => uint256)) public tokens;
 
     /**
      * Events
@@ -197,8 +203,9 @@ contract SwapContract is Ownable, ISwapContract {
         require(_destToken == address(0), "_destToken should be address(0)");
         address _feesToken = BTCT_ADDR;
         if (_incomingAmount > 0) {
-            uint256 swapAmount =
-                _incomingAmount.sub(_rewardsAmount).sub(_minerFee);
+            uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
+                _minerFee
+            );
             _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
@@ -260,8 +267,9 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev distributeNodeRewards sends rewards for Nodes.
     function distributeNodeRewards() external override returns (bool) {
         // Reduce Gas
-        uint256 rewardLPTsForNodes =
-            lockedLPTokensForNode.add(feesLPTokensForNode);
+        uint256 rewardLPTsForNodes = lockedLPTokensForNode.add(
+            feesLPTokensForNode
+        );
         require(
             rewardLPTsForNodes > 0,
             "totalRewardLPsForNode is not positive"
@@ -287,6 +295,9 @@ contract SwapContract is Ownable, ISwapContract {
         feesLPTokensForNode = 0;
         return true;
     }
+
+    /// @dev Skyppols stub method - record skypools transaction
+    function recordSkyPoolsTX() external onlyOwner returns (bool) {}
 
     /**
      * Life cycle part
@@ -377,8 +388,10 @@ contract SwapContract is Ownable, ISwapContract {
         override
         returns (uint256 nowPrice)
     {
-        (uint256 reserveA, uint256 reserveB) =
-            getFloatReserve(address(0), BTCT_ADDR);
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            BTCT_ADDR
+        );
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         nowPrice = totalLPs == 0
@@ -438,6 +451,33 @@ contract SwapContract is Ownable, ISwapContract {
         return _nodes;
     }
 
+    /// @dev balanceOf - get balance of user balance of token for skypools
+    /// @param _token The address of target token.
+    /// @param _user The user address.
+    function balanceOf(address _token, address _user)
+        public
+        view
+        returns (uint256)
+    {
+        return tokens[_token][_user];
+    }
+
+    /// @dev doParaSwap stub for skypools - execute paraswap transaction
+    function doParaSwap() public returns (bool) {}
+
+    /// @dev do1InchTrade stub for skypools - execute 1Inch transaction
+    function do1InchTrade() public returns (bool) {}
+
+    /// @dev redeemwBTC stub for skypools - redeem wBTC
+    function redeemwBTC(uint256 _amount) public returns (bool) {
+        require(tokens[BTCT_ADDR][msg.sender] >= _amount);
+
+        tokens[BTCT_ADDR][msg.sender].sub(_amount);
+        _safeTransfer(BTCT_ADDR, msg.sender, _amount);
+
+        return true;
+    }
+
     /// @dev _issueLPTokensForFloat
     /// @param _token The address of target token.
     /// @param _transaction The recevier address and amount.
@@ -458,8 +498,9 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 nowPrice = getCurrentPriceLP();
         uint256 amountOfLP = amountOfFloat.mul(lpDecimals).div(nowPrice);
         uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
-        uint256 depositFees =
-            depositFeeRate != 0 ? amountOfLP.mul(depositFeeRate).div(10000) : 0;
+        uint256 depositFees = depositFeeRate != 0
+            ? amountOfLP.mul(depositFeeRate).div(10000)
+            : 0;
 
         if (_zerofee && depositFees != 0) {
             revert();
@@ -508,8 +549,10 @@ contract SwapContract is Ownable, ISwapContract {
             "Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
         );
         uint256 withdrawal = amountOfFloat.sub(withdrawalFees).sub(_minerFee);
-        (uint256 reserveA, uint256 reserveB) =
-            getFloatReserve(address(0), BTCT_ADDR);
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            BTCT_ADDR
+        );
         if (_token == address(0)) {
             require(
                 reserveA >= amountOfFloat.sub(withdrawalFees),
@@ -553,10 +596,15 @@ contract SwapContract is Ownable, ISwapContract {
         view
         returns (uint8)
     {
-        (uint256 reserveA, uint256 reserveB) =
-            getFloatReserve(address(0), BTCT_ADDR);
-        uint256 threshold =
-            reserveA.add(reserveB).add(_amountOfFloat).mul(2).div(3);
+        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
+            address(0),
+            BTCT_ADDR
+        );
+        uint256 threshold = reserveA
+            .add(reserveB)
+            .add(_amountOfFloat)
+            .mul(2)
+            .div(3);
         if (_token == BTCT_ADDR && reserveB.add(_amountOfFloat) >= threshold) {
             return 1; // BTC float insufficient
         }
@@ -637,8 +685,9 @@ contract SwapContract is Ownable, ISwapContract {
         );
         uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
-        uint256 amountLPTokensForNode =
-            amountForNodes.mul(lpDecimals).div(nowPrice);
+        uint256 amountLPTokensForNode = amountForNodes.mul(lpDecimals).div(
+            nowPrice
+        );
         // Add minted LP tokens for Nodes
         lockedLPTokensForNode = lockedLPTokensForNode.add(
             amountLPTokensForNode
