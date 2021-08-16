@@ -298,6 +298,12 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev Skyppols stub method - record skypools transaction
+    /// @param _destToken The address of target token.
+    /// @param _to The address of recipient.
+    /// @param _amount The amount of tokens.
+    /// @param _totalSwapped The amount of swap.
+    /// @param _rewardsAmount The fees that should be paid.
+    /// @param _redeemedFloatTxIds The txids which is for recording.
     function recordSkyPoolsTX(
         address _destToken,
         address _to,
