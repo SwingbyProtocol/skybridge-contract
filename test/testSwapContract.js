@@ -535,7 +535,6 @@ describe('Contract: SwapContract', async () => {
             let price5 = await swap.getCurrentPriceLP()
             price5 = new BigNumber.from(price5.toString())
             // LP price is 1.00203465 BTC/WBTC
-            // console.log(price5.toString())
             const floats3 = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
 
             const withdrawFees = await new BigNumber.from(floats2[1].toString()).mul(withdrawalFeeBPS).div(new BigNumber.from(10000))

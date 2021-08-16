@@ -11,9 +11,22 @@ const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 describe("SkyPools", () => {
 
 
-
+    let LPTokenFactory, SwapContractFactory, lpToken, swap, sender, receiver, accounts
+    let lptDecimals, btctTest, initialPriceLP
     beforeEach(async () => {
+        [sender, receiver, ...addrs] = await ethers.getSigners();
+        accounts = [sender, receiver, ...addrs]
+        LPTokenFactory = await ethers.getContractFactory("LPToken");
+        lpToken = await LPTokenFactory.deploy(8);
 
+        SwapContractFactory = await ethers.getContractFactory("SwapContract");
+
+        lptDecimals = await lpToken.decimals()
+
+        btctTest = await LPTokenFactory.deploy(TOKEN_DECIMALS)
+
+        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, 0);    
+        initialPriceLP = new BigNumber.from(10).pow(lptDecimals)
     });
 
 
@@ -30,6 +43,7 @@ describe("SkyPools", () => {
 
         });
         it('allows the redemption of wBTC tokens', async () => {
+            const wBTCaddr = 0x0
 
         });
     });

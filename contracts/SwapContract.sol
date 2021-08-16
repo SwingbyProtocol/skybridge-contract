@@ -32,6 +32,8 @@ contract SwapContract is Ownable, ISwapContract {
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used;
+    mapping(bytes32 => bool) private usedSkyPools; /*record sky pools transaction*/
+
     // Node lists
     mapping(address => bytes32) private nodes;
     mapping(address => bool) private isInList;
@@ -297,7 +299,19 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev Skyppols stub method - record skypools transaction
-    function recordSkyPoolsTX() external onlyOwner returns (bool) {}
+    function recordSkyPoolsTX(uint256 _minerFee, bytes32 _txid)
+        external
+        onlyOwner
+        returns (bool)
+    {
+        require(!usedSkyPools[_txid], "The txid is already used");
+        floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
+            _minerFee,
+            "BTC float amount insufficient"
+        );
+        usedSkyPools[_txid] = true;
+        return true;
+    }
 
     /**
      * Life cycle part
