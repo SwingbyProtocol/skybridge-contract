@@ -32,7 +32,6 @@ contract SwapContract is Ownable, ISwapContract {
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used;
-    mapping(bytes32 => bool) private usedSkyPools; /*record sky pools transaction*/
 
     // Node lists
     mapping(address => bytes32) private nodes;
@@ -299,17 +298,32 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev Skyppols stub method - record skypools transaction
-    function recordSkyPoolsTX(uint256 _minerFee, bytes32 _txid)
-        external
-        onlyOwner
-        returns (bool)
-    {
-        require(!usedSkyPools[_txid], "The txid is already used");
-        floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
-            _minerFee,
-            "BTC float amount insufficient"
+    function recordSkyPoolsTX(
+        address _destToken,
+        address _to,
+        uint256 _amount,
+        uint256 _totalSwapped,
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
+    ) external onlyOwner returns (bool) {
+        require(whitelist[_destToken], "_destToken is not whitelisted");
+        require(
+            _destToken != address(0),
+            "_destToken should not be address(0)"
         );
-        usedSkyPools[_txid] = true;
+        address _feesToken = address(0);
+        if (_totalSwapped > 0) {
+            _swap(address(0), BTCT_ADDR, _totalSwapped);
+        } else if (_totalSwapped == 0) {
+            _feesToken = BTCT_ADDR;
+        }
+        if (_destToken == lpToken) {
+            _feesToken = lpToken;
+        }
+        _rewardsCollection(_feesToken, _rewardsAmount);
+        _addUsedTxs(_redeemedFloatTxIds);
+        tokens[_destToken][_to] = _amount;
+
         return true;
     }
 
@@ -482,12 +496,15 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev do1InchTrade stub for skypools - execute 1Inch transaction
     function do1InchTrade() public returns (bool) {}
 
-    /// @dev redeemwBTC stub for skypools - redeem wBTC
-    function redeemwBTC(uint256 _amount) public returns (bool) {
-        require(tokens[BTCT_ADDR][msg.sender] >= _amount);
+    /// @dev redeemERC20Token for skypools - redeem erc20 token
+    function redeemERC20Token(address _token, uint256 _amount)
+        public
+        returns (bool)
+    {
+        require(tokens[_token][msg.sender] >= _amount);
 
-        tokens[BTCT_ADDR][msg.sender].sub(_amount);
-        _safeTransfer(BTCT_ADDR, msg.sender, _amount);
+        tokens[_token][msg.sender].sub(_amount);
+        _safeTransfer(_token, msg.sender, _amount);
 
         return true;
     }
@@ -635,7 +652,7 @@ contract SwapContract is Ownable, ISwapContract {
         floatAmountOf[_token] = floatAmountOf[_token].add(_amount);
     }
 
-    /// @dev _removeFloat remove one side of the float.
+    /// @dev _removeFloat remove one side of the float - redone for skypools using tokens mapping
     /// @param _token The address of target token.
     /// @param _amount The amount of float.
     function _removeFloat(address _token, uint256 _amount) internal {
@@ -661,6 +678,7 @@ contract SwapContract is Ownable, ISwapContract {
         floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
             _swapAmount
         );
+
         emit Swap(_sourceToken, _destToken, _swapAmount);
     }
 
