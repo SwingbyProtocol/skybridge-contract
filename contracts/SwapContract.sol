@@ -297,19 +297,15 @@ contract SwapContract is Ownable, ISwapContract {
         return true;
     }
 
-    /// @dev Skyppols stub method - record skypools transaction
+    /// @dev Record SkyPools TX - allocate tokens from float to user in tokens[][]
     /// @param _destToken The address of target token.
     /// @param _to The address of recipient.
     /// @param _amount The amount of tokens.
-    /// @param _totalSwapped The amount of swap.
-    /// @param _rewardsAmount The fees that should be paid.
     /// @param _redeemedFloatTxIds The txids which is for recording.
     function recordSkyPoolsTX(
         address _destToken,
         address _to,
         uint256 _amount,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external onlyOwner returns (bool) {
         require(whitelist[_destToken], "_destToken is not whitelisted");
@@ -318,15 +314,15 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         address _feesToken = address(0);
-        if (_totalSwapped > 0) {
-            _swap(address(0), BTCT_ADDR, _totalSwapped);
-        } else if (_totalSwapped == 0) {
-            _feesToken = BTCT_ADDR;
-        }
+       
+       
         if (_destToken == lpToken) {
             _feesToken = lpToken;
         }
-        _rewardsCollection(_feesToken, _rewardsAmount);
+
+        _removeFloat(_destToken, _amount);
+
+
         _addUsedTxs(_redeemedFloatTxIds);
         tokens[_destToken][_to] = _amount;
 
@@ -485,15 +481,14 @@ contract SwapContract is Ownable, ISwapContract {
         return _nodes;
     }
 
-    /// @dev balanceOf - get balance of user balance of token for skypools
+    /// @dev balanceOf - return user balance for given token token for skypools
     /// @param _token The address of target token.
-    /// @param _user The user address.
-    function balanceOf(address _token, address _user)
+    function balanceOf(address _token)
         public
         view
         returns (uint256)
     {
-        return tokens[_token][_user];
+        return tokens[_token][msg.sender];
     }
 
     /// @dev doParaSwap stub for skypools - execute paraswap transaction
@@ -503,6 +498,8 @@ contract SwapContract is Ownable, ISwapContract {
     function do1InchTrade() public returns (bool) {}
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
+    /// @param _token The address of target token.
+    /// @param _amount The amount to withdraw
     function redeemERC20Token(address _token, uint256 _amount)
         public
         returns (bool)
