@@ -105,7 +105,7 @@ describe("SkyPools", () => {
 
             
             //perform recordSkyPoolsTX
-            await swap.recordSkyPoolsTX(btctTest.address, user1.address, amount, redeemedFloatTxIds)
+            await swap.recordSkyPoolsTX(btctTest.address, user1.address, amount, 0, redeemedFloatTxIds)
 
 
             //check ending balances
@@ -115,7 +115,6 @@ describe("SkyPools", () => {
             balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
             assert.equal(balance[1].toString(), startingFloatAmount.sub(amount).toString(), "Ending swap balance is correct") 
                  
-        
         });
         it('executes paraSwap transactions', async () => {
         

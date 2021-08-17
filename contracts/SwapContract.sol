@@ -306,6 +306,7 @@ contract SwapContract is Ownable, ISwapContract {
         address _destToken,
         address _to,
         uint256 _amount,
+        uint256 _totalSwapped,
         bytes32[] memory _redeemedFloatTxIds
     ) external onlyOwner returns (bool) {
         require(whitelist[_destToken], "_destToken is not whitelisted");
@@ -314,8 +315,11 @@ contract SwapContract is Ownable, ISwapContract {
             "_destToken should not be address(0)"
         );
         address _feesToken = address(0);
-       
-       
+        if (_totalSwapped > 0) {
+            _swap(address(0), BTCT_ADDR, _totalSwapped);
+        } else if (_totalSwapped == 0) {
+            _feesToken = BTCT_ADDR;
+        }
         if (_destToken == lpToken) {
             _feesToken = lpToken;
         }
