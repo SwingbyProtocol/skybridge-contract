@@ -46,7 +46,12 @@ contract SwapContract is Ownable, ISwapContract {
      */
 
     event Swap(address from, address to, uint256 amount);
-
+    event Withdraw(
+        address token,
+        address user,
+        uint256 amount,
+        uint256 balance
+    );
     event RewardsCollection(
         address feesToken,
         uint256 rewards,
@@ -326,7 +331,6 @@ contract SwapContract is Ownable, ISwapContract {
 
         _removeFloat(_destToken, _amount);
 
-
         _addUsedTxs(_redeemedFloatTxIds);
         tokens[_destToken][_to] = _amount;
 
@@ -487,11 +491,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     /// @dev balanceOf - return user balance for given token token for skypools
     /// @param _token The address of target token.
-    function balanceOf(address _token)
-        public
-        view
-        returns (uint256)
-    {
+    function balanceOf(address _token) public view returns (uint256) {
         return tokens[_token][msg.sender];
     }
 
@@ -508,10 +508,11 @@ contract SwapContract is Ownable, ISwapContract {
         public
         returns (bool)
     {
-        require(tokens[_token][msg.sender] >= _amount);
-
-        tokens[_token][msg.sender].sub(_amount);
+        require(tokens[_token][msg.sender] >= _amount, "Insufficient Balance");
+        tokens[_token][msg.sender] = tokens[_token][msg.sender].sub(_amount);
         _safeTransfer(_token, msg.sender, _amount);
+
+        emit Withdraw(_token, msg.sender, _amount, tokens[_token][msg.sender]);
 
         return true;
     }
