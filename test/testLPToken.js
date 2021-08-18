@@ -1,87 +1,101 @@
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
+const { BigNumber } = require('ethers');
 const { ZERO_ADDRESS } = constants;
-
-const LPToken = artifacts.require('LPToken');
-
 const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 
-contract('LPToken', function (accounts) {
-    const [sender, receiver] = accounts
+
+//Web3 init
+//const LPToken = artifacts.require('LPToken');
+//const SwapContract = artifacts.require('SwapContract');
+describe("Contract: LPToken", () => {
+
+
+    let LPTokenFactory, sender, receiver, accounts
+
+    let value, token, mintValue
+
     const name = "Swingby BTC LP Token";
     const symbol = 'sbBTC';
 
-    beforeEach(async function () {
+    beforeEach(async () => {
         // The bundled BN library is the same one web3 uses under the hood
-        this.value = new BN(1);
+        [sender, receiver, ...addrs] = await ethers.getSigners();
+        //this contains all of the account objects, access address string -> accounts[n].address
+        accounts = [sender, receiver, ...addrs]
 
-        this.token = await LPToken.new(TOKEN_DECIMALS)
+        LPTokenFactory = await ethers.getContractFactory("LPToken");
 
-        this.mintValue = new BN(500).mul(new BN(10).pow(new BN(TOKEN_DECIMALS)))
+        value = new BigNumber.from(1)
 
-        await this.token.mint(sender, this.mintValue)
-    });
+        token = await LPTokenFactory.deploy(TOKEN_DECIMALS);
 
-    it('has a name', async function () {
-        expect(await this.token.name()).to.equal(name);
-    });
+        mintValue = new BigNumber.from(500).mul(new BigNumber.from(10).pow(new BigNumber.from(TOKEN_DECIMALS)))
 
-    it('has a symbol', async function () {
-        expect(await this.token.symbol()).to.equal(symbol);
-    });
+        await token.mint(sender.address, mintValue)
+    })
 
-    it('has right decimals', async function () {
-        decimals = await this.token.decimals()
-        expect(decimals).to.bignumber.equal(new BN(TOKEN_DECIMALS));
-    });
+    // You can nest describe calls to create subsections.
+    describe("LPToken functions", () => {
 
-    it('reverts when minting tokens from not owner', async function () {
-        // Conditions that trigger a require statement can be precisely tested
-        await expectRevert(
-            this.token.mint(receiver, this.value, { from: receiver }),
-            'Ownable: caller is not the owner',
-        );
-    });
 
-    it('reverts when transferring tokens to the zero address', async function () {
-        // Conditions that trigger a require statement can be precisely tested
-        await expectRevert(
-            this.token.transfer(constants.ZERO_ADDRESS, this.value, { from: sender }),
-            'ERC20: transfer to the zero address',
-        );
-    });
-
-    it('emits a Transfer event on successful transfers', async function () {
-        const receipt = await this.token.transfer(
-            receiver, this.value, { from: sender }
-        );
-
-        // Event assertions can verify that the arguments are the expected ones
-        expectEvent(receipt, 'Transfer', {
-            from: sender,
-            to: receiver,
-            value: this.value,
+        it('has a name', async () => {
+            expect(await token.name()).to.equal(name)
         });
-    });
-
-    it('updates balances on successful transfers', async function () {
-        this.token.transfer(receiver, this.value, { from: sender });
-
-        // BN assertions are automatically available via chai-bn (if using Chai)
-        balanceOfReceiver = await this.token.balanceOf(receiver)
-        expect(balanceOfReceiver.sub(this.value)).to.bignumber.equal('0')
-    });
-
-    it('emits a Burn event on successful burning', async function () {
-        const burn = await this.token.burn(
-            this.mintValue, { from: sender }
-        );
-
-        // Event assertions can verify that the arguments are the expected ones
-        expectEvent(burn, 'Transfer', {
-            from: sender,
-            to: ZERO_ADDRESS,
-            value: this.mintValue,
+        it('has a symbol', async () => {
+            expect(await token.symbol()).to.equal(symbol);
         });
+        it('has the right decimals', async () => {
+            decimals = await token.decimals()
+            expect(new BigNumber.from(decimals)).equal(new BigNumber.from(TOKEN_DECIMALS));
+        });
+        it('reverts when minting tokens from not owner', async () => {
+            // Conditions that trigger a require statement can be precisely tested\
+            await expectRevert(
+                token.connect(receiver).mint(receiver.address, value),
+                'Ownable: caller is not the owner',
+            );
+        });
+        it('reverts when transferring tokens to the zero address', async () => {
+            // Conditions that trigger a require statement can be precisely tested
+            await expectRevert(
+                token.connect(sender).transfer(constants.ZERO_ADDRESS, value),
+                'ERC20: transfer to the zero address',
+            );
+        });
+        it('emits a Transfer event on successful transfers', async () => {
+            let tx = await token.connect(sender).transfer(receiver.address, value);
+            let receipt = await tx.wait();
+            const data = receipt.events[0].args
+            //console.log(data);//data emitted from Transfer Event
+            
+            assert.equal(receipt.events[0].event, 'Transfer', "Emits correct event")
+            assert.equal(data.from, sender.address)
+            assert.equal(data.to, receiver.address)
+            assert.equal(data.value._hex, value._hex)
+
+
+        });
+        it('updates balances on successful transfers', async () => {
+            await token.connect(sender).transfer(receiver.address, value)
+
+            balanceOfReceiver = await token.balanceOf(receiver.address)
+            expect(new BigNumber.from(balanceOfReceiver.sub(value))).equal('0')
+        });
+        it('emits a Burn event on successful burning', async () => {
+            let tx = await token.connect(sender).burn(mintValue);
+            let receipt = await tx.wait();
+            const data = receipt.events[0].args
+            //console.log(data);//data emitted from Transfer Event
+
+            assert.equal(receipt.events[0].event, 'Transfer', "Emits correct event")
+            assert.equal(data.from, sender.address)
+            assert.equal(data.to, ZERO_ADDRESS)
+            assert.equal(data.value._hex, mintValue._hex)
+        });
+
+
+
+
     });
-})
+});

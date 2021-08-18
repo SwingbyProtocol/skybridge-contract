@@ -1,4 +1,4 @@
-# skybridge-contract
+# skybridge-contract-v2
 
 ## Environment
 - testrpc (ganache-cli) - v2.4.0
