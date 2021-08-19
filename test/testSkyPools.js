@@ -124,8 +124,9 @@ describe("SkyPools", () => {
             await btctTest.connect(owner).transfer(swap.address, mint500wBTCs)
 
             let balance
+            
             balance = await btctTest.balanceOf(user1.address)
-            console.log("Starting Wallet Balance", utils.formatEther(balance).toString())
+            console.log("Starting balance of BTCT tokens in user's wallet", utils.formatEther(balance).toString())
             //set float reserve
             let addressesAndAmountOfFloat = web3.utils.padLeft(floatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
             await swap.recordIncomingFloat(btctTest.address, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
@@ -138,13 +139,25 @@ describe("SkyPools", () => {
             balance = await swap.tokens(btctTest.address, user1.address)
             assert.equal(balance.toNumber(), 0, "Starting user balance is correct")
 
-            let amount = new BigNumber.from(100).mul(new BigNumber.from(10).pow(lptDecimals))
-            console.log("Amount formatEther: ", utils.formatEther(amount).toString())
+            let amount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(lptDecimals))
+            console.log("Amount - 1BTC - 8 decimals: ", amount.toString())
+
+
+
+
+            balance = await btctTest.balanceOf(swap.address)
+            console.log("Balance of BTCT tokens on the contract", utils.formatEther(balance).toString())
+
+            balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address) 
+            console.log("Float Reserve of BTCT tokens on the contract BEFORE skypools transaction", utils.formatEther(balance[1]).toString())  
+
+
+
 
 
             //perform recordSkyPoolsTX to assign user1 tokens in the contract
             await swap.recordSkyPoolsTX(btctTest.address, user1.address, amount, 0, redeemedFloatTxIds)
-
+            console.log("EXECUTING SKYPOOLS TRANSACTION")
 
             //check ending balances
             balance = await swap.tokens(btctTest.address, user1.address)
@@ -158,29 +171,58 @@ describe("SkyPools", () => {
             //console.log("USER SWAP BALANCE: ", utils.formatEther(balance).toString())
             assert.equal(balance.toString(), amount.toString(), "User's swap balance is correct - balanceOf function works correctly")
 
+           
+            balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address) 
+            console.log("Float Reserve of BTCT tokens on the contract AFTER skypools transaction", utils.formatEther(balance[1]).toString())
+
+
+
+
+            
+
+
+            
+
             //redeem tokens
             const result = await swap.connect(user1).redeemERC20Token(btctTest.address, amount)
+            console.log("EXECUTING redeemERC20Token TRANSACTION")
 
+            balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address) 
+            console.log("Float Reserve of BTCT tokens on the contract AFTER REDEEM", utils.formatEther(balance[1]).toString())
 
-            //Verify result
-            const receipt = await result.wait()
-            const args = receipt.events[1].args
-
-            assert.equal(receipt.events[1].event, "Withdraw", "Event name is correct")
-            assert.equal(args.token, btctTest.address, "Token address is correct")
-            assert.equal(args.user, user1.address, "Token address is correct")
-            assert.equal(args.amount.toString(), amount.toString(), "Amount is correct")
-            assert.equal(args.balance.toNumber(), 0, "User balance is correct")            
-
-
-            //check ending balances
-            balance = await swap.connect(user1.address).balanceOf(btctTest.address)
-            assert.equal(balance.toNumber(), 0, "User's ending balance on the swap contract is correct")
+            balance = await btctTest.balanceOf(swap.address)
+            console.log("Balance of BTCT tokens on the contract after redeem", utils.formatEther(balance).toString())
 
             balance = await btctTest.balanceOf(user1.address)
-            console.log("Ending Wallet Balance", utils.formatEther(balance).toString())
+            console.log("Balance of BTCT tokens in user's wallet after redeem", utils.formatEther(balance).toString())
+            
 
-            //assert.equal(balance.toString(), amount.toString(), "User's wallet balance contains the tokens in the correct amount")
+
+
+
+
+             //Verify result
+             const receipt = await result.wait()
+             const args = receipt.events[1].args
+ 
+             assert.equal(receipt.events[1].event, "Withdraw", "Event name is correct")
+             assert.equal(args.token, btctTest.address, "Token address is correct")
+             assert.equal(args.user, user1.address, "Token address is correct")
+             assert.equal(args.amount.toString(), amount.toString(), "Amount is correct")
+             assert.equal(args.balance.toNumber(), 0, "User balance is correct")            
+ 
+ 
+             //check ending balances
+             balance = await swap.connect(user1.address).balanceOf(btctTest.address)
+             assert.equal(balance.toNumber(), 0, "User's ending balance on the swap contract is correct")
+ 
+             balance = await btctTest.balanceOf(user1.address)
+             console.log("Ending Wallet Balance", utils.formatEther(balance).toString())
+ 
+
+             let endingAmountInBTC = amount.div(new BigNumber.from(10).pow(8))
+             assert.equal(utils.formatEther(balance).toString(), endingAmountInBTC.toNumber(), "User's wallet balance contains the tokens in the correct amount")
+
         });
     });
 });
