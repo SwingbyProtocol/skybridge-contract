@@ -545,30 +545,39 @@ describe('Contract: SwapContract', async () => {
         })
 
         it('updates churn address and stakes', async () => {
+            let getNodes = await swap.getActiveNodes()
+            assert.equal(getNodes.length, 0, "0 Nodes exist already")
             let rewardAddressAndAmounts = []
             let isRemoved = []
             let churnedInCount = 25
             let tssThreshold = 16
             let nodeRewardsRatio = 66
+            let expectedNode1, expectedNode2
             for (i = 0; i < 1; i++) {
                 let staked = new BigNumber.from(3000000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
                 let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + sender.address.slice(2), 64)
                 rewardAddressAndAmounts.push(addressesAndAmountStaked)
                 isRemoved.push(false)
+                expectedNode1 = addressesAndAmountStaked
             }
             const tx1 = await swap.churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
                 value: 0,
                 gasPrice: 2 * 10 ** 6
             })
+
+            getNodes = await swap.getActiveNodes()
+            assert.equal(getNodes.length, 1, "Node has been added") 
             // console.log(tx1.receipt.gasUsed)
             // Gas cost 125954 gas
             rewardAddressAndAmounts = []
             isRemoved = []
+            
             for (i = 0; i < 1; i++) {
                 let staked = new BigNumber.from(2000000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
                 let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + receiver.address.slice(2), 64)
                 rewardAddressAndAmounts.push(addressesAndAmountStaked)
                 isRemoved.push(false)
+                expectedNode2 = addressesAndAmountStaked
             }
             const tx2 = await swap.connect(receiver).churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount + 1, tssThreshold + 1, nodeRewardsRatio + 1, withdrawalFeeBPS, {
                 value: 0,
@@ -576,6 +585,12 @@ describe('Contract: SwapContract', async () => {
             })
             // console.log(tx2.receipt.gasUsed)
             // Gas cost 106754 gas
+
+            getNodes = await swap.getActiveNodes()
+            assert.equal(getNodes.length, 2, "Second Node has been added")            
+            assert.equal(getNodes[0].toUpperCase(), expectedNode1.toUpperCase(), "Node 1 is correct")
+            assert.equal(getNodes[1].toUpperCase(), expectedNode2.toUpperCase(), "Node 2 is correct")         
+
         })
     })
 })
