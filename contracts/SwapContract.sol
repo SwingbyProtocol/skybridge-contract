@@ -503,7 +503,7 @@ contract SwapContract is Ownable, ISwapContract {
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
     /// @param _token The address of target token.
-    /// @param _amount The amount to withdraw
+    /// @param _amount The amount to withdraw - call with BTC decimals (8) for BTC
     function redeemERC20Token(address _token, uint256 _amount)
         public
         returns (bool)
@@ -704,6 +704,19 @@ contract SwapContract is Ownable, ISwapContract {
         }
         require(IERC20(_token).transfer(_to, _amount));
     }
+    /// @dev _safeTransfer executes tranfer erc20 tokens only for skypools
+    /// @param _token The address of target token
+    /// @param _to The address of receiver.
+    /// @param _amount The amount of transfer.
+    function _safeTransferERC20(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        
+        require(IERC20(_token).transfer(_to, _amount));
+    }
+
 
     /// @dev _rewardsCollection collects tx rewards.
     /// @param _feesToken The token address for collection fees.
