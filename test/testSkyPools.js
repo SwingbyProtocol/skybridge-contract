@@ -83,7 +83,7 @@ describe("SkyPools", () => {
             const startingFloatAmount = balance[1]
             assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(floatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
 
-            console.log("Starting Float amount: ", balance[1].toString())
+            //console.log("Starting Float amount: ", balance[1].toString())
 
             balance = await btctTest.balanceOf(swap.address)
             assert.equal(utils.formatEther(balance).toString(), utils.formatEther(mint500ERC20tokens).toString(), "Balance of tokens on swap contract is correct")
@@ -111,8 +111,8 @@ describe("SkyPools", () => {
             balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
             assert.equal(balance[1].toString(), startingFloatAmount.sub(amount).toString(), "Ending swap balance is correct")
 
-            console.log("Ending Float amount: ", balance[1].toString())
-            console.log("Difference: ", (startingFloatAmount.sub(balance[1]).toString()))
+            //console.log("Ending Float amount: ", balance[1].toString())
+            //console.log("Difference: ", (startingFloatAmount.sub(balance[1]).toString()))
 
             //get users swap balance before they redeem tokens
             balance = await swap.connect(user1.address).balanceOf(btctTest.address)
@@ -146,6 +146,25 @@ describe("SkyPools", () => {
         
         });
         it('executes paraSwap transactions', async () => {
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         });
         it('executes 1Inch trades', async () => {

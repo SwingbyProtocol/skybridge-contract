@@ -21,7 +21,7 @@ require("hardhat-watcher");
 const mnemonic = "4d777ee25c2bb753c12597e8f35a2eedb90ece9bc5682f335e0e2c2fdc8d5674"
 
 module.exports = {
-  defaultNetwork: "development",
+  defaultNetwork: "hardhat",
   watcher: {
     compilation: { //npx hardhat watch compilation -- auto compile on change
       tasks: ["compile"],
@@ -32,7 +32,7 @@ module.exports = {
     }
   },
   solidity: {
-    version: "0.7.3",
+    version: "0.7.5",
     settings: {
       optimizer: {
         enabled: true,
