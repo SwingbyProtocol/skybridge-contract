@@ -1,13 +1,13 @@
-const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
-const { expect, assert } = require('chai');
-const { BigNumber, Ethers } = require('ethers');
-const { ZERO_ADDRESS } = constants;
+const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers')
+const { expect, assert } = require('chai')
+const { BigNumber, Ethers } = require('ethers')
+const { ZERO_ADDRESS } = constants
 const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
-const utils = require('ethers').utils;
-
+const utils = require('ethers').utils
+const ParaSwap = require('../scripts/paraswap.js')
 //Web3 init
-//const LPToken = artifacts.require('LPToken');
-//const SwapContract = artifacts.require('SwapContract');
+//const LPToken = artifacts.require('LPToken')
+//const SwapContract = artifacts.require('SwapContract')
 
 describe("SkyPools", () => {
     let LPTokenFactory, SwapContractFactory, lptoken, swap, owner, receiver, accounts
@@ -15,12 +15,12 @@ describe("SkyPools", () => {
     let convertScale, lptDecimals, testToken, btctTest, btctDecimals, mint500ERC20tokens, balance, zeroFees, minerFees, floatAmount, sampleTxs, redeemedFloatTxIds
 
     beforeEach(async () => {
-        [owner, receiver, user1, user2, ...addrs] = await ethers.getSigners();
+        [owner, receiver, user1, user2, ...addrs] = await ethers.getSigners()
         accounts = [owner, receiver, user1, user2, ...addrs]
-        LPTokenFactory = await ethers.getContractFactory("LPToken");
-        SwapContractFactory = await ethers.getContractFactory("SwapContract");
+        LPTokenFactory = await ethers.getContractFactory("LPToken")
+        SwapContractFactory = await ethers.getContractFactory("SwapContract")
 
-        lpToken = await LPTokenFactory.deploy(8);
+        lpToken = await LPTokenFactory.deploy(8)
 
         lptDecimals = await lpToken.decimals()
 
@@ -34,7 +34,7 @@ describe("SkyPools", () => {
 
         mint500ERC20tokens = new BigNumber.from(500).mul(new BigNumber.from(10).pow(btctDecimals))
 
-        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, 0);
+        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, 0)
 
         zeroFees = false
 
@@ -56,7 +56,7 @@ describe("SkyPools", () => {
         ]
 
         await lpToken.transferOwnership(swap.address)
-    });
+    })
 
 
     // You can nest describe calls to create subsections.
@@ -93,12 +93,12 @@ describe("SkyPools", () => {
 
             balance = await btctTest.balanceOf(swap.address)
             assert.equal(utils.formatEther(balance).toString(), utils.formatEther(mint500ERC20tokens).toString(), "Balance of BTCT tokens in the contract is correct")
-            
-            
+
+
             //amount = 1 BTC, adjusted for 8 decimals
             let amount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(lptDecimals))
             //console.log(utils.formatEther(amount.mul(convertScale)).toString())
-            
+
 
 
             //perform recordSkyPoolsTX to assign user1 tokens in the contract
@@ -122,7 +122,7 @@ describe("SkyPools", () => {
             balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
             let expectedFloat = utils.formatEther(floatAmount.add(minerFees).sub(amount))
             assert.equal(utils.formatEther(balance[1]).toString(), expectedFloat, "Float Reserve of BTCT tokens on the contract AFTER skypools transaction")
-            
+
             //redeem tokens
             const result = await swap.connect(user1).redeemERC20Token(btctTest.address, amount)
 
@@ -143,13 +143,34 @@ describe("SkyPools", () => {
             balance = await btctTest.balanceOf(user1.address)
             let endingAmountInBTC = amount.div(new BigNumber.from(10).pow(8)) //convert to BTC decimals
             assert.equal(utils.formatEther(balance).toString(), endingAmountInBTC.toNumber(), "User's wallet balance contains the tokens in the correct amount")
-        
-        });
+
+        })
         it('executes paraSwap transactions', async () => {
-
-
-
+            //test API call
+            //https://apiv4.paraswap.io/v2/prices/?from=ETH&to=DAI&amount=10000000000000000000&fromDecimals=18&toDecimals=18&side=SELL&network=137
             
+            const Tokens = {
+                ["MAINNET"]: {
+                  ETH: {
+                    address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+                    decimals: 18,
+                  },
+                  MATIC: {
+                    address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+                    decimals: 18,
+                  },
+                },               
+              };
+            
+            const paraAPI_URL = "https://apiv4.paraswap.io/v2"
+            const paraswap = new ParaSwap(paraAPI_URL)
+
+            //console.log(Tokens["MAINNET"]['ETH'])
+
+
+
+            let test = await paraswap.getPrice(Tokens["MAINNET"]['ETH'], Tokens["MAINNET"]['MATIC'], "1000000000000000000", "1")
+            //console.log(test)
 
 
 
@@ -165,15 +186,10 @@ describe("SkyPools", () => {
 
 
 
-
-        });
+        })
         it('executes 1Inch trades', async () => {
 
-        });
-        it('records SkyPools Transaction and allows user to redeem ERC-20 tokens', async () => {
-            
-
-
-        });
-    });
-});
+        })
+        
+    })
+})
