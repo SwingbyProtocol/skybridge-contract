@@ -43,7 +43,7 @@ module.exports = {
   networks: {
     development: {
       url: "http://127.0.0.1:8545",
-      gas: 2100000,
+      gas: 5500000,
       gasPrice: 8000000000
     },
     hardhat: {

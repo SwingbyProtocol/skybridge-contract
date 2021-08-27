@@ -148,40 +148,58 @@ describe("SkyPools", () => {
         it('executes paraSwap transactions', async () => {
             //test API call
             //https://apiv4.paraswap.io/v2/prices/?from=ETH&to=DAI&amount=10000000000000000000&fromDecimals=18&toDecimals=18&side=SELL&network=137
-            
-            const Tokens = {
-                ["MAINNET"]: {
-                  ETH: {
-                    address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-                    decimals: 18,
-                  },
-                  MATIC: {
-                    address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
-                    decimals: 18,
-                  },
-                },               
-              };
-            
             const paraAPI_URL = "https://apiv4.paraswap.io/v2"
             const paraswap = new ParaSwap(paraAPI_URL)
 
-            //console.log(Tokens["MAINNET"]['ETH'])
+            const normalize = (amount, token) => {
+                return new BigNumber.from(amount).mul(new BigNumber.from(10).pow(token.decimals))
+            }
+            const denormalize = (amount, token) => {
+                return new BigNumber.from(amount).div(new BigNumber.from(10).pow(token.decimals))
+            }
+            const mainnetNetworkID = 1
+            const REST_TIME = 5 * 1000 // 5 seconds
+            const slippage = new BigNumber.from(3).mul(new BigNumber.from(10).pow(16)).toString() //ERC20 - 0.03
+            const Tokens = {
+                [mainnetNetworkID]: {
+                    ETH: {
+                        address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+                        decimals: 18,
+                    },
+                    MATIC: {
+                        address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+                        decimals: 18,
+                    },
+                },
+            }
+            const srcAmount = normalize(
+                1,
+                Tokens[mainnetNetworkID]['ETH']
+            )
+            let getPrice = await paraswap.getPrice(
+                Tokens[mainnetNetworkID]['ETH'],
+                Tokens[mainnetNetworkID]['MATIC'],
+                srcAmount,
+                mainnetNetworkID
+            )
+            let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage)
 
-
-
-            let test = await paraswap.getPrice(Tokens["MAINNET"]['ETH'], Tokens["MAINNET"]['MATIC'], "1000000000000000000", "1")
-            //console.log(test)
-
-
-
-
-
-
-
-
-
-
-
+            const txRequest = await paraswap.buildTransaction(
+                getPrice.payload,
+                Tokens[mainnetNetworkID]['ETH'],
+                Tokens[mainnetNetworkID]['MATIC'],
+                srcAmount.toString(),
+                minDestAmount.toString(),
+                mainnetNetworkID,
+                receiver.address
+            )  
+            
+            //console.log("RETURNED DATA: ", txRequest.config.data)
+            //console.log(txRequest.data)
+            const output = txRequest.config.data
+            const {parse} = require('json-parser')
+            const parsedOutput = parse(output)
+            //console.log(parsedOutput.priceRoute.bestRoute[0])
 
 
 
@@ -190,6 +208,6 @@ describe("SkyPools", () => {
         it('executes 1Inch trades', async () => {
 
         })
-        
+
     })
 })

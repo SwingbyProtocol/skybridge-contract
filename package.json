@@ -32,6 +32,7 @@
     "elliptic": ">=6.5.4",
     "hardhat-watcher": "^2.1.1",
     "install": "^0.13.0",
+    "json-parser": "^3.1.2",
     "node-fetch": ">=2.6.1",
     "npm": "^7.6.3",
     "truffle-contract-size": "^2.0.1"

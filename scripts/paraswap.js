@@ -5,7 +5,7 @@ const { BigNumber, Ethers } = require('ethers')
 const paraURL = "https://apiv4.paraswap.io/v2"
 
 class ParaSwap {
-    
+
     constructor(apiURL = paraURL) {
         this.apiURL = apiURL
         this.referrer = 'SkyPools'
@@ -32,7 +32,9 @@ class ParaSwap {
         }
     }
 
-    async buildTransaction(
+
+
+    async buildTransaction (
         pricePayload,
         from,
         to,
@@ -41,34 +43,33 @@ class ParaSwap {
         network,
         userAddress
     ) {
-        try {
-            const requestURL = `${this.apiURL}/transactions/${network}`
-            const requestData = {
-                priceRoute: pricePayload,
-                srcToken: from.address,
-                destToken: to.address,
-                srcAmount: srcAmount,
-                destAmount: minDestAmount,
-                userAddress: userAddress,
-                referrer: this.referrer,
-                srcDecimals: from.decimals,
-                destDecimals: to.decimals,
-            }
-
-            const { data } = await axios.post(requestURL, requestData)
-            return {
-                from: data.from,
-                to: data.to,
-                data: data.data,
-                gasLimit: '0x' + new BigNumber.from(data.gas),
-                value: '0x' + new BigNumber.from(data.value)
-            }
-        } catch (e) {
-            throw new Error(
-                `Paraswap unableo to build transaction ${from.address} ${to.address} ${network} ${e.message}`,
-            )
+        const requestURL = `${this.apiURL}/transactions/${network}?skipChecks=true&onlyParams=true`;
+        const requestData = {
+            toDecimals: to.decimals,
+            fromDecimals: from.decimals,
+            referrer: this.referrer,
+            userAddress: userAddress,
+            destAmount: minDestAmount,
+            priceRoute: pricePayload,
+            srcAmount: srcAmount,
+            destToken: to.address,
+            srcToken: from.address
         }
-    }
+        let data = "No Response"
+        await axios.post(
+            requestURL,
+            requestData
+        ).then(response => {
+            //console.log("RESPONSE: ", response)
+            data = response            
+        }).catch(e => {
+            console.log("ERROR: ", e)
+            if(e.response != undefined){
+                console.log("ERROR RESPONSE: ", e.response)
+            }
+        })
+        return data
+    }    
 }
 
 module.exports = ParaSwap;

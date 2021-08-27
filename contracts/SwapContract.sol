@@ -141,7 +141,7 @@ contract SwapContract is Ownable, ISwapContract {
             _destToken != address(0),
             "_destToken should not be address(0)"
         );
-        address _feesToken = address(0);
+        address _feesToken;
         if (_totalSwapped > 0) {
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
@@ -174,7 +174,7 @@ contract SwapContract is Ownable, ISwapContract {
             _destToken != address(0),
             "_destToken should not be address(0)"
         );
-        address _feesToken = address(0);
+        address _feesToken;
         if (_totalSwapped > 0) {
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
@@ -319,7 +319,7 @@ contract SwapContract is Ownable, ISwapContract {
             _destToken != address(0),
             "_destToken should not be address(0)"
         );
-        address _feesToken = address(0);
+        address _feesToken;
         if (_totalSwapped > 0) {
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
