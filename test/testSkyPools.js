@@ -159,12 +159,15 @@ describe("SkyPools", () => {
             }
             const mainnetNetworkID = 1
             const REST_TIME = 5 * 1000 // 5 seconds
-            const slippage = new BigNumber.from(3).mul(new BigNumber.from(10).pow(16)).toString() //ERC20 - 0.03
             const Tokens = {
                 [mainnetNetworkID]: {
                     ETH: {
                         address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
                         decimals: 18,
+                    },
+                    USDC: {
+                        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+                        decimals: 6,
                     },
                     MATIC: {
                         address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
@@ -176,34 +179,52 @@ describe("SkyPools", () => {
                 1,
                 Tokens[mainnetNetworkID]['ETH']
             )
-            let getPrice = await paraswap.getPrice(
+            let getPrice = await paraswap.oldGetPrice(
                 Tokens[mainnetNetworkID]['ETH'],
-                Tokens[mainnetNetworkID]['MATIC'],
+                Tokens[mainnetNetworkID]['USDC'],
                 srcAmount,
                 mainnetNetworkID
             )
-            let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage)
+            const slippage = (decimals) => {
+                return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //ERC20 - 0.03
+            }
+            //console.log(getPrice.payload.bestRoute[0])
+            //console.log("GET_PRICE", getPrice)
+
+            let decimals = Tokens[mainnetNetworkID]['USDC'].decimals
+            let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
+
 
             const txRequest = await paraswap.buildTransaction(
                 getPrice.payload,
                 Tokens[mainnetNetworkID]['ETH'],
-                Tokens[mainnetNetworkID]['MATIC'],
+                Tokens[mainnetNetworkID]['USDC'],
                 srcAmount.toString(),
                 minDestAmount.toString(),
                 mainnetNetworkID,
-                receiver.address
-            )  
-            
-            //console.log("RETURNED DATA: ", txRequest.config.data)
-            //console.log(txRequest.data)
+                receiver.address,
+                true //only params - true for contract -> contract | false for standard transaction object
+            )
+            let data = txRequest.data //params to execute transaction contract -> contract
+            //console.log(data)
             const output = txRequest.config.data
-            const {parse} = require('json-parser')
+            const { parse } = require('json-parser')
             const parsedOutput = parse(output)
+            //console.log(parsedOutput)
+            //console.log(parsedOutput.priceRoute.contractMethod)//get contract method
             //console.log(parsedOutput.priceRoute.bestRoute[0])
 
 
-
-
+            const paraAddress = "0xb70bc06d2c9bf03b3373799606dc7d39346c06b3"
+            const result = await swap.doParaSwap(
+                paraAddress,
+                data.factory,
+                data.initCode,
+                data.amountIn,
+                data.amountOutMin,
+                data.path,
+                data.referrer
+            )
         })
         it('executes 1Inch trades', async () => {
 

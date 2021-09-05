@@ -10,7 +10,7 @@ class ParaSwap {
         this.apiURL = apiURL
         this.referrer = 'SkyPools'
     }
-    async getPrice(from, to, srcAmount, network) {
+    async oldGetPrice(from, to, srcAmount, network) {
         try {
             const requestURL =
                 `${this.apiURL}/prices/?from=${from.address}&to=${to.address}` +
@@ -20,6 +20,10 @@ class ParaSwap {
                 headers: {
                     'X-Partner': this.referrer,
                 },
+            }).catch(e => {
+                if(e.response != undefined){
+                    console.log("ERROR RESPONSE: ", e.response)
+                }else {  console.log("ERROR: ", e) }
             })
             return {
                 price: data.priceRoute.destAmount,
@@ -27,11 +31,37 @@ class ParaSwap {
             }
         } catch (e) {
             throw new Error(
-                `Paraswap unable to fetch TEST price ${from.address} ${to.address} ${network} ${e.message}`
+                `Paraswap unable to fetch price ${from.address} ${to.address} ${network} ${e.message}`
             )
         }
     }
 
+    async getPrice(from, to, srcAmount, network) {
+        
+            const requestURL =
+                `${this.apiURL}/prices/?from=${from.address}&to=${to.address}` +
+                `&amount=${srcAmount}&fromDecimals=${from.decimals}&toDecimals` +
+                `=${to.decimals}&side=SELL&network=${network}`
+            let data = "No Response"
+            await axios.get(requestURL, {
+                headers: {
+                    'X-Partner': this.referrer,
+                },
+            }).then(response => {
+                data = response
+            }).catch(e => {
+                if(e.response != undefined){
+                    console.log("ERROR RESPONSE: ", e.response)
+                }else {  console.log("ERROR: ", e) }
+            })
+
+            if (data != 'No Response'){
+                return {
+                    data
+                }
+            }else {return data}
+
+    }
 
 
     async buildTransaction (
@@ -41,9 +71,10 @@ class ParaSwap {
         srcAmount,
         minDestAmount,
         network,
-        userAddress
+        userAddress,
+        onlyParams
     ) {
-        const requestURL = `${this.apiURL}/transactions/${network}?skipChecks=true&onlyParams=true`;
+        const requestURL = `${this.apiURL}/transactions/${network}?skipChecks=true&onlyParams=${onlyParams}`;
         const requestData = {
             toDecimals: to.decimals,
             fromDecimals: from.decimals,
@@ -62,11 +93,11 @@ class ParaSwap {
         ).then(response => {
             //console.log("RESPONSE: ", response)
             data = response            
-        }).catch(e => {
-            console.log("ERROR: ", e)
+        }).catch(e => {            
             if(e.response != undefined){
                 console.log("ERROR RESPONSE: ", e.response)
-            }
+                data = e.response
+            }else { console.log("ERROR: ", e) }
         })
         return data
     }    

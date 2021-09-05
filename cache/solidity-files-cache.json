@@ -358,8 +358,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1630103579600,
-      "contentHash": "3d083c0ecc5d5251832611a9cfc31b3e",
+      "lastModificationDate": 1630877256919,
+      "contentHash": "1568f73369eb6117ec862f4663024903",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.7.5",
@@ -387,8 +387,10 @@
         "./interfaces/IBurnableToken.sol",
         "./interfaces/IERC20.sol",
         "./interfaces/ISwapContract.sol",
+        "./interfaces/IAgustusSwapper.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/math/SafeMath.sol",
+        "hardhat/console.sol",
         "./LPToken.sol"
       ],
       "versionPragmas": [
@@ -534,6 +536,40 @@
       ],
       "artifacts": [
         "ITokenTransferProxy"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1629837418346,
+      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
       ]
     }
   }

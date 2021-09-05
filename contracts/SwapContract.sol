@@ -4,8 +4,11 @@ pragma solidity >=0.6.0 <0.8.0;
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
+import "./interfaces/IAgustusSwapper.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+
+import "hardhat/console.sol";
 
 //skypools - needed for address => tokenBalance
 import "./LPToken.sol";
@@ -496,7 +499,24 @@ contract SwapContract is Ownable, ISwapContract {
     }
 
     /// @dev doParaSwap stub for skypools - execute paraswap transaction
-    function doParaSwap() public returns (bool) {}
+    function doParaSwap(
+        address _paraSwapAddress,
+        address _factory,
+        bytes32 _initCode,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path,
+        uint8 _referrer
+    ) public {
+        IAugustusSwapper(_paraSwapAddress).swapOnUniswapFork(
+            _factory,
+            _initCode,
+            _amountIn,
+            _amountOutMin,
+            _path,
+            _referrer
+        );
+    }
 
     /// @dev do1InchTrade stub for skypools - execute 1Inch transaction
     function do1InchTrade() public returns (bool) {}
@@ -704,6 +724,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
         require(IERC20(_token).transfer(_to, _amount));
     }
+
     /// @dev _safeTransfer executes tranfer erc20 tokens only for skypools
     /// @param _token The address of target token
     /// @param _to The address of receiver.
@@ -713,10 +734,8 @@ contract SwapContract is Ownable, ISwapContract {
         address _to,
         uint256 _amount
     ) internal {
-        
         require(IERC20(_token).transfer(_to, _amount));
     }
-
 
     /// @dev _rewardsCollection collects tx rewards.
     /// @param _feesToken The token address for collection fees.
