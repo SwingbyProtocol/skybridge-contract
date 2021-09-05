@@ -358,8 +358,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1630877256919,
-      "contentHash": "1568f73369eb6117ec862f4663024903",
+      "lastModificationDate": 1630878305621,
+      "contentHash": "175a707847011727c481181d865dc05e",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.7.5",
@@ -387,7 +387,7 @@
         "./interfaces/IBurnableToken.sol",
         "./interfaces/IERC20.sol",
         "./interfaces/ISwapContract.sol",
-        "./interfaces/IAgustusSwapper.sol",
+        "./interfaces/IAugustusSwapper.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/math/SafeMath.sol",
         "hardhat/console.sol",
@@ -468,42 +468,6 @@
         "Migrations"
       ]
     },
-    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IAgustusSwapper.sol": {
-      "lastModificationDate": 1629839984993,
-      "contentHash": "ff4102e9fd064af5e8a571d88ae69b41",
-      "sourceName": "contracts/interfaces/IAgustusSwapper.sol",
-      "solcConfig": {
-        "version": "0.7.5",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./IERC20.sol"
-      ],
-      "versionPragmas": [
-        "0.7.5"
-      ],
-      "artifacts": [
-        "IAugustusSwapper"
-      ]
-    },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ITokenTransferProxy.sol": {
       "lastModificationDate": 1629840147904,
       "contentHash": "3a3e27829ee83707a1bb6e623474ba80",
@@ -570,6 +534,42 @@
       ],
       "artifacts": [
         "console"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IAugustusSwapper.sol": {
+      "lastModificationDate": 1630878289014,
+      "contentHash": "ff4102e9fd064af5e8a571d88ae69b41",
+      "sourceName": "contracts/interfaces/IAugustusSwapper.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IAugustusSwapper"
       ]
     }
   }
