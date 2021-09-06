@@ -498,9 +498,32 @@ contract SwapContract is Ownable, ISwapContract {
         return tokens[_token][msg.sender];
     }
 
+    function doParaSwapOnUniswap(
+        address paraSwapAddress,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path,
+        uint8 _referrer
+    ) public {
+        IAugustusSwapper(paraSwapAddress).swapOnUniswap(
+                _amountIn,
+                _amountOutMin,
+                _path,
+                _referrer
+            );
+    }
+
+    function doParaSwapMultiSwap(
+        address paraSwapAddress
+        //bytes32[] memory _data
+    )public {
+        //IAugustusSwapper(paraSwapAddress).multiSwap(_data);
+        console.log(paraSwapAddress);
+    }
+
     /// @dev doParaSwap stub for skypools - execute paraswap transaction
-    function doParaSwap(
-        address _paraSwapAddress,
+    function doParaSwapOnUniswapFork(
+        address paraSwapAddress,
         address _factory,
         bytes32 _initCode,
         uint256 _amountIn,
@@ -508,14 +531,16 @@ contract SwapContract is Ownable, ISwapContract {
         address[] calldata _path,
         uint8 _referrer
     ) public {
-        IAugustusSwapper(_paraSwapAddress).swapOnUniswapFork(
-            _factory,
-            _initCode,
-            _amountIn,
-            _amountOutMin,
-            _path,
-            _referrer
-        );
+        //address TokenTransferProxy = 0xb70Bc06D2c9Bf03b3373799606dc7d39346c06B3;        
+            IAugustusSwapper(paraSwapAddress).swapOnUniswapFork(
+                _factory,
+                _initCode,
+                _amountIn,
+                _amountOutMin,
+                _path,
+                _referrer
+            );
+        
     }
 
     /// @dev do1InchTrade stub for skypools - execute 1Inch transaction
@@ -803,9 +828,7 @@ contract SwapContract is Ownable, ISwapContract {
             nodeAddrs.push(_addr);
             isInList[_addr] = true;
         }
-        if (nodes[_addr] == 0x0) {
-            nodes[_addr] = _data;
-        }
+        nodes[_addr] = _data;
         return true;
     }
 

@@ -49,7 +49,8 @@ module.exports = {
     hardhat: {
       //run tests on fork of mainnet 
       forking: {
-        url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847"
+        url: "https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5",
+        blockNumber: 13174389
       }
     },
     goerli: {

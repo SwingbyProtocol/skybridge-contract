@@ -173,6 +173,10 @@ describe("SkyPools", () => {
                         address: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
                         decimals: 18,
                     },
+                    wBTC: {
+                        address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                        decimals: 8
+                    }
                 },
             }
             const srcAmount = normalize(
@@ -210,21 +214,55 @@ describe("SkyPools", () => {
             const output = txRequest.config.data
             const { parse } = require('json-parser')
             const parsedOutput = parse(output)
-            //console.log(parsedOutput)
-            //console.log(parsedOutput.priceRoute.contractMethod)//get contract method
-            //console.log(parsedOutput.priceRoute.bestRoute[0])
+            const contractMethod = parsedOutput.priceRoute.contractMethod
+
+            console.log(parsedOutput.destAmount.toString())
+
+            console.log(contractMethod)//get contract method
+
+            console.log(data)
+
+            const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+
+            //impersonate real mainnet account
+            await hre.network.provider.request({
+                method: "hardhat_impersonateAccount",
+                params: [highValueEthAccount]
+            })
+
+            const signer = await ethers.getSigner(highValueEthAccount)
+            const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5");
+            
+            const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
+
+            
+             if (contractMethod == "swapOnUniswap") {
+                const result = await swap.connect(signer).doParaSwapOnUniswap(
+                    paraSwapAddress,
+                    data.amountIn,
+                    data.amountOutMin,
+                    data.path,
+                    data.referrer
+                )
+                console.log(result.receipt)
+            } else if (contractMethod == "swapOnUniswapFork") {
+                const result = await swap.connect(signer).doParaSwapOnUniswapFork(
+                    paraSwapAddress,
+                    data.factory,
+                    data.initCode,
+                    data.amountIn,
+                    data.amountOutMin,
+                    data.path,
+                    data.referrer
+                )
+                console.log(result.receipt)
+            } else if(contractMethod == "multiSwap"){
+                //console.log(data.data)
+                await swap.connect(signer).doParaSwapMultiSwap(paraSwapAddress)
+            }
+            
 
 
-            const paraAddress = "0xb70bc06d2c9bf03b3373799606dc7d39346c06b3"
-            const result = await swap.doParaSwap(
-                paraAddress,
-                data.factory,
-                data.initCode,
-                data.amountIn,
-                data.amountOutMin,
-                data.path,
-                data.referrer
-            )
         })
         it('executes 1Inch trades', async () => {
 
