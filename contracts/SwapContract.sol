@@ -803,9 +803,7 @@ contract SwapContract is Ownable, ISwapContract {
             nodeAddrs.push(_addr);
             isInList[_addr] = true;
         }
-        if (nodes[_addr] == 0x0) {
-            nodes[_addr] = _data;
-        }
+        nodes[_addr] = _data;
         return true;
     }
 
