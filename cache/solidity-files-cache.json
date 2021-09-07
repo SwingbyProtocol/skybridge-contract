@@ -358,8 +358,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1630966486145,
-      "contentHash": "130fd0b60228e0acb230a46021c79428",
+      "lastModificationDate": 1631052362612,
+      "contentHash": "8a3f7fb24326fe0583f0b628f13bc1e2",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.7.5",
@@ -388,6 +388,7 @@
         "./interfaces/IERC20.sol",
         "./interfaces/ISwapContract.sol",
         "./interfaces/IAugustusSwapper.sol",
+        "./interfaces/ITokenTransferProxy.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/math/SafeMath.sol",
         "hardhat/console.sol",
@@ -469,7 +470,7 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ITokenTransferProxy.sol": {
-      "lastModificationDate": 1629840147904,
+      "lastModificationDate": 1629840165721,
       "contentHash": "3a3e27829ee83707a1bb6e623474ba80",
       "sourceName": "contracts/interfaces/ITokenTransferProxy.sol",
       "solcConfig": {
@@ -537,7 +538,7 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IAugustusSwapper.sol": {
-      "lastModificationDate": 1630878289014,
+      "lastModificationDate": 1631042533494,
       "contentHash": "ff4102e9fd064af5e8a571d88ae69b41",
       "sourceName": "contracts/interfaces/IAugustusSwapper.sol",
       "solcConfig": {

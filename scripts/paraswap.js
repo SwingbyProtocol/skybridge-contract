@@ -84,7 +84,8 @@ class ParaSwap {
             priceRoute: pricePayload,
             srcAmount: srcAmount,
             destToken: to.address,
-            srcToken: from.address
+            srcToken: from.address,
+            receiver: userAddress
         }
         let data = "No Response"
         await axios.post(

@@ -157,6 +157,19 @@ describe("SkyPools", () => {
             const denormalize = (amount, token) => {
                 return new BigNumber.from(amount).div(new BigNumber.from(10).pow(token.decimals))
             }
+
+            const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+
+            //impersonate real mainnet account
+            await hre.network.provider.request({
+                method: "hardhat_impersonateAccount",
+                params: [highValueEthAccount]
+            })
+
+            const signer = await ethers.getSigner(highValueEthAccount)
+            const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5");
+
+
             const mainnetNetworkID = 1
             const REST_TIME = 5 * 1000 // 5 seconds
             const Tokens = {
@@ -181,11 +194,11 @@ describe("SkyPools", () => {
             }
             const srcAmount = normalize(
                 1,
-                Tokens[mainnetNetworkID]['ETH']
+                Tokens[mainnetNetworkID]['wBTC']
             )
             let getPrice = await paraswap.oldGetPrice(
+                Tokens[mainnetNetworkID]['wBTC'],
                 Tokens[mainnetNetworkID]['ETH'],
-                Tokens[mainnetNetworkID]['USDC'],
                 srcAmount,
                 mainnetNetworkID
             )
@@ -195,18 +208,18 @@ describe("SkyPools", () => {
             //console.log(getPrice.payload.bestRoute[0])
             //console.log("GET_PRICE", getPrice)
 
-            let decimals = Tokens[mainnetNetworkID]['USDC'].decimals
+            let decimals = Tokens[mainnetNetworkID]['ETH'].decimals
             let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
 
             const txRequest = await paraswap.buildTransaction(
                 getPrice.payload,
+                Tokens[mainnetNetworkID]['wBTC'],
                 Tokens[mainnetNetworkID]['ETH'],
-                Tokens[mainnetNetworkID]['USDC'],
                 srcAmount.toString(),
                 minDestAmount.toString(),
                 mainnetNetworkID,
-                receiver.address,
+                signer.address,
                 true //only params - true for contract -> contract | false for standard transaction object
             )
             let data = txRequest.data //params to execute transaction contract -> contract
@@ -216,27 +229,27 @@ describe("SkyPools", () => {
             const parsedOutput = parse(output)
             const contractMethod = parsedOutput.priceRoute.contractMethod
 
-            console.log(parsedOutput.destAmount.toString())
 
-            console.log(contractMethod)//get contract method
+            console.log("Expected Amount: ", parsedOutput.destAmount.toString())
 
+            if(decimals = 18){
+                console.log("Formatted ERC-20 amount: ", utils.formatEther(parsedOutput.destAmount).toString())
+            }
+
+            console.log("Recomended Contract Method: ", contractMethod)//get contract method
+
+            console.log("Arguments for", contractMethod)
             console.log(data)
-
-            const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-
-            //impersonate real mainnet account
-            await hre.network.provider.request({
-                method: "hardhat_impersonateAccount",
-                params: [highValueEthAccount]
-            })
-
-            const signer = await ethers.getSigner(highValueEthAccount)
-            const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5");
-            
+        
+            //const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
             const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
 
-            
-             if (contractMethod == "swapOnUniswap") {
+
+            if (contractMethod == "swapOnUniswap") {
+                let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
+                let contract = new ethers.Contract(data.path[0], abi, provider)
+                await contract.connect(signer).approve(highValueEthAccount, srcAmount)
+
                 const result = await swap.connect(signer).doParaSwapOnUniswap(
                     paraSwapAddress,
                     data.amountIn,
@@ -256,16 +269,34 @@ describe("SkyPools", () => {
                     data.referrer
                 )
                 console.log(result.receipt)
-            } else if(contractMethod == "multiSwap"){
-                //console.log(data.data)
-                await swap.connect(signer).doParaSwapMultiSwap(paraSwapAddress)
+            } else if (contractMethod == "simpleSwap") {
+                let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
+                let contract = new ethers.Contract(data.fromToken, abi, provider)
+                await contract.connect(signer).approve(highValueEthAccount, srcAmount)
+
+                await swap.connect(signer).doParaSwapSimpleSwap(
+                    //paraSwapAddress,
+                    data.fromToken,
+                    data.toToken,
+                    data.fromAmount,
+                    data.toAmount,
+                    data.expectedAmount,
+                    data.callees,
+                    data.exchangeData,
+                    data.startIndexes,
+                    data.values,
+                    data.beneficiary,
+                    data.referrer,
+                    data.useReduxToken
+                )
+                
+            }else if (contractMethod == "multiSwap") {
+                let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
+                let contract = new ethers.Contract(data.data.fromToken, abi, provider)
+                await contract.connect(signer).approve(highValueEthAccount, srcAmount)
+
+                
             }
-            
-
-
-        })
-        it('executes 1Inch trades', async () => {
-
         })
 
     })
