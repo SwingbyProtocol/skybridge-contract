@@ -358,8 +358,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1631223355615,
-      "contentHash": "a96f5085fa87284365ff69458b85f686",
+      "lastModificationDate": 1631305226382,
+      "contentHash": "13b3fe8280f9b03b5c352720ea946144",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.7.5",
@@ -389,6 +389,8 @@
         "./interfaces/ISwapContract.sol",
         "./interfaces/IAugustusSwapper.sol",
         "./interfaces/ITokenTransferProxy.sol",
+        "./interfaces/IParaswap.sol",
+        "./interfaces/lib/Utils.sol",
         "@openzeppelin/contracts/access/Ownable.sol",
         "@openzeppelin/contracts/math/SafeMath.sol",
         "hardhat/console.sol",
@@ -571,6 +573,77 @@
       ],
       "artifacts": [
         "IAugustusSwapper"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IParaswap.sol": {
+      "lastModificationDate": 1631300390430,
+      "contentHash": "873b20ddd639a2897762d467f32c20c0",
+      "sourceName": "contracts/interfaces/IParaswap.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./lib/Utils.sol",
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IParaswap"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/lib/Utils.sol": {
+      "lastModificationDate": 1631300403245,
+      "contentHash": "1b3b1cc6b1bb4126c0aff2ef39bc2109",
+      "sourceName": "contracts/interfaces/lib/Utils.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Utils"
       ]
     }
   }

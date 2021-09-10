@@ -217,7 +217,7 @@ describe("SkyPools", () => {
             const wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, minABI, provider)
             const swingbywBTC_Balance = await wBTC_Contract.balanceOf(swingby.address)
             const swingbyETH_Balance = await provider.getBalance(swingbyContractAddress)
-            console.log(utils.formatEther(swingbyETH_Balance).toString())
+            //console.log(utils.formatEther(swingbyETH_Balance).toString())
 
             const srcAmount = normalize(
                 1,
@@ -253,8 +253,8 @@ describe("SkyPools", () => {
                 signer.address,
                 true //only params - true for contract -> contract | false for standard transaction object
             )
-            
-             let data = txRequest.data //params to execute transaction contract -> contract
+
+            let data = txRequest.data //params to execute transaction contract -> contract
             //console.log(data)
             const output = txRequest.config.data
             const { parse } = require('json-parser')
@@ -274,6 +274,8 @@ describe("SkyPools", () => {
             console.log(data)
 
             const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
+            const newParaAddress = "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57"
+
 
 
             if (contractMethod == "swapOnUniswap") {
@@ -291,44 +293,72 @@ describe("SkyPools", () => {
                 console.log(result.receipt)
             } else if (contractMethod == "swapOnUniswapFork") {
                 const result = await swap.connect(signer).doParaSwapOnUniswapFork(
-                    paraSwapAddress,
-                    data.factory,
-                    data.initCode,
-                    data.amountIn,
-                    data.amountOutMin,
-                    data.path,
-                    data.referrer
+                    newParaAddress,
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4]
                 )
-                console.log(result.receipt)
+                //console.log(result)
             } else if (contractMethod == "simpleSwap") {
-                let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
-                let contract = new ethers.Contract(data.fromToken, abi, provider)
-                await contract.connect(signer).approve(highValueEthAccount, srcAmount)
-
-                await swap.connect(signer).doParaSwapSimpleSwap(
-                    //paraSwapAddress,
-                    data.fromToken,
-                    data.toToken,
-                    data.fromAmount,
-                    data.toAmount,
-                    data.expectedAmount,
-                    data.callees,
-                    data.exchangeData,
-                    data.startIndexes,
-                    data.values,
-                    data.beneficiary,
-                    data.referrer,
-                    data.useReduxToken
+                const dataArray = [
+                    data[0].fromToken,
+                    data[0].toToken,
+                    data[0].fromAmount,
+                    data[0].toAmount,
+                    data[0].expectedAmount,
+                    data[0].callees,
+                    data[0].exchangeData,
+                    data[0].startIndexes,
+                    data[0].values,
+                    data[0].beneficiary,
+                    data[0].partner,
+                    data[0].feePercent,
+                    data[0].permit,
+                    data[0].deadline,
+                    data[0].uuid
+                ]
+                const result = await swap.connect(signer).doParaSwapSimpleSwap(
+                    newParaAddress,
+                    dataArray
                 )
+                //console.log(result)
 
-            } else if (contractMethod == "multiSwap") {
-                let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
-                let contract = new ethers.Contract(data.data.fromToken, abi, provider)
-                await contract.connect(signer).approve(highValueEthAccount, srcAmount)
+            }else if (contractMethod == "swapOnZeroXv4") {
+                const result = await swap.connect(signer).doParaSwapOnZeroXv4(
+                    newParaAddress,
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4],
+                    data[5]
+                )
+                //console.log(result)
 
-
+            }else if (contractMethod == "multiSwap") { //this might not be possible due to the max depth of the stack....
+                const dataArray = [
+                    data[0].fromToken,
+                    data[0].fromAmount,
+                    data[0].toAmount,
+                    data[0].expectedAmount,
+                    data[0].beneficiary,
+                    data[0].path,
+                    data[0].partner,
+                    data[0].feePercent,
+                    data[0].permit,
+                    data[0].deadline,
+                    data[0].uuid                    
+                ]
+                 const result = await swap.connect(signer).doParaSwapMultiSwap(
+                    //newParaAddress,
+                    dataArray
+                )
+                //console.log(result)
             }
-             
+
+
 
         })
 

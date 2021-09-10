@@ -6,6 +6,8 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
 import "./interfaces/IAugustusSwapper.sol";
 import "./interfaces/ITokenTransferProxy.sol";
+import "./interfaces/IParaswap.sol";
+import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
@@ -48,7 +50,6 @@ contract SwapContract is Ownable, ISwapContract {
     /**
      * Events
      */
-
 
     event Swap(address from, address to, uint256 amount);
     event Withdraw(
@@ -502,118 +503,57 @@ contract SwapContract is Ownable, ISwapContract {
 
     function doParaSwapOnUniswap(
         address paraSwapAddress,
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address[] calldata _path,
-        uint8 _referrer
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path
     ) public {
-        IAugustusSwapper(paraSwapAddress).swapOnUniswap(
-            _amountIn,
-            _amountOutMin,
-            _path,
-            _referrer
-        );
+        IParaswap(paraSwapAddress).swapOnUniswap(amountIn, amountOutMin, path);
     }
 
     /// @dev doParaSwap stub for skypools - execute paraswap transaction
     function doParaSwapOnUniswapFork(
         address paraSwapAddress,
-        address _factory,
-        bytes32 _initCode,
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address[] calldata _path,
-        uint8 _referrer
+        address factory,
+        bytes32 initCode,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path
     ) public {
         //address TokenTransferProxy = 0xb70Bc06D2c9Bf03b3373799606dc7d39346c06B3;
-        IAugustusSwapper(paraSwapAddress).swapOnUniswapFork(
-            _factory,
-            _initCode,
-            _amountIn,
-            _amountOutMin,
-            _path,
-            _referrer
+        IParaswap(paraSwapAddress).swapOnUniswapFork(
+            factory,
+            initCode,
+            amountIn,
+            amountOutMin,
+            path
         );
     }
-
-    struct SimpleSwapParams {
-        address fromToken;
-        address toToken;
-        uint256 fromAmount;
-        uint256 toAmount;
-        uint256 expectedAmount;
-        address[] callees;
-        bytes exchangeData;
-        uint256[] startIndexes;
-        uint256[] values;
-        address payable beneficiary;
-        string referrer;
-        bool useReduxToken;
+    function doParaSwapOnZeroXv4(
+        address paraSwapAddress,
+        IERC20 fromToken,
+        IERC20 toToken,
+        uint256 fromAmount,
+        uint256 amountOutMin,
+        address exchange,
+        bytes calldata payload
+    ) public {
+        IParaswap(paraSwapAddress).swapOnZeroXv4(fromToken, toToken, fromAmount, amountOutMin, exchange, payload);
     }
 
     function doParaSwapSimpleSwap(
-        //address paraswapAddress,
-        address fromToken, /*fromToken*/
-        address toToken, /*toToken*/
-        uint256 fromAmount, /*fromAmount*/
-        uint256 toAmount, /*toAmount*/
-        uint256 expectedAmount, /*expectedAmount*/
-        address[] memory callees, /*callees*/
-        bytes memory exchangeData, /*exchangeData*/
-        uint256[] memory startIndexes, /*startIndexes*/
-        uint256[] memory values, /*values*/
-        address payable beneficiary, /*beneficiary*/
-        string memory referrer, /*referrer*/
-        bool useReduxToken /*useReduxToken*/
+        address paraSwapAddress,
+        Utils.SimpleData calldata data
     ) public {
-
-        SimpleSwapParams memory params;
-        params.fromToken = fromToken;
-        params.toToken = toToken;
-        params.fromAmount = fromAmount;
-        params.toAmount = toAmount;
-        params.expectedAmount = expectedAmount;
-        params.callees = callees;
-        params.exchangeData = exchangeData;
-        params.startIndexes = startIndexes;
-        params.values = values;
-        params.beneficiary = beneficiary;
-        params.referrer = referrer;
-        params.useReduxToken = useReduxToken;
-
-        _doSimpleSwap(params);
-        //_doSimpleSwap(params, paraswapAddress);
+        IParaswap(paraSwapAddress).simpleSwap(data);
     }
 
-    function _doSimpleSwap(SimpleSwapParams memory params)
-        internal
-    //address paraswapAddress
-    {
-        //https://i.imgur.com/epYSvWP.png
-
-
-        require(IERC20(params.fromToken).approve(address(this), params.toAmount));
-        console.log(address(this));
-        //console.log(params.fromToken);
-        
-        IAugustusSwapper(0x1bD435F3C054b6e901B7b108a0ab7617C808677b).simpleSwap(
-                params.fromToken,
-                params.toToken,
-                params.fromAmount,
-                params.toAmount,
-                params.expectedAmount,
-                params.callees,
-                params.exchangeData,
-                params.startIndexes,
-                params.values,
-                params.beneficiary,
-                params.referrer,
-                params.useReduxToken
-            );
+    function doParaSwapMultiSwap(
+        //address paraSwapAddress,
+        Utils.SellData calldata data
+    ) public {
+        //IParaswap(0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57).multiSwap(data);
+        //console.log(paraSwapAddress);
     }
-
-    /// @dev do1InchTrade stub for skypools - execute 1Inch transaction
-    function do1InchTrade() public returns (bool) {}
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
     /// @param _token The address of target token.

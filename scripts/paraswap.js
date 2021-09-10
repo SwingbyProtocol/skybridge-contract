@@ -21,7 +21,7 @@ class ParaSwap {
                     `${this.apiURL}/prices/?from=${from.address}&to=${to.address}` +
                     `&amount=${srcAmount}&fromDecimals=${from.decimals}&toDecimals` +
                     `=${to.decimals}&side=SELL&network=${network}`
-                //+ `&excludeContractMethods=megaSwap,swapOnUniswap,swapOnUniswapFork`
+
                 const { data } = await axios.get(requestURL, {
                     headers: {
                         'X-Partner': this.referrer,
@@ -46,8 +46,9 @@ class ParaSwap {
                     `${this.apiURL}/prices/?srcToken=${from.address}&destToken=${to.address}` +
                     `&amount=${srcAmount}&srcDecimals=${from.decimals}&destDecimals` +
                     `=${to.decimals}&side=SELL&network=${network}`
-                //+ `&excludeContractMethods=megaSwap,swapOnUniswap,swapOnUniswapFork`
-                const { data } = await axios.get(requestURL, {
+                    + `&excludeContractMethods=multiSwap`
+                    //+  `&includeContractMethods=multiSwap`
+                    const { data } = await axios.get(requestURL, {
                     headers: {
                         'partner': this.referrer,
                     },
@@ -108,7 +109,7 @@ class ParaSwap {
                 } else { console.log("ERROR: ", e) }
             })
             return data
-        }else if(this.version == 5) {
+        } else if (this.version == 5) {
             const requestURL = `${this.apiURL}/transactions/${network}?skipChecks=true&onlyParams=${onlyParams}`;
             const requestData = {
                 destDecimals: to.decimals,
@@ -138,7 +139,7 @@ class ParaSwap {
             return data
         }
     }
-        
+
 }
 
 module.exports = ParaSwap;
