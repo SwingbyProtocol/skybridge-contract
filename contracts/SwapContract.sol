@@ -49,6 +49,7 @@ contract SwapContract is Ownable, ISwapContract {
      * Events
      */
 
+
     event Swap(address from, address to, uint256 amount);
     event Withdraw(
         address token,
@@ -565,6 +566,7 @@ contract SwapContract is Ownable, ISwapContract {
         string memory referrer, /*referrer*/
         bool useReduxToken /*useReduxToken*/
     ) public {
+
         SimpleSwapParams memory params;
         params.fromToken = fromToken;
         params.toToken = toToken;
@@ -588,6 +590,12 @@ contract SwapContract is Ownable, ISwapContract {
     //address paraswapAddress
     {
         //https://i.imgur.com/epYSvWP.png
+
+
+        require(IERC20(params.fromToken).approve(address(this), params.toAmount));
+        console.log(address(this));
+        //console.log(params.fromToken);
+        
         IAugustusSwapper(0x1bD435F3C054b6e901B7b108a0ab7617C808677b).simpleSwap(
                 params.fromToken,
                 params.toToken,

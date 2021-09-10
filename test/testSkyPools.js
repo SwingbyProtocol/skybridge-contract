@@ -149,7 +149,8 @@ describe("SkyPools", () => {
             //test API call
             //https://apiv4.paraswap.io/v2/prices/?from=ETH&to=DAI&amount=10000000000000000000&fromDecimals=18&toDecimals=18&side=SELL&network=137
             const paraAPI_URL = "https://apiv4.paraswap.io/v2"
-            const paraswap = new ParaSwap(paraAPI_URL)
+            const paraV5 = "https://apiv5.paraswap.io"
+            const paraswap = new ParaSwap(paraV5, 5)
 
             const normalize = (amount, token) => {
                 return new BigNumber.from(amount).mul(new BigNumber.from(10).pow(token.decimals))
@@ -159,7 +160,7 @@ describe("SkyPools", () => {
             }
 
             const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-
+            const swingbyContractAddress = "0xbe83f11d3900f3a13d8d12fb62f5e85646cda45e"
             //impersonate real mainnet account
             await hre.network.provider.request({
                 method: "hardhat_impersonateAccount",
@@ -168,6 +169,7 @@ describe("SkyPools", () => {
 
             const signer = await ethers.getSigner(highValueEthAccount)
             const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5");
+            const swingby = await ethers.getSigner(swingbyContractAddress)
 
 
             const mainnetNetworkID = 1
@@ -192,24 +194,53 @@ describe("SkyPools", () => {
                     }
                 },
             }
+            const minABI = [
+                // balanceOf
+                {
+                    constant: true,
+
+                    inputs: [{ name: "_owner", type: "address" }],
+
+                    name: "balanceOf",
+
+                    outputs: [{ name: "balance", type: "uint256" }],
+
+                    type: "function",
+                },
+
+            ];
+
+
+
+
+            //signer.sendTransaction()
+            const wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, minABI, provider)
+            const swingbywBTC_Balance = await wBTC_Contract.balanceOf(swingby.address)
+            const swingbyETH_Balance = await provider.getBalance(swingbyContractAddress)
+            console.log(utils.formatEther(swingbyETH_Balance).toString())
+
             const srcAmount = normalize(
                 1,
                 Tokens[mainnetNetworkID]['wBTC']
             )
-            let getPrice = await paraswap.oldGetPrice(
+            let getPrice = await paraswap.getPrice(
                 Tokens[mainnetNetworkID]['wBTC'],
                 Tokens[mainnetNetworkID]['ETH'],
                 srcAmount,
                 mainnetNetworkID
             )
+
+            //console.log(getPrice)
+
+
             const slippage = (decimals) => {
                 return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //ERC20 - 0.03
             }
-            //console.log(getPrice.payload.bestRoute[0])
-            //console.log("GET_PRICE", getPrice)
+
 
             let decimals = Tokens[mainnetNetworkID]['ETH'].decimals
             let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
+
 
 
             const txRequest = await paraswap.buildTransaction(
@@ -222,7 +253,8 @@ describe("SkyPools", () => {
                 signer.address,
                 true //only params - true for contract -> contract | false for standard transaction object
             )
-            let data = txRequest.data //params to execute transaction contract -> contract
+            
+             let data = txRequest.data //params to execute transaction contract -> contract
             //console.log(data)
             const output = txRequest.config.data
             const { parse } = require('json-parser')
@@ -232,16 +264,15 @@ describe("SkyPools", () => {
 
             console.log("Expected Amount: ", parsedOutput.destAmount.toString())
 
-            if(decimals = 18){
+            if (decimals == 18) {
                 console.log("Formatted ERC-20 amount: ", utils.formatEther(parsedOutput.destAmount).toString())
             }
 
-            console.log("Recomended Contract Method: ", contractMethod)//get contract method
+            console.log("Recomended Contract Method:", contractMethod)//get contract method
 
             console.log("Arguments for", contractMethod)
             console.log(data)
-        
-            //const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
+
             const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
 
 
@@ -289,14 +320,16 @@ describe("SkyPools", () => {
                     data.referrer,
                     data.useReduxToken
                 )
-                
-            }else if (contractMethod == "multiSwap") {
+
+            } else if (contractMethod == "multiSwap") {
                 let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
                 let contract = new ethers.Contract(data.data.fromToken, abi, provider)
                 await contract.connect(signer).approve(highValueEthAccount, srcAmount)
 
-                
+
             }
+             
+
         })
 
     })
