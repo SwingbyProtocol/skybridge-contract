@@ -111,8 +111,6 @@ describe("SkyPools", () => {
             balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
             assert.equal(balance[1].toString(), startingFloatAmount.sub(amount).toString(), "Ending swap balance is correct")
 
-            //console.log("Ending Float amount: ", balance[1].toString())
-            //console.log("Difference: ", (startingFloatAmount.sub(balance[1]).toString()))
 
             //get users swap balance before they redeem tokens
             balance = await swap.connect(user1.address).balanceOf(btctTest.address)
@@ -159,8 +157,11 @@ describe("SkyPools", () => {
                 return new BigNumber.from(amount).div(new BigNumber.from(10).pow(token.decimals))
             }
 
-            const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+            //const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+            const highValueEthAccount = "0x10c6b61DbF44a083Aec3780aCF769C77BE747E23" // ~.8 wBTC
             const swingbyContractAddress = "0xbe83f11d3900f3a13d8d12fb62f5e85646cda45e"
+            const testSwapContractAddress = swap.address
+            
             //impersonate real mainnet account
             await hre.network.provider.request({
                 method: "hardhat_impersonateAccount",
@@ -194,30 +195,6 @@ describe("SkyPools", () => {
                     }
                 },
             }
-            const minABI = [
-                // balanceOf
-                {
-                    constant: true,
-
-                    inputs: [{ name: "_owner", type: "address" }],
-
-                    name: "balanceOf",
-
-                    outputs: [{ name: "balance", type: "uint256" }],
-
-                    type: "function",
-                },
-
-            ];
-
-
-
-
-            //signer.sendTransaction()
-            const wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, minABI, provider)
-            const swingbywBTC_Balance = await wBTC_Contract.balanceOf(swingby.address)
-            const swingbyETH_Balance = await provider.getBalance(swingbyContractAddress)
-            //console.log(utils.formatEther(swingbyETH_Balance).toString())
 
             const srcAmount = normalize(
                 1,
@@ -274,9 +251,51 @@ describe("SkyPools", () => {
             console.log(data)
 
             const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
-            const newParaAddress = "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57"
+            const newParaAddress = "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57"     
 
 
+            /////////////////////////////// SET STARTING BALANCES //////////////////////////////////////////////
+            //npx hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5 --fork-block-number 13220045
+            //impersonated account at this block has .78678582 wBTC and 1621.283816188209230922 ETH
+            const url = "http://localhost:8545";
+            const localProvider = new ethers.providers.JsonRpcProvider(url);
+            const minABI = [
+                // balanceOf
+                {
+                    constant: true,
+
+                    inputs: [{ name: "_owner", type: "address" }],
+
+                    name: "balanceOf",
+
+                    outputs: [{ name: "balance", type: "uint256" }],
+
+                    type: "function",
+                },
+                "function transfer(address, uint) returns (bool)"
+            ];
+
+            const wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, minABI, localProvider)
+
+            //transfer wBTC to contract, seems to be not working...
+            await wBTC_Contract.connect(signer).transfer(testSwapContractAddress, 500000)
+
+            
+            let swingbywBTC_Balance = await wBTC_Contract.balanceOf(swingby.address)
+            let swingbyTest_Balance = await wBTC_Contract.balanceOf(testSwapContractAddress)
+            let swingbyETH_Balance = await localProvider.getBalance(swingbyContractAddress)
+            let highValueEthBalance = await localProvider.getBalance(signer.address)
+            let highValuewBTCBalance = await wBTC_Contract.balanceOf(signer.address)
+            let ownerBalance = await wBTC_Contract.balanceOf(owner.address)
+            console.log("High Value ETH account balance: ", highValueEthBalance.toString())
+            //console.log("Swingby Contract ETH balance: ", utils.formatEther(swingbyETH_Balance).toString())
+            console.log("Swingby Deployed/Production Contract wBTC balance: ", swingbywBTC_Balance.toString())
+            console.log("Swingby TEST/LOCAL Contract wBTC balance: ", swingbyTest_Balance.toString())
+            console.log("High Value Account wBTC balance: ", highValuewBTCBalance.toString())
+
+            console.log("Owner wBTC balance: ", utils.formatEther(ownerBalance).toString())
+
+            
 
             if (contractMethod == "swapOnUniswap") {
                 let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
@@ -319,13 +338,19 @@ describe("SkyPools", () => {
                     data[0].deadline,
                     data[0].uuid
                 ]
-                const result = await swap.connect(signer).doParaSwapSimpleSwap(
+
+
+
+                const result = await swap.connect(owner).doParaSwapSimpleSwap(
                     newParaAddress,
+                    data[0].fromToken,
+                    data[0].fromAmount,
                     dataArray
                 )
+
                 //console.log(result)
 
-            }else if (contractMethod == "swapOnZeroXv4") {
+            } else if (contractMethod == "swapOnZeroXv4") {
                 const result = await swap.connect(signer).doParaSwapOnZeroXv4(
                     newParaAddress,
                     data[0],
@@ -337,7 +362,7 @@ describe("SkyPools", () => {
                 )
                 //console.log(result)
 
-            }else if (contractMethod == "multiSwap") { //this might not be possible due to the max depth of the stack....
+            } else if (contractMethod == "multiSwap") { //this might not be possible due to the max depth of the stack....
                 const dataArray = [
                     data[0].fromToken,
                     data[0].fromAmount,
@@ -349,9 +374,9 @@ describe("SkyPools", () => {
                     data[0].feePercent,
                     data[0].permit,
                     data[0].deadline,
-                    data[0].uuid                    
+                    data[0].uuid
                 ]
-                 const result = await swap.connect(signer).doParaSwapMultiSwap(
+                const result = await swap.connect(signer).doParaSwapMultiSwap(
                     //newParaAddress,
                     dataArray
                 )
@@ -359,8 +384,15 @@ describe("SkyPools", () => {
             }
 
 
+           
 
-        })
+            
+
+
+
+            
+            
+        })//END PARASWAP
 
     })
 })

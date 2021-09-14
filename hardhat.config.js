@@ -50,7 +50,7 @@ module.exports = {
       //run tests on fork of mainnet 
       forking: {
         url: "https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5",
-        blockNumber: 13174395
+        blockNumber: 13220045
       }
     },
     goerli: {

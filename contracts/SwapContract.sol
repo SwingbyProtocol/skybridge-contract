@@ -520,6 +520,8 @@ contract SwapContract is Ownable, ISwapContract {
         address[] calldata path
     ) public {
         //address TokenTransferProxy = 0xb70Bc06D2c9Bf03b3373799606dc7d39346c06B3;
+        IERC20(BTCT_ADDR).approve(address(this), amountIn);
+
         IParaswap(paraSwapAddress).swapOnUniswapFork(
             factory,
             initCode,
@@ -528,6 +530,7 @@ contract SwapContract is Ownable, ISwapContract {
             path
         );
     }
+
     function doParaSwapOnZeroXv4(
         address paraSwapAddress,
         IERC20 fromToken,
@@ -537,13 +540,23 @@ contract SwapContract is Ownable, ISwapContract {
         address exchange,
         bytes calldata payload
     ) public {
-        IParaswap(paraSwapAddress).swapOnZeroXv4(fromToken, toToken, fromAmount, amountOutMin, exchange, payload);
+        IParaswap(paraSwapAddress).swapOnZeroXv4(
+            fromToken,
+            toToken,
+            fromAmount,
+            amountOutMin,
+            exchange,
+            payload
+        );
     }
 
     function doParaSwapSimpleSwap(
         address paraSwapAddress,
+        address fromToken,
+        uint256 amount,
         Utils.SimpleData calldata data
-    ) public {
+    ) onlyOwner public payable {
+        IERC20(fromToken).approve(address(this), amount);
         IParaswap(paraSwapAddress).simpleSwap(data);
     }
 
@@ -856,6 +869,6 @@ contract SwapContract is Ownable, ISwapContract {
 
     /// @dev The contract doesn't allow receiving Ether.
     fallback() external {
-        revert();
+        revert("This contract doesn't allow receiving Ether");
     }
 }
