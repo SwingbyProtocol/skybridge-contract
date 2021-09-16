@@ -358,8 +358,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1631828081845,
-      "contentHash": "ab9fb27f2cb209fefa6c538f1703b173",
+      "lastModificationDate": 1631830788631,
+      "contentHash": "29cccf089ab77e56a86318128e306bda",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.7.5",

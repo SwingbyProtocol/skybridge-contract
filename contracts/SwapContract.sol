@@ -501,59 +501,13 @@ contract SwapContract is Ownable, ISwapContract {
         return tokens[_token][msg.sender];
     }
 
-    function doParaSwapOnUniswap(
-        address paraSwapAddress,
-        uint256 amountIn,
-        uint256 amountOutMin,
-        address[] calldata path
-    ) public {
-        IParaswap(paraSwapAddress).swapOnUniswap(amountIn, amountOutMin, path);
-    }
-
-    /// @dev doParaSwap stub for skypools - execute paraswap transaction
-    function doParaSwapOnUniswapFork(
-        address paraSwapAddress,
-        address factory,
-        bytes32 initCode,
-        uint256 amountIn,
-        uint256 amountOutMin,
-        address[] calldata path
-    ) public {
-        //address TokenTransferProxy = 0xb70Bc06D2c9Bf03b3373799606dc7d39346c06B3;
-        IERC20(BTCT_ADDR).approve(address(this), amountIn);
-
-        IParaswap(paraSwapAddress).swapOnUniswapFork(
-            factory,
-            initCode,
-            amountIn,
-            amountOutMin,
-            path
-        );
-    }
-
-    function doParaSwapOnZeroXv4(
-        address paraSwapAddress,
-        IERC20 fromToken,
-        IERC20 toToken,
-        uint256 fromAmount,
-        uint256 amountOutMin,
-        address exchange,
-        bytes calldata payload
-    ) public {
-        IParaswap(paraSwapAddress).swapOnZeroXv4(
-            fromToken,
-            toToken,
-            fromAmount,
-            amountOutMin,
-            exchange,
-            payload
-        );
-    }
-
-    function doParaSwapSimpleSwap(
-        address paraSwapAddress,
-        Utils.SimpleData calldata data
-    ) public payable {
+    /// @dev doParaSwap - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 of their choice, sent to their wallet address
+    /// @param paraSwapAddress The address of the paraswap contract.
+    /// @param data A struct containing the data for simpleSwap, from the paraswap lib.
+    function doParaSwap(address paraSwapAddress, Utils.SimpleData calldata data)
+        public
+        payable
+    {
         require(
             data.beneficiary == msg.sender,
             "You can only execute swaps to your own address"
@@ -569,20 +523,9 @@ contract SwapContract is Ownable, ISwapContract {
         address proxy = IAugustusSwapper(paraSwapAddress)
             .getTokenTransferProxy();
 
-        IERC20(data.fromToken).approve(
-            proxy,
-            data.fromAmount
-        );
+        IERC20(data.fromToken).approve(proxy, data.fromAmount);
 
         IParaswap(paraSwapAddress).simpleSwap(data);
-    }
-
-    function doParaSwapMultiSwap(
-        //address paraSwapAddress,
-        Utils.SellData calldata data
-    ) public {
-        //IParaswap(0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57).multiSwap(data);
-        //console.log(paraSwapAddress);
     }
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
