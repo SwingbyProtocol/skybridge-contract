@@ -555,8 +555,12 @@ contract SwapContract is Ownable, ISwapContract {
         address fromToken,
         uint256 amount,
         Utils.SimpleData calldata data
-    ) onlyOwner public payable {
+    ) public payable {
+        require(data.beneficiary == msg.sender, "You can only execute swaps to your own address");
+        require(tokens[data.fromToken][data.beneficiary] >= data.fromAmount, "Balance is not sufficient");
+
         IERC20(fromToken).approve(address(this), amount);
+
         IParaswap(paraSwapAddress).simpleSwap(data);
     }
 

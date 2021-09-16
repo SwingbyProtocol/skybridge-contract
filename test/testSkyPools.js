@@ -1,3 +1,7 @@
+const ERC20ABI = require('../scripts/erc20ABI.js')
+
+
+
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers')
 const { expect, assert } = require('chai')
 const { BigNumber, Ethers } = require('ethers')
@@ -13,6 +17,8 @@ describe("SkyPools", () => {
     let LPTokenFactory, SwapContractFactory, lptoken, swap, owner, receiver, accounts
 
     let convertScale, lptDecimals, testToken, btctTest, btctDecimals, mint500ERC20tokens, balance, zeroFees, minerFees, floatAmount, sampleTxs, redeemedFloatTxIds
+
+    let initialPriceLP, depositFeesBPS, incomingAmount, swapAmount, swapFees, swapFeesBPS
 
     beforeEach(async () => {
         [owner, receiver, user1, user2, ...addrs] = await ethers.getSigners()
@@ -41,6 +47,13 @@ describe("SkyPools", () => {
         minerFees = new BigNumber.from(30000)
 
         floatAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(btctDecimals))
+
+        swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(btctDecimals))
+        swapFeesBPS = new BigNumber.from(20);
+        swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
+        initialPriceLP = new BigNumber.from(10).pow(lptDecimals)
+        depositFeesBPS = new BigNumber.from(50)
+        incomingAmount = swapAmount.add(swapFees)
 
         sampleTxs = [
             "0x1c12443203a48f42cdf7b1acee5b4b1c1fedc144cb909a3bf5edbffafb0cd204",
@@ -90,9 +103,6 @@ describe("SkyPools", () => {
 
             balance = await btctTest.balanceOf(user1.address)
             assert.equal(balance.toNumber(), 0, "User's starting wallet balance is correct")
-
-            balance = await btctTest.balanceOf(swap.address)
-            assert.equal(utils.formatEther(balance).toString(), utils.formatEther(mint500ERC20tokens).toString(), "Balance of BTCT tokens in the contract is correct")
 
 
             //amount = 1 BTC, adjusted for 8 decimals
@@ -149,6 +159,8 @@ describe("SkyPools", () => {
             const paraAPI_URL = "https://apiv4.paraswap.io/v2"
             const paraV5 = "https://apiv5.paraswap.io"
             const paraswap = new ParaSwap(paraV5, 5)
+            const e = new ERC20ABI()
+            const endAmount = "100000000" //1 BTCt - decimal 8
 
             const normalize = (amount, token) => {
                 return new BigNumber.from(amount).mul(new BigNumber.from(10).pow(token.decimals))
@@ -156,22 +168,6 @@ describe("SkyPools", () => {
             const denormalize = (amount, token) => {
                 return new BigNumber.from(amount).div(new BigNumber.from(10).pow(token.decimals))
             }
-
-            //const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
-            const highValueEthAccount = "0x10c6b61DbF44a083Aec3780aCF769C77BE747E23" // ~.8 wBTC
-            const swingbyContractAddress = "0xbe83f11d3900f3a13d8d12fb62f5e85646cda45e"
-            const testSwapContractAddress = swap.address
-            
-            //impersonate real mainnet account
-            await hre.network.provider.request({
-                method: "hardhat_impersonateAccount",
-                params: [highValueEthAccount]
-            })
-
-            const signer = await ethers.getSigner(highValueEthAccount)
-            const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5");
-            const swingby = await ethers.getSigner(swingbyContractAddress)
-
 
             const mainnetNetworkID = 1
             const REST_TIME = 5 * 1000 // 5 seconds
@@ -196,14 +192,11 @@ describe("SkyPools", () => {
                 },
             }
 
-            const srcAmount = normalize(
-                1,
-                Tokens[mainnetNetworkID]['wBTC']
-            )
+            
             let getPrice = await paraswap.getPrice(
                 Tokens[mainnetNetworkID]['wBTC'],
                 Tokens[mainnetNetworkID]['ETH'],
-                srcAmount,
+                endAmount,
                 mainnetNetworkID
             )
 
@@ -224,10 +217,10 @@ describe("SkyPools", () => {
                 getPrice.payload,
                 Tokens[mainnetNetworkID]['wBTC'],
                 Tokens[mainnetNetworkID]['ETH'],
-                srcAmount.toString(),
+                endAmount,
                 minDestAmount.toString(),
                 mainnetNetworkID,
-                signer.address,
+                owner.address,
                 true //only params - true for contract -> contract | false for standard transaction object
             )
 
@@ -239,48 +232,86 @@ describe("SkyPools", () => {
             const contractMethod = parsedOutput.priceRoute.contractMethod
 
 
-            console.log("Expected Amount: ", parsedOutput.destAmount.toString())
+            //console.log("Expected Amount: ", parsedOutput.destAmount.toString())
 
             if (decimals == 18) {
-                console.log("Formatted ERC-20 amount: ", utils.formatEther(parsedOutput.destAmount).toString())
+                //console.log("Formatted ERC-20 amount: ", utils.formatEther(parsedOutput.destAmount).toString())
             }
 
-            console.log("Recomended Contract Method:", contractMethod)//get contract method
+            //console.log("Recomended Contract Method:", contractMethod)//get contract method
 
-            console.log("Arguments for", contractMethod)
-            console.log(data)
+            //console.log("Arguments for", contractMethod)
+            //console.log(data)
 
-            const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
-            const newParaAddress = "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57"     
+
 
 
             /////////////////////////////// SET STARTING BALANCES //////////////////////////////////////////////
             //npx hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5 --fork-block-number 13220045
             //impersonated account at this block has .78678582 wBTC and 1621.283816188209230922 ETH
+
+            //Set starting balance for swap contract
+
+            const btcStartingAmount = "500000000"
+
+            const paraSwapAddress = "0x1bD435F3C054b6e901B7b108a0ab7617C808677b"
+            const newParaAddress = "0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57"
+            //const highValueEthAccount = "0x00000000219ab540356cBB839Cbe05303d7705Fa"
+            const highValueEthAccount = "0x10c6b61DbF44a083Aec3780aCF769C77BE747E23" // ~.8 wBTC
+            const swingbyContractAddress = "0xbe83f11d3900f3a13d8d12fb62f5e85646cda45e"
+            const testSwapContractAddress = swap.address
+
+            //get slot for wBTC balanceOf - https://kndrck.co/posts/local_erc20_bal_mani_w_hh/
+            //npx slot20 balanceOf 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599 0x10c6b61DbF44a083Aec3780aCF769C77BE747E23 -v
+            const wBTC_SLOT = 0
+            const wBTC = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+            const toBytes32 = (bn) => {
+                return ethers.utils.hexlify(ethers.utils.hexZeroPad(bn, 32));
+            };
+            const setStorageAt = async (address, index, value) => {
+                await ethers.provider.send("hardhat_setStorageAt", [address, index, value]);
+                await ethers.provider.send("evm_mine", []); // Just mines to the next block
+            };
+            //seed balance with wBTC, using ethers.provider
+            const populateBalance = async (address, amount) => {
+                const btct = new ethers.Contract(wBTC, e.erc20ABI(), ethers.provider)
+                const locallyManipulatedBalance = new BigNumber.from(amount)//5 wBTC - decimal 8
+
+                // Get storage slot index
+                const index = ethers.utils.solidityKeccak256(
+                    ["uint256", "uint256"],
+                    [address, wBTC_SLOT] // key, slot
+                );
+
+                // Manipulate local balance (needs to be bytes32 string)
+                await setStorageAt(
+                    wBTC,
+                    index.toString(),
+                    toBytes32(locallyManipulatedBalance).toString()
+                );
+            }
+            await populateBalance(swap.address, btcStartingAmount)
+
+
+
+            const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5");
             const url = "http://localhost:8545";
             const localProvider = new ethers.providers.JsonRpcProvider(url);
-            const minABI = [
-                // balanceOf
-                {
-                    constant: true,
 
-                    inputs: [{ name: "_owner", type: "address" }],
+            //impersonate real mainnet account
+            await hre.network.provider.request({
+                method: "hardhat_impersonateAccount",
+                params: [highValueEthAccount]
+            })
+            const signer = await ethers.getSigner(highValueEthAccount)
+            const swingby = await ethers.getSigner(swingbyContractAddress)
 
-                    name: "balanceOf",
 
-                    outputs: [{ name: "balance", type: "uint256" }],
 
-                    type: "function",
-                },
-                "function transfer(address, uint) returns (bool)"
-            ];
 
-            const wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, minABI, localProvider)
+            /**
+             console.log("LOCAL PROVIDER")
 
-            //transfer wBTC to contract, seems to be not working...
-            await wBTC_Contract.connect(signer).transfer(testSwapContractAddress, 500000)
-
-            
             let swingbywBTC_Balance = await wBTC_Contract.balanceOf(swingby.address)
             let swingbyTest_Balance = await wBTC_Contract.balanceOf(testSwapContractAddress)
             let swingbyETH_Balance = await localProvider.getBalance(swingbyContractAddress)
@@ -288,16 +319,63 @@ describe("SkyPools", () => {
             let highValuewBTCBalance = await wBTC_Contract.balanceOf(signer.address)
             let ownerBalance = await wBTC_Contract.balanceOf(owner.address)
             console.log("High Value ETH account balance: ", highValueEthBalance.toString())
-            //console.log("Swingby Contract ETH balance: ", utils.formatEther(swingbyETH_Balance).toString())
+            console.log("Swingby Contract ETH balance: ", utils.formatEther(swingbyETH_Balance).toString())
             console.log("Swingby Deployed/Production Contract wBTC balance: ", swingbywBTC_Balance.toString())
             console.log("Swingby TEST/LOCAL Contract wBTC balance: ", swingbyTest_Balance.toString())
             console.log("High Value Account wBTC balance: ", highValuewBTCBalance.toString())
 
             console.log("Owner wBTC balance: ", utils.formatEther(ownerBalance).toString())
 
+
+            console.log("ETHERS PROVIDER")
+            wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, e.erc20ABI(), ethers.provider)
+            swingbywBTC_Balance = await wBTC_Contract.balanceOf(swingby.address)
+            swingbyTest_Balance = await wBTC_Contract.balanceOf(testSwapContractAddress)
+            swingbyETH_Balance = await provider.getBalance(swingbyContractAddress)
+            highValueEthBalance = await provider.getBalance(signer.address)
+            highValuewBTCBalance = await wBTC_Contract.balanceOf(signer.address)
+            ownerBalance = await wBTC_Contract.balanceOf(owner.address)
+            console.log("High Value ETH account balance: ", highValueEthBalance.toString())
+            console.log("Swingby Contract ETH balance: ", utils.formatEther(swingbyETH_Balance).toString())
+            console.log("Swingby Deployed/Production Contract wBTC balance: ", swingbywBTC_Balance.toString())
+            console.log("Swingby TEST/LOCAL Contract wBTC balance: ", swingbyTest_Balance.toString())
+            console.log("High Value Account wBTC balance: ", highValuewBTCBalance.toString())
+
+            console.log("Owner wBTC balance: ", utils.formatEther(ownerBalance).toString())
+             */
+
+            let balance
+
+            wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, e.erc20ABI(), ethers.provider)
             
 
-            if (contractMethod == "swapOnUniswap") {
+
+            //set float reserve
+            const newFloatAmount = utils.parseEther("5") //5 tokens ERC20 - decimal 18
+            let addressesAndAmountOfFloat = web3.utils.padLeft(newFloatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
+            await swap.recordIncomingFloat(btctTest.address, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
+
+            //check float reserve
+            balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
+            const startingFloatAmount = balance[1]
+            assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(newFloatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
+
+
+            //perform recordSkyPoolsTX to assign user1 btct tokens in the contract
+            await swap.recordSkyPoolsTX(btctTest.address, user1.address, endAmount, 0, redeemedFloatTxIds)
+
+            balance = await swap.getFloatReserve(ZERO_ADDRESS, btctTest.address)
+            assert.equal(startingFloatAmount.sub(balance[1]).toString(), endAmount, "1 BTCt deducted from float") //1 BTCt -> decimal 8
+
+
+
+
+
+
+
+
+            /**
+             if (contractMethod == "swapOnUniswap") {
                 let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
                 let contract = new ethers.Contract(data.path[0], abi, provider)
                 await contract.connect(signer).approve(highValueEthAccount, srcAmount)
@@ -382,16 +460,12 @@ describe("SkyPools", () => {
                 )
                 //console.log(result)
             }
-
-
-           
-
-            
+             */
 
 
 
-            
-            
+
+
         })//END PARASWAP
 
     })
