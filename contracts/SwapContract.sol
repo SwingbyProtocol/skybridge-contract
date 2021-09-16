@@ -552,14 +552,27 @@ contract SwapContract is Ownable, ISwapContract {
 
     function doParaSwapSimpleSwap(
         address paraSwapAddress,
-        address fromToken,
-        uint256 amount,
         Utils.SimpleData calldata data
     ) public payable {
-        require(data.beneficiary == msg.sender, "You can only execute swaps to your own address");
-        require(tokens[data.fromToken][data.beneficiary] >= data.fromAmount, "Balance is not sufficient");
+        require(
+            data.beneficiary == msg.sender,
+            "You can only execute swaps to your own address"
+        );
+        require(
+            tokens[data.fromToken][data.beneficiary] >= data.fromAmount,
+            "Balance is not sufficient"
+        );
+        require(
+            data.fromToken == BTCT_ADDR,
+            "fromToken must be the required BTCt token"
+        );
+        address proxy = IAugustusSwapper(paraSwapAddress)
+            .getTokenTransferProxy();
 
-        IERC20(fromToken).approve(address(this), amount);
+        IERC20(data.fromToken).approve(
+            proxy,
+            data.fromAmount
+        );
 
         IParaswap(paraSwapAddress).simpleSwap(data);
     }
