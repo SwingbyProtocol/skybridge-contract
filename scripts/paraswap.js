@@ -118,7 +118,7 @@ class ParaSwap {
                 partner: this.referrer,
                 userAddress: userAddress,
                 //destAmount: minDestAmount,
-                slippage: 500, //5% -> prevents issues with expected amount received
+                slippage: 1000, //5% -> prevents issues with expected amount received
                 priceRoute: pricePayload,
                 srcAmount: srcAmount,
                 destToken: to.address,

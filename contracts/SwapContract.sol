@@ -19,8 +19,7 @@ import "./LPToken.sol";
 contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
-    address constant ETHER =
-        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE); 
+    
 
     struct spPendingTx {
         uint256 SwapID; //swap hash for identification of this swap.
@@ -58,6 +57,9 @@ contract SwapContract is Ownable, ISwapContract {
 
     //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
     mapping(address => mapping(address => uint256)) public tokens;
+    //keep track of ether in tokens[][]
+    address constant ETHER =
+        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE); 
 
     /**
      * Events
@@ -248,7 +250,6 @@ contract SwapContract is Ownable, ISwapContract {
     /**
      * Float part
      */
-
     /// @dev recordIncomingFloat mints LP token.
     /// @param _token The address of target token.
     /// @param _addressesAndAmountOfFloat The address of recipient and amount.
@@ -514,10 +515,11 @@ contract SwapContract is Ownable, ISwapContract {
         return _nodes;
     }
 
-    /// @dev balanceOf - return user balance for given token token for skypools
+    /// @dev balanceOf - return user balance for given token and user for skypools
     /// @param _token The address of target token.
-    function balanceOf(address _token) public view returns (uint256) {
-        return tokens[_token][msg.sender];
+    /// @param _user The address of target user.
+    function balanceOf(address _token, address _user) public view returns (uint256) {
+        return tokens[_token][_user];
     }
 
     /// @dev doParaSwap - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 of their choice, sent to their wallet address
@@ -550,7 +552,7 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
     /// @param token The address of the ERC-20 token contract.
     /// @param amount amount to be deposited.
-    function spDeposit(address token, uint256 amount) public {
+    function spDepositToken(address token, uint256 amount) public {
         require(token != ETHER);
 
         require(IERC20(token).transferFrom(msg.sender, address(this), amount));
@@ -566,10 +568,9 @@ contract SwapContract is Ownable, ISwapContract {
         );
     }
 
-    /// @dev spDeposit - ETHER ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
-    function spDeposit() public payable {
+    /// @dev spDeposit - ETHER ONLY - users deposit ether attached to msg.value, balances to be stored in tokens[][]
+    function spDepositEther() public payable {
         require(msg.value > 0);
-
         tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].add(msg.value);
         emit Deposit(
             ETHER,
@@ -579,7 +580,7 @@ contract SwapContract is Ownable, ISwapContract {
             block.timestamp
         );
     }
-
+    /// @dev spParaSwapSimpleSwapAndRecord - stubb
     function spParaSwapSimpleSwapAndRecord(
         address destinationAddressForBTC
 
@@ -888,6 +889,6 @@ contract SwapContract is Ownable, ISwapContract {
 
     /// @dev The contract doesn't allow receiving Ether.
     fallback() external {
-        revert("This contract doesn't allow receiving Ether");
+        revert("This contract doesn't allow receiving Ether - use spDeposit() to deposit ether");
     }
 }
