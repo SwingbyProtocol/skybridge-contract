@@ -527,7 +527,6 @@ contract SwapContract is Ownable, ISwapContract {
     /// @param data A struct containing the data for simpleSwap, from the paraswap lib.
     function doParaSwap(address paraSwapAddress, Utils.SimpleData calldata data)
         public
-        payable
     {
         require(
             data.beneficiary == msg.sender,
