@@ -95,6 +95,7 @@ class ParaSwap {
                 srcToken: from.address,
                 receiver: userAddress
             }
+            console.log("destAmount", minDestAmount)
             let data = "No Response"
             await axios.post(
                 requestURL,
@@ -116,7 +117,8 @@ class ParaSwap {
                 srcDecimals: from.decimals,
                 partner: this.referrer,
                 userAddress: userAddress,
-                destAmount: minDestAmount,
+                //destAmount: minDestAmount,
+                slippage: 500, //5% -> prevents issues with expected amount received
                 priceRoute: pricePayload,
                 srcAmount: srcAmount,
                 destToken: to.address,

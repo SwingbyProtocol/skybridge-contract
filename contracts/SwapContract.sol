@@ -19,10 +19,22 @@ import "./LPToken.sol";
 contract SwapContract is Ownable, ISwapContract {
     using SafeMath for uint256;
 
-    address public BTCT_ADDR;
-    address public lpToken;
+    address constant ETHER =
+        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE); 
+
+    struct spPendingTx {
+        uint256 SwapID; //swap hash for identification of this swap.
+        address DestAddr; //destination BTC address for the swap.
+        uint256 AmountWBTC; //outbound amount for this swap.
+        uint256 Timestamp; // block timestamp that is set by EVM
+    }
+
+    mapping(uint256 => spPendingTx) public spPendingTXs;
 
     mapping(address => bool) public whitelist;
+
+    address public BTCT_ADDR;
+    address public lpToken;  
 
     uint8 public churnedInCount;
     uint8 public tssThreshold;
@@ -57,6 +69,13 @@ contract SwapContract is Ownable, ISwapContract {
         address user,
         uint256 amount,
         uint256 balance
+    );
+    event Deposit(
+        address token,
+        address user,
+        uint256 amount,
+        uint256 balance,
+        uint256 Timestamp
     );
     event RewardsCollection(
         address feesToken,
@@ -526,6 +545,46 @@ contract SwapContract is Ownable, ISwapContract {
         IERC20(data.fromToken).approve(proxy, data.fromAmount);
 
         IParaswap(paraSwapAddress).simpleSwap(data);
+    }
+
+    /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
+    /// @param token The address of the ERC-20 token contract.
+    /// @param amount amount to be deposited.
+    function spDeposit(address token, uint256 amount) public {
+        require(token != ETHER);
+
+        require(IERC20(token).transferFrom(msg.sender, address(this), amount));
+
+        tokens[token][msg.sender] = tokens[token][msg.sender].add(amount);
+
+        emit Deposit(
+            token,
+            msg.sender,
+            amount,
+            tokens[token][msg.sender],
+            block.timestamp
+        );
+    }
+
+    /// @dev spDeposit - ETHER ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
+    function spDeposit() public payable {
+        require(msg.value > 0);
+
+        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].add(msg.value);
+        emit Deposit(
+            ETHER,
+            msg.sender,
+            msg.value,
+            tokens[ETHER][msg.sender],
+            block.timestamp
+        );
+    }
+
+    function spParaSwapSimpleSwapAndRecord(
+        address destinationAddressForBTC
+
+    ) external onlyOwner{
+
     }
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
