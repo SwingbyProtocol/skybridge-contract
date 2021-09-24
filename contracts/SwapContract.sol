@@ -10,30 +10,29 @@ import "./interfaces/IParaswap.sol";
 import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-
+//import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+//import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./interfaces/lib/SafeERC20.sol";
 import "hardhat/console.sol";
-
 //skypools - needed for address => tokenBalance
 import "./LPToken.sol";
 
-contract SwapContract is Ownable, ISwapContract {
+contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     using SafeMath for uint256;
-
-    
+    using SafeERC20 for IERC20;
 
     struct spPendingTx {
         uint256 SwapID; //swap hash for identification of this swap.
-        address DestAddr; //destination BTC address for the swap.
+        string DestAddr; //destination BTC address for the swap.
         uint256 AmountWBTC; //outbound amount for this swap.
         uint256 Timestamp; // block timestamp that is set by EVM
     }
 
-    mapping(uint256 => spPendingTx) public spPendingTXs;
-
     mapping(address => bool) public whitelist;
 
     address public BTCT_ADDR;
-    address public lpToken;  
+    address public lpToken;
 
     uint8 public churnedInCount;
     uint8 public tssThreshold;
@@ -48,7 +47,9 @@ contract SwapContract is Ownable, ISwapContract {
     uint256 private lpDecimals;
 
     mapping(address => uint256) private floatAmountOf;
-    mapping(bytes32 => bool) private used;
+    mapping(bytes32 => bool) private used; //used TX
+    mapping(uint256 => spPendingTx) public spPendingTXs; //active/pending TX
+    uint256 private activeTxCount;
 
     // Node lists
     mapping(address => bytes32) private nodes;
@@ -59,12 +60,11 @@ contract SwapContract is Ownable, ISwapContract {
     mapping(address => mapping(address => uint256)) public tokens;
     //keep track of ether in tokens[][]
     address constant ETHER =
-        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE); 
+        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
 
     /**
      * Events
      */
-
     event Swap(address from, address to, uint256 amount);
     event Withdraw(
         address token,
@@ -102,6 +102,14 @@ contract SwapContract is Ownable, ISwapContract {
         uint256 currentPriceLP,
         uint256 withdrawal,
         bytes32 txid
+    );
+
+    event SwapTokensToBTC(
+        uint256 swap_id,
+        uint256 input_amount,
+        uint256 output_amount,
+        string dest_address_btc,
+        uint256 Timestamp
     );
 
     event DistributeNodeRewards(uint256 rewardLPTsForNodes);
@@ -518,16 +526,17 @@ contract SwapContract is Ownable, ISwapContract {
     /// @dev balanceOf - return user balance for given token and user for skypools
     /// @param _token The address of target token.
     /// @param _user The address of target user.
-    function balanceOf(address _token, address _user) public view returns (uint256) {
+    function balanceOf(address _token, address _user)
+        public
+        view
+        returns (uint256)
+    {
         return tokens[_token][_user];
     }
 
     /// @dev doParaSwap - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 of their choice, sent to their wallet address
-    /// @param paraSwapAddress The address of the paraswap contract.
     /// @param data A struct containing the data for simpleSwap, from the paraswap lib.
-    function doParaSwap(address paraSwapAddress, Utils.SimpleData calldata data)
-        public
-    {
+    function doParaSwap(Utils.SimpleData calldata data) external nonReentrant {
         require(
             data.beneficiary == msg.sender,
             "You can only execute swaps to your own address"
@@ -540,29 +549,106 @@ contract SwapContract is Ownable, ISwapContract {
             data.fromToken == BTCT_ADDR,
             "fromToken must be the required BTCt token"
         );
-        address proxy = IAugustusSwapper(paraSwapAddress)
-            .getTokenTransferProxy();
+        _doParaSwap(data);
 
-        IERC20(data.fromToken).approve(proxy, data.fromAmount);
+        tokens[data.fromToken][data.beneficiary] = tokens[data.fromToken][
+            data.beneficiary
+        ].sub(data.fromAmount);
+    }
 
-        IParaswap(paraSwapAddress).simpleSwap(data);
+    function _doParaSwap(Utils.SimpleData calldata data)
+        internal
+        returns (uint256 receivedAmount)
+    {
+        address paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
+        
+        address proxy = IAugustusSwapper(
+            paraswapAddress
+        ).getTokenTransferProxy();
+
+        //IERC20(data.fromToken).approve(proxy, data.fromAmount);
+        IERC20(data.fromToken).safeIncreaseAllowance(proxy, data.fromAmount);
+
+        receivedAmount = IParaswap(
+            paraswapAddress
+        ).simpleSwap(data);
+
+        require(receivedAmount >= 0, "Received amount can not be 0");
+
+        return receivedAmount;
+    }
+
+    /// @dev spParaSwapSimpleSwapAndRecord - FLOW 2 -> swap ERC20 -> wBTC
+    function spParaSwapSimpleSwapAndRecord(
+        string memory destinationAddressForBTC,
+        Utils.SimpleData calldata data
+    ) external nonReentrant {
+        require(data.fromToken != BTCT_ADDR);
+        require(data.toToken == BTCT_ADDR, "Must swap to BTC token");
+        require(
+            data.beneficiary == address(this),
+            "You can only execute flow 2 swaps to this contract's address"
+        );
+        require(
+            tokens[data.fromToken][msg.sender] >= data.fromAmount,
+            "Balance is not sufficient"
+        );
+        uint256 receivedAmount = _doParaSwap(data);
+
+        floatAmountOf[data.toToken] = floatAmountOf[data.toToken].add(
+            receivedAmount
+        );
+        tokens[data.fromToken][msg.sender] = tokens[data.fromToken][msg.sender]
+            .sub(data.fromAmount);
+
+        _spRecordPendingTx(
+            destinationAddressForBTC,
+            receivedAmount,
+            data.fromAmount
+        );
+    }
+
+    function _spRecordPendingTx(
+        string memory destinationAddressForBTC,
+        uint256 btctAmount,
+        uint256 inputAmount
+    ) internal {
+        activeTxCount = activeTxCount.add(1); //increment TX count
+
+        spPendingTXs[activeTxCount] = spPendingTx(
+            activeTxCount,
+            destinationAddressForBTC,
+            btctAmount,
+            block.timestamp
+        );
+
+        emit SwapTokensToBTC(
+            activeTxCount,
+            inputAmount,
+            btctAmount,
+            destinationAddressForBTC,
+            block.timestamp
+        );
     }
 
     /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
-    /// @param token The address of the ERC-20 token contract.
-    /// @param amount amount to be deposited.
-    function spDepositToken(address token, uint256 amount) public {
-        require(token != ETHER);
+    /// @param _token The address of the ERC-20 token contract.
+    /// @param _amount amount to be deposited.
+    function spDepositToken(address _token, uint256 _amount) public {
+        require(_token != ETHER);
+        require(_token != BTCT_ADDR);
 
-        require(IERC20(token).transferFrom(msg.sender, address(this), amount));
+        require(
+            IERC20(_token).transferFrom(msg.sender, address(this), _amount)
+        );
 
-        tokens[token][msg.sender] = tokens[token][msg.sender].add(amount);
+        tokens[_token][msg.sender] = tokens[_token][msg.sender].add(_amount);
 
         emit Deposit(
-            token,
+            _token,
             msg.sender,
-            amount,
-            tokens[token][msg.sender],
+            _amount,
+            tokens[_token][msg.sender],
             block.timestamp
         );
     }
@@ -578,13 +664,6 @@ contract SwapContract is Ownable, ISwapContract {
             tokens[ETHER][msg.sender],
             block.timestamp
         );
-    }
-    /// @dev spParaSwapSimpleSwapAndRecord - stubb
-    function spParaSwapSimpleSwapAndRecord(
-        address destinationAddressForBTC
-
-    ) external onlyOwner{
-
     }
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
@@ -791,18 +870,6 @@ contract SwapContract is Ownable, ISwapContract {
         require(IERC20(_token).transfer(_to, _amount));
     }
 
-    /// @dev _safeTransfer executes tranfer erc20 tokens only for skypools
-    /// @param _token The address of target token
-    /// @param _to The address of receiver.
-    /// @param _amount The amount of transfer.
-    function _safeTransferERC20(
-        address _token,
-        address _to,
-        uint256 _amount
-    ) internal {
-        require(IERC20(_token).transfer(_to, _amount));
-    }
-
     /// @dev _rewardsCollection collects tx rewards.
     /// @param _feesToken The token address for collection fees.
     /// @param _rewardsAmount The amount of rewards.
@@ -888,6 +955,8 @@ contract SwapContract is Ownable, ISwapContract {
 
     /// @dev The contract doesn't allow receiving Ether.
     fallback() external {
-        revert("This contract doesn't allow receiving Ether - use spDeposit() to deposit ether");
+        revert(
+            "This contract doesn't allow receiving Ether - use spDepositEther() to deposit ether"
+        );
     }
 }

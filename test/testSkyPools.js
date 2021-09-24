@@ -91,6 +91,7 @@ describe("SkyPools", () => {
 
             //set float reserve
             let addressesAndAmountOfFloat = web3.utils.padLeft(floatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
+
             await swap.recordIncomingFloat(btctTest.address, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
 
             //check starting balances
@@ -298,7 +299,7 @@ describe("SkyPools", () => {
                     mainnetNetworkID,
                     user1.address,
                     true //only params - true for contract -> contract | false for standard transaction object
-                )                
+                )
                 let data = txRequest.data //params to execute transaction contract -> contract       
 
                 /////////////////////////////// EXECUTE TRANSACTIONS //////////////////////////////////////////////
@@ -350,7 +351,6 @@ describe("SkyPools", () => {
                     data[0].uuid
                 ]
                 const result = await swap.connect(user1).doParaSwap(
-                    newParaAddress,
                     dataArray
                 )
                 //console.log(result)
@@ -365,7 +365,6 @@ describe("SkyPools", () => {
                 describe('Testing for Successful Failure - FLOW 1', async () => {
                     it('rejects transactions when msg.sender does not match beneficiary nor holder of tokens in tokens[][]', async () => {
                         await swap.connect(user2).doParaSwap(
-                            newParaAddress,
                             dataArray
                         ).should.be.rejectedWith("You can only execute swaps to your own address")
                     })
@@ -388,7 +387,6 @@ describe("SkyPools", () => {
                             data[0].uuid
                         ]
                         await swap.connect(user1).doParaSwap(
-                            newParaAddress,
                             badDataArray
                         ).should.be.rejectedWith("You can only execute swaps to your own address")
                     })
@@ -396,7 +394,7 @@ describe("SkyPools", () => {
             })//END FLOW 1
 
             it('executes paraSwap transactions: Flow 2 => ERC20 -> wBTC -> BTC', async () => {
-                let balance, amount, result, overrides
+                let balance, amount, result, overrides, receipt, event
                 const ETHER = Tokens[mainnetNetworkID]['ETH'].address
 
                 /////////////////////////////// TESTING DEPOSIT ETHER //////////////////////////////////////////////
@@ -407,8 +405,8 @@ describe("SkyPools", () => {
                 result = await swap.connect(user1).spDepositEther(overrides)
                 balance = await swap.balanceOf(ETHER, user1.address)
                 assert.equal(balance._hex, amount._hex, "Balance is correct after depositing ETHER")
-                const receipt = await result.wait()
-                const event = receipt.events[0].args
+                receipt = await result.wait()
+                event = receipt.events[0].args
 
                 //verify event receipt is correct
                 event.token.toString().should.equal(ETHER, 'token is correct')
@@ -446,8 +444,8 @@ describe("SkyPools", () => {
                 let decimals = Tokens[mainnetNetworkID]['UNI'].decimals
                 let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
-                
-                 //console.log(getPrice)
+
+                //console.log(getPrice)
                 //POST request - build TX data to send to contract
                 const txRequest = await paraswap.buildTransaction(
                     getPrice.payload,
@@ -456,7 +454,7 @@ describe("SkyPools", () => {
                     amount.toString(),
                     minDestAmount.toString(),
                     mainnetNetworkID,
-                    user1.address,
+                    swap.address,
                     true //only params - true for contract -> contract | false for standard transaction object
                 )
 
@@ -465,14 +463,66 @@ describe("SkyPools", () => {
                 const output = txRequest.config.data
                 const { parse } = require('json-parser')
                 const parsedOutput = parse(output)
-                const contractMethod = parsedOutput.priceRoute.contractMethod               
+                const contractMethod = parsedOutput.priceRoute.contractMethod
                 //console.log("Recomended Contract Method:", contractMethod)//get contract method
                 //console.log("Arguments for", contractMethod)
                 //console.log(data) 
-                 
 
+                /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
+                const receivingBTC_Addr = "ms3xtHsLq2AZsQdtaPnLLnLbCtWSitUnZi"
+                const dataArray = [
+                    data[0].fromToken,
+                    data[0].toToken,
+                    data[0].fromAmount,
+                    data[0].toAmount,
+                    data[0].expectedAmount,
+                    data[0].callees,
+                    data[0].exchangeData,
+                    data[0].startIndexes,
+                    data[0].values,
+                    data[0].beneficiary,
+                    data[0].partner,
+                    data[0].feePercent,
+                    data[0].permit,
+                    data[0].deadline,
+                    data[0].uuid
+                ]
+                balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)                
+                assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spParaSwapSimpleSwapAndRecord is 0")
+                
+                
+                const swapAndRecordResult = await swap.connect(user1).spParaSwapSimpleSwapAndRecord(
+                    receivingBTC_Addr,
+                    dataArray
+                )
+                receipt = await swapAndRecordResult.wait()
+                /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
+                //check float reserve
+                balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
+                const startingFloatAmount = balance[1] //49398 sats as of pinned block 13220045
+                //console.log(startingFloatAmount.toString())
+                assert.equal(startingFloatAmount.toString(), new BigNumber.from("49398").toString(), "Float amount is present")//value should be 49398 sats: aprox BTC value of 1 uni token as of the pinned block: 13220045
 
-               
+                balance = await swap.connect(user1).balanceOf(UNI, user1.address)
+                assert.equal(balance.toString(), "0", "Uni token has been swapped and user no longer holds it in tokens[][]")
+
+                event = receipt.events[receipt.events.length - 1]
+                let args = event.args
+                //console.log(args.swap_id.toString())
+                assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
+                assert.equal(args.swap_id.toString(), "1", "Swap ID is correct")
+                assert.equal(args.input_amount.toString(), data[0].fromAmount, "Input Amount (ERC-20) is correct")
+                assert.equal(args.output_amount.toString(), startingFloatAmount, "Output amount matches float amount")
+                assert.equal(args.dest_address_btc, receivingBTC_Addr, "Dest BTC addr is correct")
+                args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
+
+                //testing values of the pending TX that was created
+                let pendingTX = await swap.spPendingTXs("1")
+                assert.equal(pendingTX.SwapID.toString(), "1", "Swap ID is correct")
+                assert.equal(pendingTX.DestAddr, receivingBTC_Addr, "Dest BTC addr is correct")
+                assert.equal(pendingTX.AmountWBTC.toString(), startingFloatAmount, "Output amount matches float amount")
+                pendingTX.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
+
             })
         })//END PARASWAP
     })//END SKYPOOLS FUNCTIONS

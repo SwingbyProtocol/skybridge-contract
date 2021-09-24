@@ -26,7 +26,7 @@
   "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
   "dependencies": {
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
-    "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/contracts": "^3.4.2",
     "@truffle/hdwallet-provider": "^1.2.3",
     "axios": "^0.21.1",
     "chai-as-promised": "^7.1.1",
