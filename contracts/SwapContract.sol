@@ -23,16 +23,22 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     using SafeERC20 for IERC20;
 
     struct spPendingTx {
-        uint256 SwapID; //swap hash for identification of this swap.
+        bytes32 SwapID; //swap hash for identification of this swap.
         string DestAddr; //destination BTC address for the swap.
         uint256 AmountWBTC; //outbound amount for this swap.
-        uint256 Timestamp; // block timestamp that is set by EVM
+        uint64 Timestamp; // block timestamp that is set by EVM
+        uint64 ExpirationTime;
     }
+    uint64 public expirationTime;
+
+    //mapping(uint256 => spPendingTx) public spPendingTXs; //active/pending TX
+    spPendingTx[] spPendingTXs;
+    uint256 private activeTxCount;
 
     mapping(address => bool) public whitelist;
 
-    address public BTCT_ADDR;
-    address public lpToken;
+    address public immutable BTCT_ADDR;
+    address public immutable lpToken;
 
     uint8 public churnedInCount;
     uint8 public tssThreshold;
@@ -43,13 +49,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     uint256 public feesLPTokensForNode;
     uint256 public initialExchangeRate;
 
-    uint256 private convertScale;
-    uint256 private lpDecimals;
+    uint256 private immutable convertScale;
+    uint256 private immutable lpDecimals;
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used; //used TX
-    mapping(uint256 => spPendingTx) public spPendingTXs; //active/pending TX
-    uint256 private activeTxCount;
 
     // Node lists
     mapping(address => bytes32) private nodes;
@@ -61,6 +65,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     //keep track of ether in tokens[][]
     address constant ETHER =
         address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    address constant paraswapAddress =
+        0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
 
     /**
      * Events
@@ -105,11 +111,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     );
 
     event SwapTokensToBTC(
-        uint256 swap_id,
+        bytes32 swap_id,
         uint256 input_amount,
         uint256 output_amount,
         string dest_address_btc,
-        uint256 Timestamp
+        uint64 Timestamp,
+        uint64 ExpirationTime
     );
 
     event DistributeNodeRewards(uint256 rewardLPTsForNodes);
@@ -124,11 +131,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address _lpToken,
         address _btct,
         uint256 _existingBTCFloat
-    ) public {
+    ) {
+        //set default expiration time for pending TX
+        expirationTime = 604800; //1 week
         // Set lpToken address
         lpToken = _lpToken;
         // Set initial lpDecimals of LP token
-        lpDecimals = 10**IERC20(lpToken).decimals();
+        lpDecimals = 10**IERC20(_lpToken).decimals();
         // Set BTCT address
         BTCT_ADDR = _btct;
         // Set nodeRewardsRatio
@@ -140,14 +149,14 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // Set convertScale
         convertScale = 10**(IERC20(_btct).decimals() - 8);
         // Set initialExchangeRate
-        initialExchangeRate = lpDecimals;
+        initialExchangeRate = 10**IERC20(_lpToken).decimals();
         // Set lockedLPTokensForNode
         lockedLPTokensForNode = 0;
         // Set feesLPTokensForNode
         feesLPTokensForNode = 0;
         // Set whitelist addresses
-        whitelist[BTCT_ADDR] = true;
-        whitelist[lpToken] = true;
+        whitelist[_btct] = true;
+        whitelist[_lpToken] = true;
         whitelist[address(0)] = true;
         floatAmountOf[address(0)] = _existingBTCFloat;
     }
@@ -560,29 +569,35 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         internal
         returns (uint256 receivedAmount)
     {
-        address paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
-        
-        address proxy = IAugustusSwapper(
-            paraswapAddress
-        ).getTokenTransferProxy();
+        //address paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
+
+        address proxy = IAugustusSwapper(paraswapAddress)
+            .getTokenTransferProxy();
 
         //IERC20(data.fromToken).approve(proxy, data.fromAmount);
         IERC20(data.fromToken).safeIncreaseAllowance(proxy, data.fromAmount);
 
-        receivedAmount = IParaswap(
-            paraswapAddress
-        ).simpleSwap(data);
+        receivedAmount = IParaswap(paraswapAddress).simpleSwap(data);
 
-        require(receivedAmount >= 0, "Received amount can not be 0");
+        require(receivedAmount != 0, "Received amount can not be 0");
 
         return receivedAmount;
     }
+
+    /// @dev setExpirationTime - allow node to adjust expiration time
+    function setExpirationTime(uint64 _expirationTime) external onlyOwner {
+        expirationTime = _expirationTime;
+    }
+    
 
     /// @dev spParaSwapSimpleSwapAndRecord - FLOW 2 -> swap ERC20 -> wBTC
     function spParaSwapSimpleSwapAndRecord(
         string memory destinationAddressForBTC,
         Utils.SimpleData calldata data
     ) external nonReentrant {
+        //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
+        //console.log("Converted to bytes32 and back to String:",_bytes32ToString(destBytes32));
+
         require(data.fromToken != BTCT_ADDR);
         require(data.toToken == BTCT_ADDR, "Must swap to BTC token");
         require(
@@ -593,13 +608,15 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             tokens[data.fromToken][msg.sender] >= data.fromAmount,
             "Balance is not sufficient"
         );
+
+        tokens[data.fromToken][msg.sender] = tokens[data.fromToken][msg.sender]
+            .sub(data.fromAmount);
+
         uint256 receivedAmount = _doParaSwap(data);
 
         floatAmountOf[data.toToken] = floatAmountOf[data.toToken].add(
             receivedAmount
-        );
-        tokens[data.fromToken][msg.sender] = tokens[data.fromToken][msg.sender]
-            .sub(data.fromAmount);
+        );      
 
         _spRecordPendingTx(
             destinationAddressForBTC,
@@ -608,27 +625,82 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
     }
 
+    /// @dev _spRecordPendingTx - hash a unique swap ID, and add it to the array of pending TXs, and then emit event
+    /// @param destinationAddressForBTC The BTC address to send BTC to.
+    /// @param btctAmount amount in BTC decimal 8.
+    /// @param inputAmount amount swapped from - may not be needed
     function _spRecordPendingTx(
         string memory destinationAddressForBTC,
         uint256 btctAmount,
         uint256 inputAmount
     ) internal {
-        activeTxCount = activeTxCount.add(1); //increment TX count
+        //hash TX data for unique ID
+        bytes32 ID = keccak256(
+            abi.encodePacked(
+                activeTxCount,
+                destinationAddressForBTC,
+                btctAmount,
+                inputAmount,
+                block.timestamp
+            )
+        );
 
-        spPendingTXs[activeTxCount] = spPendingTx(
-            activeTxCount,
-            destinationAddressForBTC,
-            btctAmount,
-            block.timestamp
+        spPendingTXs.push(
+            spPendingTx(
+                ID,
+                destinationAddressForBTC,
+                btctAmount,
+                uint64(block.timestamp),
+                uint64(block.timestamp.add(expirationTime))
+            )
         );
 
         emit SwapTokensToBTC(
-            activeTxCount,
+            ID,
             inputAmount,
             btctAmount,
             destinationAddressForBTC,
-            block.timestamp
+            uint64(block.timestamp),
+            uint64(block.timestamp.add(expirationTime))
         );
+
+        activeTxCount = activeTxCount.add(1); //increment TX count
+    }
+
+    /// @dev spGetPendingSwaps - returns array of pending swap data and oldest pending swap
+    /// @return data - returns array of pending swap struct objects
+    function spGetPendingSwaps()
+        external
+        view
+        returns (spPendingTx[] memory data)
+    {
+        spPendingTx memory oldest;
+        uint64 currentTime = uint64(block.timestamp);
+        data = new spPendingTx[](spPendingTXs.length);
+        for (uint256 i = 0; i < activeTxCount; i++) {
+            data[i] = spPendingTXs[i];
+
+            if (
+                spPendingTXs[i].Timestamp < currentTime &&
+                spPendingTXs[i].Timestamp != uint64(0)
+            ) {
+                oldest = spPendingTXs[i];
+                currentTime = spPendingTXs[i].Timestamp;
+            }
+        }
+    }
+
+    
+
+    /// @dev spExecuteSwap - deletes
+    function spExecuteSwap(uint256 _swapID) external onlyOwner {
+        //spPendingTx storage next = this.spPendingTXs.pop();
+        //TODO
+        //switch BTC address to bytes32 type - waiting on feedback, might not be feasable
+        //switch mapping to array
+        //use POP to get oldest pending
+        //allow owner to adjust the expiration times
+        //once expiration time has elapsed, txID is moved to used, data is deleted, deduct from activeTxCount
     }
 
     /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
@@ -649,7 +721,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             msg.sender,
             _amount,
             tokens[_token][msg.sender],
-            block.timestamp
+            uint64(block.timestamp)
         );
     }
 
