@@ -321,8 +321,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContractFactory.sol": {
-      "lastModificationDate": 1632518890641,
-      "contentHash": "d3c3458f1f69ba2aa1ca2377af7e8956",
+      "lastModificationDate": 1633045195392,
+      "contentHash": "9116589f3f7db0e2f133a903aef50254",
       "sourceName": "contracts/SwapContractFactory.sol",
       "solcConfig": {
         "version": "0.7.5",
@@ -358,8 +358,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1632957422588,
-      "contentHash": "5849a280b415f45e61fe377be7664734",
+      "lastModificationDate": 1633045197410,
+      "contentHash": "38c8ca8bcc167c83bb64f42e89aa94c3",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.7.5",
@@ -384,6 +384,7 @@
         }
       },
       "imports": [
+        "./interfaces/IWETH.sol",
         "./interfaces/IBurnableToken.sol",
         "./interfaces/IERC20.sol",
         "./interfaces/ISwapContract.sol",
@@ -751,6 +752,40 @@
       ],
       "artifacts": [
         "ReentrancyGuard"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IWETH.sol": {
+      "lastModificationDate": 1633045159569,
+      "contentHash": "44ce7026ece8ae7061ce8bd9c245bb3d",
+      "sourceName": "contracts/interfaces/IWETH.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IWETH"
       ]
     }
   }

@@ -21,6 +21,7 @@ describe("SkyPools", () => {
     let convertScale, lptDecimals, testToken, btctTest, btctDecimals, mint500ERC20tokens, balance, zeroFees, minerFees, floatAmount, sampleTxs, redeemedFloatTxIds
 
     //let initialPriceLP, depositFeesBPS, incomingAmount, swapAmount, swapFees, swapFeesBPS
+    const wETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
 
     before(async () => {
         [owner, receiver, user1, user2, ...addrs] = await ethers.getSigners()
@@ -42,7 +43,7 @@ describe("SkyPools", () => {
 
         mint500ERC20tokens = new BigNumber.from(500).mul(new BigNumber.from(10).pow(btctDecimals))
 
-        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, 0)
+        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, wETH, 0)
 
         zeroFees = false
 
@@ -256,7 +257,7 @@ describe("SkyPools", () => {
 
                 //re-deploy with real world wBTC address
                 lpToken = await LPTokenFactory.deploy(8)
-                swap = await SwapContractFactory.deploy(lpToken.address, wBTC, 0)
+                swap = await SwapContractFactory.deploy(lpToken.address, wBTC, wETH, 0)
 
                 await lpToken.transferOwnership(swap.address)
                 expect(await lpToken.getOwner()).to.equal(swap.address)
@@ -350,7 +351,7 @@ describe("SkyPools", () => {
                     data[0].deadline,
                     data[0].uuid
                 ]
-                const result = await swap.connect(user1).doParaSwap(
+                const result = await swap.connect(user1).spParaSwapBTC2Token(
                     dataArray
                 )
                 //console.log(result)
@@ -366,7 +367,7 @@ describe("SkyPools", () => {
 
                 /////////////////////////////// TEST FOR FAILURE //////////////////////////////////////////////
                 it('rejects transactions when msg.sender does not match beneficiary nor holder of tokens in tokens[][]', async () => {
-                    await swap.connect(user2).doParaSwap(
+                    await swap.connect(user2).spParaSwapBTC2Token(
                         dataArray
                     ).should.be.rejectedWith("You can only execute swaps to your own address")
                 })
@@ -388,7 +389,7 @@ describe("SkyPools", () => {
                         data[0].deadline,
                         data[0].uuid
                     ]
-                    await swap.connect(user1).doParaSwap(
+                    await swap.connect(user1).spParaSwapBTC2Token(
                         badDataArray
                     ).should.be.rejectedWith("You can only execute swaps to your own address")
                 })
@@ -403,11 +404,11 @@ describe("SkyPools", () => {
                 overrides = {
                     value: amount
                 }
-                result = await swap.connect(user1).spDepositEther(overrides)
+                result = await swap.connect(user1).spDeposit("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", amount, overrides)
                 balance = await swap.balanceOf(ETHER, user1.address)
                 assert.equal(balance._hex, amount._hex, "Balance is correct after depositing ETHER")
                 receipt = await result.wait()
-                event = receipt.events[0].args
+                event = receipt.events[receipt.events.length - 1].args
 
                 //verify event receipt is correct
                 event.token.toString().should.equal(ETHER, 'token is correct')
@@ -416,13 +417,17 @@ describe("SkyPools", () => {
                 event.balance.toString().should.equal(amount.toString(), 'balance is correct')
                 event.Timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
 
+
+                //check redeemEther function
+                //result = await swap.connect(user1).redeemEther(amount)
+
                 /////////////////////////////// TESTING DEPOSIT UNI TOKENS //////////////////////////////////////////////
                 await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(2))//amount refers to number of UNI tokens here
                 balance = await UNI_Contract.balanceOf(user1.address)
                 assert.equal(balance.toString(), amount.mul(2).toString(), "User has correct number of UNI tokens in their personal wallet")
 
-                let approval = await UNI_Contract.connect(user1).approve(swap.address, amount)
-                result = await swap.connect(user1).spDepositToken(UNI, amount)
+                await UNI_Contract.connect(user1).approve(swap.address, amount)
+                result = await swap.connect(user1).spDeposit(UNI, amount)
 
                 balance = await swap.connect(user1).balanceOf(UNI, user1.address)
                 assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
@@ -490,10 +495,10 @@ describe("SkyPools", () => {
                     data[0].uuid
                 ]
                 balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spParaSwapSimpleSwapAndRecord is 0")
+                assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spParaSwapToken2BTC is 0")
 
                 let testAddr = "0x" + receivingBTC_Addr
-                const swapAndRecordResult = await swap.connect(user1).spParaSwapSimpleSwapAndRecord(
+                const swapAndRecordResult = await swap.connect(user1).spParaSwapToken2BTC(
                     receivingBTC_Addr,
                     dataArray
                 )
@@ -536,9 +541,11 @@ describe("SkyPools", () => {
                 data[0].Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
                 blocktime = data[0].Timestamp
                 assert.equal(data[0].ExpirationTime.toString(), blocktime.add(expireTime).toString(), "Expiration time is correct")
-                            
-                
-                
+
+
+
+
+
             })
         })//END PARASWAP
     })//END SKYPOOLS FUNCTIONS

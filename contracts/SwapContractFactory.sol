@@ -10,6 +10,7 @@ contract SwapContractFactory {
     function deployNewContracts(
         address _owner,
         address _wbtc,
+        address _wETH,
         uint8   _decimals,
         uint256 _existingBTCFloat
     ) external returns (address) {
@@ -17,6 +18,7 @@ contract SwapContractFactory {
         SwapContract sc = new SwapContract(
             address(lpToken),
             _wbtc,
+            _wETH,
             _existingBTCFloat
         );
         lpToken.transferOwnership(address(sc));

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
+import "./interfaces/IWETH.sol";
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
@@ -10,6 +11,7 @@ import "./interfaces/IParaswap.sol";
 import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+
 //import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 //import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -31,9 +33,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
     uint64 public expirationTime;
 
-    //mapping(uint256 => spPendingTx) public spPendingTXs; //active/pending TX
-    spPendingTx[] spPendingTXs;
-    uint256 private activeTxCount;
+    mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
+    //spPendingTx[] spPendingTXs;
+    uint256 private swapCount;
+    uint256 private latestRemovedIndex;
 
     mapping(address => bool) public whitelist;
 
@@ -67,6 +70,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     address constant paraswapAddress =
         0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
+    address public immutable wETH;
 
     /**
      * Events
@@ -130,10 +134,16 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     constructor(
         address _lpToken,
         address _btct,
+        address _wETH,
         uint256 _existingBTCFloat
     ) {
         //set default expiration time for pending TX
         expirationTime = 604800; //1 week
+        //init latest removed index and swapCount
+        latestRemovedIndex = 0;
+        swapCount = 0;
+        //set address for wETH
+        wETH = _wETH;
         // Set lpToken address
         lpToken = _lpToken;
         // Set initial lpDecimals of LP token
@@ -544,28 +554,33 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev doParaSwap - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 of their choice, sent to their wallet address
-    /// @param data A struct containing the data for simpleSwap, from the paraswap lib.
-    function doParaSwap(Utils.SimpleData calldata data) external nonReentrant {
+    /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
+    function spParaSwapBTC2Token(Utils.SimpleData calldata _data)
+        external
+        nonReentrant
+    {
         require(
-            data.beneficiary == msg.sender,
+            _data.beneficiary == msg.sender,
             "You can only execute swaps to your own address"
         );
         require(
-            tokens[data.fromToken][data.beneficiary] >= data.fromAmount,
+            tokens[_data.fromToken][_data.beneficiary] >= _data.fromAmount,
             "Balance is not sufficient"
         );
         require(
-            data.fromToken == BTCT_ADDR,
+            _data.fromToken == BTCT_ADDR,
             "fromToken must be the required BTCt token"
         );
-        _doParaSwap(data);
+        _doParaSwap(_data);
 
-        tokens[data.fromToken][data.beneficiary] = tokens[data.fromToken][
-            data.beneficiary
-        ].sub(data.fromAmount);
+        tokens[_data.fromToken][_data.beneficiary] = tokens[_data.fromToken][
+            _data.beneficiary
+        ].sub(_data.fromAmount);
     }
 
-    function _doParaSwap(Utils.SimpleData calldata data)
+    /// @dev _doParaSwap - performs paraswap transaction
+    /// @param _data data from API call that is ready to be sent to paraswap
+    function _doParaSwap(Utils.SimpleData calldata _data)
         internal
         returns (uint256 receivedAmount)
     {
@@ -574,10 +589,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address proxy = IAugustusSwapper(paraswapAddress)
             .getTokenTransferProxy();
 
-        //IERC20(data.fromToken).approve(proxy, data.fromAmount);
-        IERC20(data.fromToken).safeIncreaseAllowance(proxy, data.fromAmount);
+        //IERC20(_data.fromToken).approve(proxy, data.fromAmount);
+        IERC20(_data.fromToken).safeIncreaseAllowance(proxy, _data.fromAmount);
 
-        receivedAmount = IParaswap(paraswapAddress).simpleSwap(data);
+        receivedAmount = IParaswap(paraswapAddress).simpleSwap(_data);
 
         require(receivedAmount != 0, "Received amount can not be 0");
 
@@ -585,86 +600,85 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev setExpirationTime - allow node to adjust expiration time
+    /// @param _expirationTime new expiration time
     function setExpirationTime(uint64 _expirationTime) external onlyOwner {
         expirationTime = _expirationTime;
     }
-    
 
     /// @dev spParaSwapSimpleSwapAndRecord - FLOW 2 -> swap ERC20 -> wBTC
-    function spParaSwapSimpleSwapAndRecord(
-        string memory destinationAddressForBTC,
-        Utils.SimpleData calldata data
+    /// @param _destinationAddressForBTC The BTC address to send BTC to.
+    /// @param _data data from API call that is ready to be sent to paraswap
+    function spParaSwapToken2BTC(
+        string memory _destinationAddressForBTC,
+        Utils.SimpleData calldata _data
     ) external nonReentrant {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
         //console.log("Converted to bytes32 and back to String:",_bytes32ToString(destBytes32));
 
-        require(data.fromToken != BTCT_ADDR);
-        require(data.toToken == BTCT_ADDR, "Must swap to BTC token");
+        require(_data.fromToken != BTCT_ADDR);
+        require(_data.toToken == BTCT_ADDR, "Must swap to BTC token");
         require(
-            data.beneficiary == address(this),
+            _data.beneficiary == address(this),
             "You can only execute flow 2 swaps to this contract's address"
         );
         require(
-            tokens[data.fromToken][msg.sender] >= data.fromAmount,
+            tokens[_data.fromToken][msg.sender] >= _data.fromAmount,
             "Balance is not sufficient"
         );
 
-        tokens[data.fromToken][msg.sender] = tokens[data.fromToken][msg.sender]
-            .sub(data.fromAmount);
+        tokens[_data.fromToken][msg.sender] = tokens[_data.fromToken][
+            msg.sender
+        ].sub(_data.fromAmount);
 
-        uint256 receivedAmount = _doParaSwap(data);
+        uint256 receivedAmount = _doParaSwap(_data);
 
-        floatAmountOf[data.toToken] = floatAmountOf[data.toToken].add(
+        floatAmountOf[_data.toToken] = floatAmountOf[_data.toToken].add(
             receivedAmount
-        );      
+        );
 
         _spRecordPendingTx(
-            destinationAddressForBTC,
+            _destinationAddressForBTC,
             receivedAmount,
-            data.fromAmount
+            _data.fromAmount
         );
     }
 
     /// @dev _spRecordPendingTx - hash a unique swap ID, and add it to the array of pending TXs, and then emit event
-    /// @param destinationAddressForBTC The BTC address to send BTC to.
-    /// @param btctAmount amount in BTC decimal 8.
-    /// @param inputAmount amount swapped from - may not be needed
+    /// @param _destinationAddressForBTC The BTC address to send BTC to.
+    /// @param _btctAmount amount in BTC decimal 8.
+    /// @param _inputAmount amount swapped from - may not be needed
     function _spRecordPendingTx(
-        string memory destinationAddressForBTC,
-        uint256 btctAmount,
-        uint256 inputAmount
+        string memory _destinationAddressForBTC,
+        uint256 _btctAmount,
+        uint256 _inputAmount
     ) internal {
         //hash TX data for unique ID
         bytes32 ID = keccak256(
             abi.encodePacked(
-                activeTxCount,
-                destinationAddressForBTC,
-                btctAmount,
-                inputAmount,
+                swapCount,
+                _destinationAddressForBTC,
+                _btctAmount,
+                _inputAmount,
                 block.timestamp
             )
         );
 
-        spPendingTXs.push(
-            spPendingTx(
-                ID,
-                destinationAddressForBTC,
-                btctAmount,
-                uint64(block.timestamp),
-                uint64(block.timestamp.add(expirationTime))
-            )
-        );
-
-        emit SwapTokensToBTC(
+        spPendingTXs[swapCount] = spPendingTx(
             ID,
-            inputAmount,
-            btctAmount,
-            destinationAddressForBTC,
+            _destinationAddressForBTC,
+            _btctAmount,
             uint64(block.timestamp),
             uint64(block.timestamp.add(expirationTime))
         );
-
-        activeTxCount = activeTxCount.add(1); //increment TX count
+        swapCount = swapCount.add(1); //increment TX count
+        emit SwapTokensToBTC(
+            ID,
+            _inputAmount,
+            _btctAmount,
+            _destinationAddressForBTC,
+            uint64(block.timestamp),
+            uint64(block.timestamp.add(expirationTime))
+        );
     }
 
     /// @dev spGetPendingSwaps - returns array of pending swap data and oldest pending swap
@@ -674,75 +688,91 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         view
         returns (spPendingTx[] memory data)
     {
-        spPendingTx memory oldest;
-        uint64 currentTime = uint64(block.timestamp);
-        data = new spPendingTx[](spPendingTXs.length);
-        for (uint256 i = 0; i < activeTxCount; i++) {
-            data[i] = spPendingTXs[i];
-
-            if (
-                spPendingTXs[i].Timestamp < currentTime &&
-                spPendingTXs[i].Timestamp != uint64(0)
-            ) {
-                oldest = spPendingTXs[i];
-                currentTime = spPendingTXs[i].Timestamp;
-            }
+        uint256 index = 0;
+        data = new spPendingTx[](swapCount.sub(latestRemovedIndex));
+        for (uint256 i = latestRemovedIndex.add(1); i <= swapCount; i++) {
+            data[index] = spPendingTXs[index.add(latestRemovedIndex)];
+            index = index.add(1);
         }
     }
 
-    
-
-    /// @dev spExecuteSwap - deletes
-    function spExecuteSwap(uint256 _swapID) external onlyOwner {
-        //spPendingTx storage next = this.spPendingTXs.pop();
-        //TODO
-        //switch BTC address to bytes32 type - waiting on feedback, might not be feasable
-        //switch mapping to array
-        //use POP to get oldest pending
-        //allow owner to adjust the expiration times
-        //once expiration time has elapsed, txID is moved to used, data is deleted, deduct from activeTxCount
+    /// @dev spExecuteSwap - node calls periodicly to remove expired swaps from spPendingTXs, assumes TXs are ordered oldest to newest
+    /// @param _fullCheck - perform a full scan of the mapping up to the current index - do this if the expiration time has been changed
+    function spCleanUpOldSPTXs(bool _fullCheck) external onlyOwner {
+        uint64 current = uint64(block.timestamp);
+        if (_fullCheck) {
+            for (uint256 i = 0; i < swapCount; i++) {
+                if (spPendingTXs[i].ExpirationTime < current) {
+                    delete spPendingTXs[i];
+                    latestRemovedIndex = i;
+                }
+            }
+        } else {
+            for (uint256 i = latestRemovedIndex; i <= swapCount; i++) {
+                if (spPendingTXs[i].ExpirationTime < current) {
+                    delete spPendingTXs[i];
+                    latestRemovedIndex = i;
+                }
+            }
+        }
     }
 
     /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
     /// @param _token The address of the ERC-20 token contract.
     /// @param _amount amount to be deposited.
-    function spDepositToken(address _token, uint256 _amount) public {
-        require(_token != ETHER);
-        require(_token != BTCT_ADDR);
+    function spDeposit(address _token, uint256 _amount) public payable {
+        if (msg.value == 0) {
+            require(_token != ETHER);
+            require(_token != BTCT_ADDR);
 
-        require(
-            IERC20(_token).transferFrom(msg.sender, address(this), _amount)
-        );
+            require(
+                IERC20(_token).transferFrom(msg.sender, address(this), _amount)
+            );
+            tokens[_token][msg.sender] = tokens[_token][msg.sender].add(
+                _amount
+            );
 
-        tokens[_token][msg.sender] = tokens[_token][msg.sender].add(_amount);
+            emit Deposit(
+                _token,
+                msg.sender,
+                _amount,
+                tokens[_token][msg.sender],
+                uint64(block.timestamp)
+            );
+        } else {
+            require(msg.value > 0);
+            //swap to wETH tokens - contract now holds wETH instead of ether
+            IWETH(wETH).deposit{value: msg.value}();
 
-        emit Deposit(
-            _token,
-            msg.sender,
-            _amount,
-            tokens[_token][msg.sender],
-            uint64(block.timestamp)
-        );
+            tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].add(
+                msg.value
+            );
+
+            emit Deposit(
+                ETHER,
+                msg.sender,
+                msg.value,
+                tokens[ETHER][msg.sender],
+                block.timestamp
+            );
+        }
     }
 
-    /// @dev spDeposit - ETHER ONLY - users deposit ether attached to msg.value, balances to be stored in tokens[][]
-    function spDepositEther() public payable {
-        require(msg.value > 0);
-        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].add(msg.value);
-        emit Deposit(
-            ETHER,
-            msg.sender,
-            msg.value,
-            tokens[ETHER][msg.sender],
-            block.timestamp
-        );
-    }
+    /// @dev redeemEther for skypools - swap wETH for ether and send to user's wallet
+    /// @param _amount amount to withdraw
+    function redeemEther(uint256 _amount) external payable {
+        require(tokens[ETHER][msg.sender] >= _amount);
+        IWETH(wETH).withdraw(_amount);
+        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].sub(_amount);
+		msg.sender.transfer(_amount);
+		emit Withdraw(ETHER, msg.sender, _amount, tokens[ETHER][msg.sender]);
+    }    
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
     /// @param _token The address of target token.
     /// @param _amount The amount to withdraw - call with BTC decimals (8) for BTC
     function redeemERC20Token(address _token, uint256 _amount)
-        public
+        external
         returns (bool)
     {
         require(tokens[_token][msg.sender] >= _amount, "Insufficient Balance");
