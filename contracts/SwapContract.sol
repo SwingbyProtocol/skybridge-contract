@@ -80,14 +80,15 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address token,
         address user,
         uint256 amount,
-        uint256 balance
+        uint256 balance,
+        uint64 Timestamp
     );
     event Deposit(
         address token,
         address user,
         uint256 amount,
         uint256 balance,
-        uint256 Timestamp
+        uint64 Timestamp
     );
     event RewardsCollection(
         address feesToken,
@@ -553,10 +554,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return tokens[_token][_user];
     }
 
-    /// @dev doParaSwap - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 of their choice, sent to their wallet address
+    /// @dev spParaSwapBTC2Token - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
     /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
     function spParaSwapBTC2Token(Utils.SimpleData calldata _data)
         external
+        payable
         nonReentrant
     {
         require(
@@ -586,16 +588,23 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     {
         //address paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
 
+        require(_data.fromToken != ETHER, "Use path wETH -> wBTC");
+        require(_data.toToken != ETHER, "Use path wBTC -> wETH");
+
         address proxy = IAugustusSwapper(paraswapAddress)
             .getTokenTransferProxy();
 
-        //IERC20(_data.fromToken).approve(proxy, data.fromAmount);
-        IERC20(_data.fromToken).safeIncreaseAllowance(proxy, _data.fromAmount);
-
+        if (_data.fromToken != wETH) {
+            IERC20(_data.fromToken).safeIncreaseAllowance(
+                proxy,
+                _data.fromAmount
+            );
+        } else {
+            IWETH(wETH).approve(proxy, _data.fromAmount);
+        }
         receivedAmount = IParaswap(paraswapAddress).simpleSwap(_data);
 
         require(receivedAmount != 0, "Received amount can not be 0");
-
         return receivedAmount;
     }
 
@@ -605,13 +614,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         expirationTime = _expirationTime;
     }
 
-    /// @dev spParaSwapSimpleSwapAndRecord - FLOW 2 -> swap ERC20 -> wBTC
+    /// @dev spParaSwapToken2BTC - FLOW 2 -> swap ERC20 -> wBTC
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _data data from API call that is ready to be sent to paraswap
     function spParaSwapToken2BTC(
         string memory _destinationAddressForBTC,
         Utils.SimpleData calldata _data
-    ) external nonReentrant {
+    ) external payable nonReentrant {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
         //console.log("Converted to bytes32 and back to String:",_bytes32ToString(destBytes32));
 
@@ -621,6 +630,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _data.beneficiary == address(this),
             "You can only execute flow 2 swaps to this contract's address"
         );
+
         require(
             tokens[_data.fromToken][msg.sender] >= _data.fromAmount,
             "Balance is not sufficient"
@@ -632,9 +642,15 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         uint256 receivedAmount = _doParaSwap(_data);
 
+        tokens[_data.toToken][address(this)] = tokens[_data.toToken][
+            address(this)
+        ].add(receivedAmount);
+
+        /**
         floatAmountOf[_data.toToken] = floatAmountOf[_data.toToken].add(
             receivedAmount
         );
+         */
 
         _spRecordPendingTx(
             _destinationAddressForBTC,
@@ -700,9 +716,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _fullCheck - perform a full scan of the mapping up to the current index - do this if the expiration time has been changed
     function spCleanUpOldSPTXs(bool _fullCheck) external onlyOwner {
         uint64 current = uint64(block.timestamp);
-        if (_fullCheck) {
+        if (_fullCheck) {//check entire mapping up to current index for latest TX - do this after adjusting expirationTime
             for (uint256 i = 0; i < swapCount; i++) {
                 if (spPendingTXs[i].ExpirationTime < current) {
+                    tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
+                        address(this)
+                    ].sub(spPendingTXs[i].AmountWBTC);
                     delete spPendingTXs[i];
                     latestRemovedIndex = i;
                 }
@@ -710,6 +729,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         } else {
             for (uint256 i = latestRemovedIndex; i <= swapCount; i++) {
                 if (spPendingTXs[i].ExpirationTime < current) {
+                    tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
+                        address(this)
+                    ].sub(spPendingTXs[i].AmountWBTC);
                     delete spPendingTXs[i];
                     latestRemovedIndex = i;
                 }
@@ -744,16 +766,14 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             //swap to wETH tokens - contract now holds wETH instead of ether
             IWETH(wETH).deposit{value: msg.value}();
 
-            tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].add(
-                msg.value
-            );
+            tokens[wETH][msg.sender] = tokens[wETH][msg.sender].add(msg.value);
 
             emit Deposit(
                 ETHER,
                 msg.sender,
                 msg.value,
-                tokens[ETHER][msg.sender],
-                block.timestamp
+                tokens[wETH][msg.sender],
+                uint64(block.timestamp)
             );
         }
     }
@@ -761,12 +781,22 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev redeemEther for skypools - swap wETH for ether and send to user's wallet
     /// @param _amount amount to withdraw
     function redeemEther(uint256 _amount) external payable {
-        require(tokens[ETHER][msg.sender] >= _amount);
+        require(tokens[wETH][msg.sender] >= _amount);
         IWETH(wETH).withdraw(_amount);
-        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].sub(_amount);
-		msg.sender.transfer(_amount);
-		emit Withdraw(ETHER, msg.sender, _amount, tokens[ETHER][msg.sender]);
-    }    
+        tokens[wETH][msg.sender] = tokens[wETH][msg.sender].sub(_amount);
+        msg.sender.transfer(_amount);
+        emit Withdraw(
+            ETHER,
+            msg.sender,
+            _amount,
+            tokens[wETH][msg.sender],
+            uint64(block.timestamp)
+        );
+    }
+
+    receive() external payable {
+        assert(msg.sender == wETH); // only accept ETH via fallback from the WETH contract
+    }
 
     /// @dev redeemERC20Token for skypools - redeem erc20 token
     /// @param _token The address of target token.
@@ -779,7 +809,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         tokens[_token][msg.sender] = tokens[_token][msg.sender].sub(_amount);
         _safeTransfer(_token, msg.sender, _amount);
 
-        emit Withdraw(_token, msg.sender, _amount, tokens[_token][msg.sender]);
+        emit Withdraw(
+            _token,
+            msg.sender,
+            _amount,
+            tokens[_token][msg.sender],
+            uint64(block.timestamp)
+        );
 
         return true;
     }
@@ -1057,8 +1093,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev The contract doesn't allow receiving Ether.
     fallback() external {
-        revert(
-            "This contract doesn't allow receiving Ether - use spDepositEther() to deposit ether"
-        );
+        revert();
     }
 }

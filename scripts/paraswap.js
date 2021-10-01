@@ -13,6 +13,18 @@ class ParaSwap {
         this.referrer = 'SkyPools'
     }
 
+    async getTokens(networkID){
+        if(this.version == 5){
+            const requestURL = `${this.apiURL}/tokens/${networkID}`
+            
+            const {data} = await axios.get(requestURL).catch(e => {
+                if (e.response != undefined) {
+                    console.log("ERROR RESPONSE: ", e.response.data)
+                } else { console.log("ERROR: ", e) }
+            })            
+            return {data}
+        }
+    }
 
     async getPrice(from, to, srcAmount, network) {
         if (this.version == 4) {
@@ -28,7 +40,7 @@ class ParaSwap {
                     },
                 }).catch(e => {
                     if (e.response != undefined) {
-                        console.log("ERROR RESPONSE: ", e.response)
+                        console.log("ERROR RESPONSE: ", e.response.data)
                     } else { console.log("ERROR: ", e) }
                 })
                 return {
@@ -54,7 +66,7 @@ class ParaSwap {
                     },
                 }).catch(e => {
                     if (e.response != undefined) {
-                        console.log("ERROR RESPONSE: ", e.response)
+                        console.log("ERROR RESPONSE: ", e.response.data)
                     } else { console.log("ERROR: ", e) }
                 })
                 return {
