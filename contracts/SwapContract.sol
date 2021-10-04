@@ -26,7 +26,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     struct spPendingTx {
         bytes32 SwapID; //swap hash for identification of this swap.
-        string DestAddr; //destination BTC address for the swap.
+        //string DestAddr; //destination BTC address for the swap.
+        bytes32 DestAddr;
         uint256 AmountWBTC; //outbound amount for this swap.
         uint64 Timestamp; // block timestamp that is set by EVM
         uint64 ExpirationTime;
@@ -120,7 +121,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bytes32 swap_id,
         uint256 input_amount,
         uint256 output_amount,
-        string dest_address_btc,
+        //string dest_address_btc,
+        bytes32 dest_address_btc,
         uint64 Timestamp,
         uint64 ExpirationTime
     );
@@ -613,7 +615,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _data data from API call that is ready to be sent to paraswap
     function spParaSwapToken2BTC(
-        string memory _destinationAddressForBTC,
+        //string memory _destinationAddressForBTC,
+        bytes32 _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external payable nonReentrant {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
@@ -659,7 +662,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _btctAmount amount in BTC decimal 8.
     /// @param _inputAmount amount swapped from - may not be needed
     function _spRecordPendingTx(
-        string memory _destinationAddressForBTC,
+        //string memory _destinationAddressForBTC,
+        bytes32 _destinationAddressForBTC,
         uint256 _btctAmount,
         uint256 _inputAmount
     ) internal {

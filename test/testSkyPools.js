@@ -444,10 +444,6 @@ describe("SkyPools", () => {
                 //check redeemEther function
                 //result = await swap.connect(user1).redeemEther(amount)
 
-
-
-
-
                 //Deposit ETHER again for flow 2 transaction
                 await swap.connect(user1).spDeposit("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", amount, overrides)
 
@@ -493,10 +489,11 @@ describe("SkyPools", () => {
                 //console.log("Arguments for", contractMethod)
 
                 /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
-                const receivingBTC_Addr = "ms3xtHsLq2AZsQdtaPnLLnLbCtWSitUnZi"
+                //const receivingBTC_Addr = "ms3xtHsLq2AZsQdtaPnLLnLbCtWSitUnZi"
+                const receivingBTC_Addr = sampleTxs[0]
+
                 //console.log("Expected BTC address: ", receivingBTC_Addr)
 
-                let btcBytes = sampleTxs[0]//"00f54a5851e9372b87810a8e60cdd2e7cfd80b6e31c7f18fe8"
 
                 const dataArray = [
                     data[0].fromToken,
@@ -628,7 +625,8 @@ describe("SkyPools", () => {
                 //console.log(data) 
 
                 /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
-                const receivingBTC_Addr = "ms3xtHsLq2AZsQdtaPnLLnLbCtWSitUnZi"
+                //const receivingBTC_Addr = "ms3xtHsLq2AZsQdtaPnLLnLbCtWSitUnZi"
+                const receivingBTC_Addr = sampleTxs[0]
                 //console.log("Expected BTC address: ", receivingBTC_Addr)
 
                 const dataArray = [
