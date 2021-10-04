@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity >=0.6.0 <=0.8.9;
 pragma experimental ABIEncoderV2;
 import "./interfaces/IWETH.sol";
 import "./interfaces/IBurnableToken.sol";
@@ -10,11 +10,11 @@ import "./interfaces/ITokenTransferProxy.sol";
 import "./interfaces/IParaswap.sol";
 import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 //import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 //import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/lib/SafeERC20.sol";
 import "hardhat/console.sol";
 //skypools - needed for address => tokenBalance
@@ -784,7 +784,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(tokens[wETH][msg.sender] >= _amount);
         IWETH(wETH).withdraw(_amount);
         tokens[wETH][msg.sender] = tokens[wETH][msg.sender].sub(_amount);
-        msg.sender.transfer(_amount);
+        address payable sender = payable(msg.sender);
+        sender.transfer(_amount);
         emit Withdraw(
             ETHER,
             msg.sender,
