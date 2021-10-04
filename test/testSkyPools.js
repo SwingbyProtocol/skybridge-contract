@@ -212,6 +212,8 @@ describe("SkyPools", () => {
             const UNI = "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
             //const wBTC_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['wBTC'].address, e.erc20ABI(), ethers.provider)
             const UNI_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['UNI'].address, e.erc20ABI(), ethers.provider)
+            const wETH_Contract = new ethers.Contract(Tokens[mainnetNetworkID]['WETH'].address, e.erc20ABI(), ethers.provider)
+
             //Set starting balance for swap contract
             //get slot for wBTC balanceOf - https://kndrck.co/posts/local_erc20_bal_mani_w_hh/
             //npx slot20 balanceOf 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599 0x10c6b61DbF44a083Aec3780aCF769C77BE747E23 -v
@@ -271,7 +273,8 @@ describe("SkyPools", () => {
                 expect(await lpToken.owner()).to.equal(swap.address)
 
 
-            })
+            })//beforeEach
+
             it('executes paraSwap transactions: Flow 1 => BTC -> wBTC -> ERC20', async () => {
                 /////////////////////////////// SET STARTING BALANCES //////////////////////////////////////////////
                 //npx hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5 --fork-block-number 13220045
@@ -402,10 +405,9 @@ describe("SkyPools", () => {
                 })
             })//END FLOW 1
 
-            it('executes paraSwap transactions: Flow 2 => ETH -> wBTC -> BTC', async () => {
+            it('executes paraSwap transactions: Flow 2a => ETH -> wETH -> wBTC -> BTC', async () => {
                 let balance, amount, result, overrides, receipt, event
                 const ETHER = Tokens[mainnetNetworkID]['ETH'].address
-                const wETH = Tokens[mainnetNetworkID]['WETH'].address
                 amount = utils.parseEther("1")
                 overrides = {
                     value: amount
@@ -494,6 +496,8 @@ describe("SkyPools", () => {
                 const receivingBTC_Addr = "ms3xtHsLq2AZsQdtaPnLLnLbCtWSitUnZi"
                 //console.log("Expected BTC address: ", receivingBTC_Addr)
 
+                let btcBytes = sampleTxs[0]//"00f54a5851e9372b87810a8e60cdd2e7cfd80b6e31c7f18fe8"
+
                 const dataArray = [
                     data[0].fromToken,
                     data[0].toToken,
@@ -516,23 +520,60 @@ describe("SkyPools", () => {
 
                 //console.log(data)
 
-                /**
-                 const swapAndRecordResult = await swap.connect(user1).spParaSwapToken2BTC(
+
+                let expireTime = new BigNumber.from(604800)//1 week in seconds
+
+
+                balance = await wETH_Contract.balanceOf(swap.address)
+                assert.equal(balance.toString(), amount.toString(), "Balance of wETH on swap contract before swap is correct")
+
+                const swapAndRecordResult = await swap.connect(user1).spParaSwapToken2BTC(
                     receivingBTC_Addr,
                     dataArray
                 )
-                 */
+                /////////////////////////////// CHECK ENDING BALANCES //////////////////////////////////////////////
+
+                balance = await wETH_Contract.balanceOf(swap.address)
+                assert.equal(balance.toString(), "0", "Balance of wETH on swap contract after swap is correct")
+
+                balance = await swap.balanceOf(wBTC, swap.address)
+                balance.toNumber().should.be.at.least(1, "Balance is present")
+                const expectedSats = balance.toString() // 7257905 sats sas of pinned block
 
 
-                //receipt = await swapAndRecordResult.wait()
-                //console.log(swapAndRecordResult)
-
-                //console.log(data) 
+                receipt = await swapAndRecordResult.wait()
 
 
+                //check data from event emitted 
+                event = receipt.events[receipt.events.length - 1]
+                let args = event.args
+                //console.log(args.swap_id.toString())
+                assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
+                //assert.equal(args.swap_id.toString(), "1", "Swap ID is correct")
+                args.swap_id.toString().length.should.be.at.least(1, "swap ID is present")
+                const TX_ID = args.swap_id
+                assert.equal(args.input_amount.toString(), data[0].fromAmount, "Input Amount (ERC-20) is correct")
+                //assert.equal(args.output_amount.toString(), startingFloatAmount, "Output amount matches float amount")
+                assert.equal(args.dest_address_btc, receivingBTC_Addr, "Dest BTC addr is correct")
+                args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
+                let blocktime = args.Timestamp
+                assert.equal(args.ExpirationTime.toString(), blocktime.add(expireTime).toString(), "Expiration time is correct")
 
-            })
-            it('executes paraSwap transactions: Flow 2 => ERC20 -> wBTC -> BTC', async () => {
+
+                 //check spGetPendingSwaps()
+                data = await swap.spGetPendingSwaps()
+                assert.equal(data.length, 1, "1 item in data array returned")
+                assert.equal(data[0].SwapID.toString(), TX_ID, "Swap ID is correct")
+                assert.equal(data[0].DestAddr, receivingBTC_Addr, "Dest BTC addr is correct")
+                assert.equal(data[0].AmountWBTC.toString(), expectedSats, "Output amount matches float amount")
+                data[0].Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
+                blocktime = data[0].Timestamp
+                assert.equal(data[0].ExpirationTime.toString(), blocktime.add(expireTime).toString(), "Expiration time is correct")
+                
+            })//flow 2a: ETH -> wETH -> wBTC -> BTC
+
+
+            it('executes paraSwap transactions: Flow 2b => ERC20 -> wBTC -> BTC', async () => {
                 let balance, amount, result, overrides, receipt, event
                 amount = utils.parseEther("1")
                 /////////////////////////////// TESTING DEPOSIT UNI TOKENS //////////////////////////////////////////////
@@ -610,7 +651,6 @@ describe("SkyPools", () => {
                 balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                 assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spParaSwapToken2BTC is 0")
 
-                let testAddr = "0x" + receivingBTC_Addr
                 const swapAndRecordResult = await swap.connect(user1).spParaSwapToken2BTC(
                     receivingBTC_Addr,
                     dataArray
@@ -621,7 +661,7 @@ describe("SkyPools", () => {
                 /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
                 let expireTime = new BigNumber.from(604800)//1 week in seconds
                 const expectedSats = "49398" //49398 sats as of pinned block 13220045
-                
+
                 balance = await swap.balanceOf(wBTC, swap.address)
                 assert.equal(balance.toString(), expectedSats, "Balance is correct in contract's address in tokens[][]")
 

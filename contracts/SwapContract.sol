@@ -71,6 +71,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     address constant paraswapAddress =
         0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
     address public immutable wETH;
+    
 
     /**
      * Events
@@ -594,14 +595,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address proxy = IAugustusSwapper(paraswapAddress)
             .getTokenTransferProxy();
 
-        if (_data.fromToken != wETH) {
-            IERC20(_data.fromToken).safeIncreaseAllowance(
-                proxy,
-                _data.fromAmount
-            );
-        } else {
-            IWETH(wETH).approve(proxy, _data.fromAmount);
-        }
+        IERC20(_data.fromToken).safeIncreaseAllowance(proxy, _data.fromAmount);       
+
         receivedAmount = IParaswap(paraswapAddress).simpleSwap(_data);
 
         require(receivedAmount != 0, "Received amount can not be 0");
@@ -716,7 +711,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _fullCheck - perform a full scan of the mapping up to the current index - do this if the expiration time has been changed
     function spCleanUpOldSPTXs(bool _fullCheck) external onlyOwner {
         uint64 current = uint64(block.timestamp);
-        if (_fullCheck) {//check entire mapping up to current index for latest TX - do this after adjusting expirationTime
+        if (_fullCheck) {
+            //check entire mapping up to current index for latest TX - do this after adjusting expirationTime
             for (uint256 i = 0; i < swapCount; i++) {
                 if (spPendingTXs[i].ExpirationTime < current) {
                     tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
