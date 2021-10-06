@@ -206,6 +206,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
+        console.log(_destToken);
+        console.log(_to);
+        console.log(_amount);
         _safeTransfer(_destToken, _to, _amount);
         return true;
     }
@@ -1006,6 +1009,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _amount = _amount.mul(convertScale);
         }
         require(IERC20(_token).transfer(_to, _amount));
+
     }
 
     /// @dev _rewardsCollection collects tx rewards.
