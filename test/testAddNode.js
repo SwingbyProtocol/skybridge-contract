@@ -83,7 +83,16 @@ describe("Testing Node Functions...", () => {
                     isRemoved.push(false)
                 }
                 //the churn function from SwapContract is taking ~15 seconds....
-                const tx1 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                const tx1 = await swap.churn(
+                    sender.address, 
+                    rewardAddressAndAmounts, 
+                    isRemoved, 
+                    churnedInCount, 
+                    tssThreshold, 
+                    nodeRewardsRatio, 
+                    withdrawalFeeBPS, 
+                    new BigNumber.from(0),
+                    {
                     value: 0,
                     gasPrice: 2 * 10 ** 6
                 })
@@ -106,7 +115,7 @@ describe("Testing Node Functions...", () => {
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
                     isRemoved.push(false)
                 }
-                const tx2 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                const tx2 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0), {
                     value: 0,
                     gasPrice: 2 * 10 ** 6
                 })
@@ -149,7 +158,7 @@ describe("Testing Node Functions...", () => {
                 }
                 //console.log("rewardAddressAndAmounts", rewardAddressAndAmounts)
                 //console.log("isRemoved", isRemoved)
-                const tx3 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                const tx3 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0),{
                     value: 0,
                     gasPrice: 2 * 10 ** 6
                 })
@@ -176,7 +185,7 @@ describe("Testing Node Functions...", () => {
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
                     isRemoved.push(false)
                 }
-                const tx1 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                const tx1 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0), {
                     value: 0,
                     //gas: 9000000,//cannot override gas
                     gasPrice: 2 * 10 ** 6
@@ -192,7 +201,7 @@ describe("Testing Node Functions...", () => {
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
                     isRemoved.push(false)
                 }
-                const tx2 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                const tx2 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0),{
                     value: 0,
                     gasPrice: 2 * 10 ** 6
                 })
@@ -230,7 +239,7 @@ describe("Testing Node Functions...", () => {
                     rewardAddressAndAmounts.push(addressesAndAmountStaked)
                     isRemoved.push(false)
                 }
-                const tx3 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+                const tx3 = await swap.churn(sender.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0),{
                     value: 0,
                     gasPrice: 2 * 10 ** 6
                 })

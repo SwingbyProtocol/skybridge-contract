@@ -536,7 +536,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev setExpirationTime - allow node to adjust expiration time
     /// @param _expirationTime new expiration time
-    function setExpirationTime(uint256 _expirationTime) external onlyOwner {
+    function _setExpirationTime(uint256 _expirationTime) internal {
         expirationTime = _expirationTime;
     }
 
@@ -688,7 +688,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint8 _churnedInCount,
         uint8 _tssThreshold,
         uint8 _nodeRewardsRatio,
-        uint8 _withdrawalFeeBPS
+        uint8 _withdrawalFeeBPS,
+        uint256 _expirationTime //set to 0 to keep existing expiration time
     ) external override onlyOwner returns (bool) {
         require(
             _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
@@ -710,6 +711,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _rewardAddressAndAmounts.length == _isRemoved.length,
             "_rewardAddressAndAmounts and _isRemoved length is not match"
         );
+        if(_expirationTime != 0){
+            _setExpirationTime(_expirationTime);
+        }
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _rewardAddressAndAmounts.length; i++) {

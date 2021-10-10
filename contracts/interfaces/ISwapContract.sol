@@ -53,7 +53,9 @@ interface ISwapContract {
         uint8 _churnedInCount,
         uint8 _tssThreshold,
         uint8 _nodeRewardsRatio,
-        uint8 _withdrawalFeeBPS
+        uint8 _withdrawalFeeBPS,
+        uint256 _expirationTime
+
     ) external returns (bool);
 
     function isTxUsed(bytes32 _txid) external view returns (bool);

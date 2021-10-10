@@ -555,7 +555,7 @@ describe('Contract: SwapContract', async () => {
                 rewardAddressAndAmounts.push(addressesAndAmountStaked)
                 isRemoved.push(false)
             }
-            const tx1 = await swap.churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, {
+            const tx1 = await swap.churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0),{
                 value: 0,
                 gasPrice: 2 * 10 ** 6
             })
@@ -569,7 +569,7 @@ describe('Contract: SwapContract', async () => {
                 rewardAddressAndAmounts.push(addressesAndAmountStaked)
                 isRemoved.push(false)
             }
-            const tx2 = await swap.connect(receiver).churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount + 1, tssThreshold + 1, nodeRewardsRatio + 1, withdrawalFeeBPS, {
+            const tx2 = await swap.connect(receiver).churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount + 1, tssThreshold + 1, nodeRewardsRatio + 1, withdrawalFeeBPS, new BigNumber.from(0),{
                 value: 0,
                 gasPrice: 2 * 10 ** 6
             })
