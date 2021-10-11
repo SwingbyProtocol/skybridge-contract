@@ -7,6 +7,8 @@ module.exports = async function (deployer, net) {
     return
   }
   let BTCT_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
+  let wETH_ADDR = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  //0xc778417e063141139fce010982780140aa0cd5ab
   if (net == "goerli") {
     BTCT_ADDR = "0xEb47a21C1fC00D1E863019906df1771b80DBE182"
   }
@@ -19,9 +21,13 @@ module.exports = async function (deployer, net) {
   if (net == "bsc_mainnet") {
     BTCT_ADDR = "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"
   }
+  if (net == "ropsten"){
+    wETH_ADDR = "0xc778417e063141139fce010982780140aa0cd5ab"
+    BTCT_ADDR = "0xbde8bb00a7ef67007a96945b3a3621177b615c44"
+  }
   await deployer.deploy(LPToken, TOKEN_DECIMALS)
   const lpToken = await LPToken.deployed()
-  await deployer.deploy(SwapContract, lpToken.address, BTCT_ADDR, 0);
+  await deployer.deploy(SwapContract, lpToken.address, BTCT_ADDR, wETH_ADDR, 0);
   const swapContract = await SwapContract.deployed()
   await lpToken.transferOwnership(swapContract.address)
 };
