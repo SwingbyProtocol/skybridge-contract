@@ -507,6 +507,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         //hash TX data for unique ID
         bytes32 ID = keccak256(
             abi.encodePacked(
+                BTCT_ADDR, //specific to current chain
                 swapCount,
                 _destinationAddressForBTC,
                 _btctAmount,
@@ -562,6 +563,27 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     function _spCleanUpOldTXs() internal {
         uint256 current = block.timestamp;
         for (uint256 i = latestRemovedIndex; i <= swapCount; i++) {
+            if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
+                tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
+                    address(this)
+                ].sub(spPendingTXs[i].AmountWBTC);
+                delete spPendingTXs[i];
+                latestRemovedIndex = i;
+            }
+        }
+    }
+    
+    /// @dev spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
+    /// @param _loopCount - max times the loop will run
+    function spCleanUpOldTXs(uint256 _loopCount) external {
+        uint256 max = latestRemovedIndex.add(_loopCount);
+
+        if(max >= swapCount){
+            max = swapCount;
+        }
+
+        uint256 current = block.timestamp;
+        for (uint256 i = latestRemovedIndex; i <= max; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
                 tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
                     address(this)
