@@ -21,9 +21,10 @@ module.exports = async function (deployer, net) {
   if (net == "bsc_mainnet") {
     BTCT_ADDR = "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"
   }
-  if (net == "ropsten"){
+  if (net == "ropsten"){//token decimals must be 18
     wETH_ADDR = "0xc778417e063141139fce010982780140aa0cd5ab"
-    BTCT_ADDR = "0xbde8bb00a7ef67007a96945b3a3621177b615c44"
+    //BTCT_ADDR = "0xbde8bb00a7ef67007a96945b3a3621177b615c44"
+    BTCT_ADDR = "0xaD6D458402F60fD3Bd25163575031ACDce07538D"//address for DAI as there is no liquidity for BTCt on Ropsten
   }
   await deployer.deploy(LPToken, TOKEN_DECIMALS)
   const lpToken = await LPToken.deployed()

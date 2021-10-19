@@ -17,12 +17,17 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
+require('dotenv').config();
+const mnemonic = [process.env.PRIVATE_KEYS] || "not found"
+console.log(mnemonic)
+//const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('truffle-hdwallet-provider-privkey');
 
-const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
-const mnemonic = process.env.SEED
+//const mnemonic = process.env.SEED
+
 
 module.exports = {
   /**
@@ -61,6 +66,21 @@ module.exports = {
     goerli: {
       provider: () => new HDWalletProvider(mnemonic, `https://goerli.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847`),
       network_id: 5,       // Ropsten's id
+      gas: 5500000,        // Ropsten has a lower block limit than mainnet
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
+      gasPrice: 53000000000
+    },
+    
+    ropsten: {
+      provider: function () {
+        return new HDWalletProvider(
+          mnemonic,
+          `https://eth-ropsten.alchemyapi.io/v2/5EGdI7OUE9ptMFggrLzsM2dDpBYPMujp`
+        )
+      },      
+      network_id: 3,       // Ropsten's id
       gas: 5500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
@@ -110,7 +130,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.7.5",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.0",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
@@ -121,8 +141,13 @@ module.exports = {
       }
     },
   },
+  api_keys: {//https://ethereum.stackexchange.com/questions/19437/etherscan-how-can-i-verify-a-contract-with-multiple-imports-deployed-with-truff/20887
+    etherscan: 'A7EAG5WB4FRAHIURRGWD8HSTM8CVYXZGZ4'
+  },
   plugins: [
     "@chainsafe/truffle-plugin-abigen",
-    "truffle-contract-size" /*compile first, then run: truffle run contract-size*/
+    "truffle-contract-size", /*compile first, then run: truffle run contract-size*/
+    'truffle-plugin-verify'
   ]
+  
 };

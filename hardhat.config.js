@@ -63,6 +63,16 @@ module.exports = {
       skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
       gasPrice: 53000000000
     },
+    ropsten: {
+      url: "https://eth-ropsten.alchemyapi.io/v2/5EGdI7OUE9ptMFggrLzsM2dDpBYPMujp",
+      accounts:[mnemonic],
+      network_id: 3,       // Ropsten's id
+      gas: 5500000,        // Ropsten has a lower block limit than mainnet
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
+      gasPrice: 53000000000
+    },
     mainnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
       accounts:[mnemonic],

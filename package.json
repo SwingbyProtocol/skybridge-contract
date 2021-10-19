@@ -30,13 +30,17 @@
     "@truffle/hdwallet-provider": "^1.2.3",
     "axios": "^0.21.1",
     "chai-as-promised": "^7.1.1",
+    "dotenv": "^8.2.0",
     "elliptic": ">=6.5.4",
     "hardhat-watcher": "^2.1.1",
     "install": "^0.13.0",
     "json-parser": "^3.1.2",
     "node-fetch": ">=2.6.1",
     "npm": "^7.6.3",
-    "truffle-contract-size": "^2.0.1"
+    "sol2uml": "^1.1.6",
+    "truffle-contract-size": "^2.0.1",
+    "truffle-hdwallet-provider-privkey": "0.3.0",
+    "truffle-plugin-verify": "^0.5.15"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -49,6 +53,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.1",
     "hardhat": "^2.6.1",
+    "truffle-flattener": "^1.5.0",
     "web3": "^1.4.0"
   }
 }
