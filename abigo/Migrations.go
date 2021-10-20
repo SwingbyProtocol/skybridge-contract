@@ -137,7 +137,7 @@ func bindMigrations(address common.Address, caller bind.ContractCaller, transact
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Migrations *MigrationsRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+func (_Migrations *MigrationsRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
 	return _Migrations.Contract.MigrationsCaller.contract.Call(opts, result, method, params...)
 }
 
@@ -156,7 +156,7 @@ func (_Migrations *MigrationsRaw) Transact(opts *bind.TransactOpts, method strin
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Migrations *MigrationsCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
+func (_Migrations *MigrationsCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
 	return _Migrations.Contract.contract.Call(opts, result, method, params...)
 }
 
@@ -175,17 +175,12 @@ func (_Migrations *MigrationsTransactorRaw) Transact(opts *bind.TransactOpts, me
 //
 // Solidity: function last_completed_migration() view returns(uint256)
 func (_Migrations *MigrationsCaller) LastCompletedMigration(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _Migrations.contract.Call(opts, &out, "last_completed_migration")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _Migrations.contract.Call(opts, out, "last_completed_migration")
+	return *ret0, err
 }
 
 // LastCompletedMigration is a free data retrieval call binding the contract method 0x445df0ac.
@@ -206,17 +201,12 @@ func (_Migrations *MigrationsCallerSession) LastCompletedMigration() (*big.Int, 
 //
 // Solidity: function owner() view returns(address)
 func (_Migrations *MigrationsCaller) Owner(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _Migrations.contract.Call(opts, &out, "owner")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _Migrations.contract.Call(opts, out, "owner")
+	return *ret0, err
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.

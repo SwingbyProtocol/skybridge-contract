@@ -14,6 +14,8 @@ require("@nomiclabs/hardhat-truffle5");
 
 require("hardhat-watcher");
 
+require('@symblox/hardhat-abi-gen');
+
 //const mnemonic = process.env.SEED
 
 //This requires a private key rather than a memonic, this is a private key to a throw away account so this can compile, but it should be stored in a local secret.json file
@@ -128,6 +130,12 @@ module.exports = {
         //  evmVersion: "byzantium"
       }
     },
+  },
+  abiExporter: {
+    path: './abi',
+    clear: true,
+    flat: true,
+    spacing: 2
   },
   plugins: [
     "@chainsafe/truffle-plugin-abigen"
