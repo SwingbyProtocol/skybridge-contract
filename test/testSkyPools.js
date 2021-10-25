@@ -484,9 +484,9 @@ describe("SkyPools", () => {
                     dataArray
                 )
 
-                balance = await wBTC_Contract.balanceOf(swap.address)
+                //balance = await wBTC_Contract.balanceOf(swap.address)
                 //console.log("Contract SATS AFTER SWAP: ", balance.toString())
-                balance = await swap.balanceOf(wBTC, swap.address)
+                //balance = await swap.balanceOf(wBTC, swap.address)
                 //console.log("BalanceOf SATS in tokens[][]: ", balance.toString())
                 //console.log("EXPECTED AMOUNT (FROM API): ", data[0].expectedAmount.toString())
 
