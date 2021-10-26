@@ -131,14 +131,14 @@ module.exports = {
       }
     },
   },
-  /*
+
 abiExporter: {
     path: './abi',
-    clear: true,
+    clear: false,
     flat: true,
     spacing: 2
   },
-  */
+  
   plugins: [
     "@chainsafe/truffle-plugin-abigen"
   ]

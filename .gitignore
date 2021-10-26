@@ -3,3 +3,4 @@ build/*
 abigenBindings/bin
 .DS_Store
 .env
+cache/*
