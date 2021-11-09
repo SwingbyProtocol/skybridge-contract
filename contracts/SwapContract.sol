@@ -401,7 +401,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
     function spParaSwapBTC2Token(Utils.SimpleData calldata _data)
         external
-        payable
         nonReentrant
     {
         require(
@@ -443,7 +442,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _data data from API call that is ready to be sent to paraswap
     function spParaSwapToken2BTC(
-        //string memory _destinationAddressForBTC,
         bytes32 _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external nonReentrant {
@@ -634,7 +632,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev redeemEther for skypools - swap wETH for ether and send to user's wallet
     /// @param _amount amount to withdraw
-    function redeemEther(uint256 _amount) external payable nonReentrant {
+    function redeemEther(uint256 _amount) external nonReentrant {
         require(tokens[wETH][msg.sender] >= _amount);
         IWETH(wETH).withdraw(_amount);
         tokens[wETH][msg.sender] = tokens[wETH][msg.sender].sub(_amount);

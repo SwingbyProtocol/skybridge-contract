@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity >=0.6.0 <=0.8.9;
+pragma experimental ABIEncoderV2;
+
+import "./lib/Utils.sol";
 
 interface ISwapContract {
     function singleTransferERC20(
@@ -42,6 +45,30 @@ interface ISwapContract {
 
     function distributeNodeRewards() external returns (bool);
 
+    function recordSkyPoolsTX(
+        address _to,
+        uint256 _totalSwapped,
+        uint256 _rewardsAmount,
+        bytes32[] memory _usedTxIds
+    ) external returns (bool);
+
+    function spParaSwapBTC2Token(Utils.SimpleData calldata _data) external;
+
+    function spParaSwapToken2BTC(
+        bytes32 _destinationAddressForBTC,
+        Utils.SimpleData calldata _data
+    ) external;
+
+    function spGetPendingSwaps() external view;
+
+    function spCleanUpOldTXs(uint256 _loopCount) external;
+
+    function spDeposit(address _token, uint256 _amount) external payable;
+
+    function redeemEther(uint256 _amount) external;
+
+    function redeemERC20Token(address _token, uint256 _amount) external;
+
     function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
         external
         returns (bool);
@@ -55,7 +82,6 @@ interface ISwapContract {
         uint8 _nodeRewardsRatio,
         uint8 _withdrawalFeeBPS,
         uint256 _expirationTime
-
     ) external returns (bool);
 
     function isTxUsed(bytes32 _txid) external view returns (bool);
