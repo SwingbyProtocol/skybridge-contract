@@ -160,10 +160,14 @@ describe("SkyPools", () => {
 
             //amount = 1 BTC, adjusted for 8 decimals
             let amount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(lptDecimals))
-            //console.log(utils.formatEther(amount.mul(convertScale)).toString())
+            //console.log(utils.formatEther(amount.mul(convertScale)).toString()
 
             //perform recordSkyPoolsTX to assign user1 tokens in the contract
-            await swap.recordSkyPoolsTX(btctTest.address, user1.address, amount, 0, redeemedFloatTxIds)
+            let swapFeesBPS = new BigNumber.from(20);
+            let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(btctDecimals))
+            let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
+
+            await swap.recordSkyPoolsTX(user1.address, amount, swapFees, sampleTxs) // TODO: need to add rewwards
 
             //check ending balances
             balance = await swap.tokens(btctTest.address, user1.address)
