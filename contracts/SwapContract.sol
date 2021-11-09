@@ -365,10 +365,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _to The address of recipient.
     /// @param _totalSwapped The amount of swap amount.
     /// @param _rewardsAmount The fees that should be paid.
+    /// @param _usedTxIds The txids which is for recording this function.
     function recordSkyPoolsTX(
         address _to,
         uint256 _totalSwapped,
-        uint256 _rewardsAmount
+        uint256 _rewardsAmount,
+        bytes32[] memory _usedTxIds
     ) external onlyOwner returns (bool) {
         require(_totalSwapped != 0, "_totalSwapped must be non zero");
         require(_rewardsAmount != 0, "_rewardsAmount must be non zero");
@@ -379,6 +381,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         _rewardsCollection(address(0), _rewardsAmount);
                 
+        _addUsedTxs(_usedTxIds);
+
         return true;
     }
 
