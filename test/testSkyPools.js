@@ -97,10 +97,14 @@ describe("SkyPools", () => {
 
             //amount = 1 BTC, adjusted for 8 decimals
             let amount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(lptDecimals))
-            //console.log(utils.formatEther(amount.mul(convertScale)).toString())
+            //console.log(utils.formatEther(amount.mul(convertScale)).toString()
 
             //perform recordSkyPoolsTX to assign user1 tokens in the contract
-            await swap.recordSkyPoolsTX(user1.address, amount, 0) // TODO: need to add rewwards
+            let swapFeesBPS = new BigNumber.from(20);
+            let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(btctDecimals))
+            let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
+
+            await swap.recordSkyPoolsTX(user1.address, amount, swapFees, sampleTxs) // TODO: need to add rewwards
 
             //check ending balances
             balance = await swap.tokens(btctTest.address, user1.address)
@@ -306,7 +310,10 @@ describe("SkyPools", () => {
                 assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(newFloatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
 
                 //perform recordSkyPoolsTX to assign user1 btct tokens in the contract
-                await swap.recordSkyPoolsTX(user1.address, endAmount, 0) // todo: need to add rewards
+                let swapFeesBPS = new BigNumber.from(20);
+                let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
+                let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
+                await swap.recordSkyPoolsTX(user1.address, endAmount, swapFees, sampleTxs) // todo: need to add rewards
 
                 balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                 assert.equal(startingFloatAmount.sub(balance[1]).toString(), endAmount, "1 BTCt deducted from float") //1 BTCt -> decimal 8
@@ -475,10 +482,10 @@ describe("SkyPools", () => {
 
                 balance = await wETH_Contract.balanceOf(swap.address)
                 assert.equal(balance.toString(), amount.toString(), "Balance of wETH on swap contract before swap is correct")
-                
-                
-                
-                
+
+
+
+
                 const swapAndRecordResult = await swap.connect(user1).spParaSwapToken2BTC(
                     receivingBTC_Addr,
                     dataArray
@@ -557,9 +564,9 @@ describe("SkyPools", () => {
                         refundAddr = data[i].RefundAddr.toString()
                         refundAmount = data[i].AmountWBTC
                     }
-                }                
-                
-                 //issue refund
+                }
+
+                //issue refund
                 await swap.connect(owner).singleTransferERC20(
                     wBTC,
                     refundAddr,
@@ -568,7 +575,7 @@ describe("SkyPools", () => {
                     new BigNumber.from(0),
                     redeemedFloatTxIds
                 )
-                
+
                 balance = await wBTC_Contract.balanceOf(swap.address)
                 assert.equal(balance.toString(), "0", "Contract balance after refund is 0")
 

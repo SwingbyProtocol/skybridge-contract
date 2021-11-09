@@ -809,6 +809,11 @@ export default [
         "internalType": "uint256",
         "name": "_rewardsAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "_usedTxIds",
+        "type": "bytes32[]"
       }
     ],
     "name": "recordSkyPoolsTX",
