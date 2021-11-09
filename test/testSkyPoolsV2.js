@@ -15,7 +15,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-describe("SkyPools", () => {    
+describe("SkyPools", () => {
     let LPTokenFactory, SwapContractFactory, lptoken, swap, owner, receiver, accounts
 
     let convertScale, lptDecimals, btctTest, btctDecimals, mint500ERC20tokens, balance, zeroFees, minerFees, floatAmount, sampleTxs, redeemedFloatTxIds
@@ -26,60 +26,126 @@ describe("SkyPools", () => {
     const srcAmountETH = "1000000000000000000"//1 ETHER
     const srcAmountBTC = "10000000"//.1 wBTC
 
-    const simpleDataFlow1 = [ '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    '10000000',
-    '702062308029837650',
-    '1404124616059675300',
-    [ '0xdef1c0ded9bec7f1a1670819833240f027b25eff' ],
-    '0xaa77476c000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c59900000000000000000000000000000000000000000000000013aed978d540a30000000000000000000000000000000000000000000000000000000000009a1d200000000000000000000000000000006daea1723962647b7e189d311d757fb793000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee57000000000000000000000000f73d63c3eb97389cb5a28c4ad5e8ac428cb164170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006189bd3b75c584835392e8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000001c1681a9e8fd6e29ffd26e9885ced9357a97c18b2116ac83a5323c61a8edd28ce213effddfd61f437136d11071b44342e6d04a99e54345763491b658e70521a55c0000000000000000000000000000000000000000000000000000000000989680',
-    [ 0, 484 ],
-    [ '0' ],
-    '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417', //set to beneficiary
-    '0x000000000000000000000000536b79506F6f6c73',
-    '0',
-    '0x',
-    '1636416827',
-    '0xb285291040f111ecbd35cff44415087d' ]
+    const simpleDataFlow1 = ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        '10000000',
+        '702062308029837650',
+        '1404124616059675300',
+        ['0xdef1c0ded9bec7f1a1670819833240f027b25eff'],
+        '0xaa77476c000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c59900000000000000000000000000000000000000000000000013aed978d540a30000000000000000000000000000000000000000000000000000000000009a1d200000000000000000000000000000006daea1723962647b7e189d311d757fb793000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee57000000000000000000000000f73d63c3eb97389cb5a28c4ad5e8ac428cb164170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006189bd3b75c584835392e8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000001c1681a9e8fd6e29ffd26e9885ced9357a97c18b2116ac83a5323c61a8edd28ce213effddfd61f437136d11071b44342e6d04a99e54345763491b658e70521a55c0000000000000000000000000000000000000000000000000000000000989680',
+        [0, 484],
+        ['0'],
+        '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417', //set to beneficiary
+        '0x000000000000000000000000536b79506F6f6c73',
+        '0',
+        '0x',
+        '1636416827',
+        '0xb285291040f111ecbd35cff44415087d']
 
-    const simpleDataFlow2 = [ '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-    '100000000000000000',
-    '355624',
-    '711247',
-    [ '0xF9234CB08edb93c0d4a4d4c70cC3FfD070e78e07' ],
-    '0x91a32b69000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000016345785d8a00000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000004de5bb2b8038a1640196fbe3e38816f3e67cba72d940',
-    [ 0, 228 ],
-    [ '0' ],
-    '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417', //set to beneficiary
-    '0x000000000000000000000000536b79506F6f6c73',
-    '0',
-    '0x',
-    '1636437969',
-    '0xd70aca2040f011ec99e22154ce3687c5' ]
+    const simpleDataFlow2 = ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        '100000000000000000',
+        '355624',
+        '711247',
+        ['0xF9234CB08edb93c0d4a4d4c70cC3FfD070e78e07'],
+        '0x91a32b69000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000016345785d8a00000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000004de5bb2b8038a1640196fbe3e38816f3e67cba72d940',
+        [0, 228],
+        ['0'],
+        '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417', //set to beneficiary
+        '0x000000000000000000000000536b79506F6f6c73',
+        '0',
+        '0x',
+        '1636437969',
+        '0xd70aca2040f011ec99e22154ce3687c5']
 
-    const swapOnUniswapFlow1 = [ '10000000',
-    '698729514669918696',
-    [ '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-      '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ] ]
-    const swapOnUniswapFlow2 = [ '1000000000000000000',
-    '3556087',
-    [ '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599' ] ]
+    const swapOnUniswapFlow1 = ['10000000',
+        '698729514669918696',
+        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']]
+    const swapOnUniswapFlow2 = ['1000000000000000000',
+        '3556087',
+        ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']]
 
-    const swapOnUniswapForkFlow1 = [ '0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac',
-    '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
-    '10000000',
-    '701071243021484014',
-    [ '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-      '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ] ]
-    const swapOnUniswapForkFlow2 = [ '0x9DEB29c9a4c7A88a3C0257393b7f3335338D9A9D',
-    '0x69d637e77615df9f235f642acebbdad8963ef35c5523142078c9b8f9d0ceba7e',
-    '1000000000000000000',
-    '3557483',
-    [ '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599' ] ]
+    const swapOnUniswapForkFlow1 = ['0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac',
+        '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
+        '10000000',
+        '701071243021484014',
+        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']]
+    const swapOnUniswapForkFlow2 = ['0x9DEB29c9a4c7A88a3C0257393b7f3335338D9A9D',
+        '0x69d637e77615df9f235f642acebbdad8963ef35c5523142078c9b8f9d0ceba7e',
+        '1000000000000000000',
+        '3557483',
+        ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+            '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']]
 
+    const megaSwapFlow1 = ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        '10000000',
+        '705750070469144500',
+        '1411500140938289000',
+        '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417',
+        [{
+            fromAmountPercent: '10000', path: [{
+                fromAmountPercent: '10000', path: [[{
+                    to: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                    totalNetworkFee: '0',
+                    adapters: [[{
+                        adapter: '0x3A0430bF7cd2633af111ce3204DB4b0990857a6F',
+                        percent: '10000',
+                        networkFee: '0',
+                        route: [[{
+                            targetExchange: '0xdef1c0ded9bec7f1a1670819833240f027b25eff',
+                            payload:
+                                '0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c59900000000000000000000000000000000000000000000000013c7d7211330da0000000000000000000000000000000000000000000000000000000000009a1d200000000000000000000000000000006daea1723962647b7e189d311d757fb793000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee57000000000000000000000000f73d63c3eb97389cb5a28c4ad5e8ac428cb16417000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000618aec61211a44fbd465e8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000001c099cb350fd61290eaf26a7179497f26aebcf6b6259e9afbf2d40d26f14749172193238feba1cc7bc64a3f78e31d4c76df84fbe331bfd403c31ef8f75646a1924',
+                            networkFee: '0',
+                            index: 1,
+                            percent: '10000'
+                        }]]
+                    }]]
+                }]]
+            }]
+        }],
+        '0x000000000000000000000000536b79506F6f6c73',
+        '0',
+        '0x',
+        '1636494292',
+        '0x0f2285a041a611ec8ad1a990111451b6']
+
+
+
+
+    const megaSwapFlow2 = ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        '1000000000000000000',
+        '3542657',
+        '7085313',
+        '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417',
+        [{
+            fromAmountPercent: '10000', path: [{
+                fromAmountPercent: '10000', path: [[{
+                    to: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                    totalNetworkFee: '0',
+                    adapters: [[{
+                        adapter: '0x3A0430bF7cd2633af111ce3204DB4b0990857a6F',
+                        percent: '10000',
+                        networkFee: '0',
+                        route: [[{
+                            targetExchange: '0xF9234CB08edb93c0d4a4d4c70cC3FfD070e78e07',
+                            payload:
+                                '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000001000000000000000000004de5bb2b8038a1640196fbe3e38816f3e67cba72d940',
+                            networkFee: '0',
+                            index: 4,
+                            percent: '10000'
+                        }]]
+                    }]]
+                }]]
+            }]
+        }],
+        '0x000000000000000000000000536b79506F6f6c73',
+        '0',
+        '0x',
+        '1636515546',
+        '0x76926e4041a511ecb33d53aea0fc08c4']
 
 
 
@@ -126,7 +192,7 @@ describe("SkyPools", () => {
             "0xce66450451e62b9b4c406d0a83b90a5036039673d2682d4ec292f375ae571382"
         ]
 
-        await lpToken.transferOwnership(swap.address)  
+        await lpToken.transferOwnership(swap.address)
     })
 
 
@@ -209,32 +275,32 @@ describe("SkyPools", () => {
 
         })
         describe("Executing paraSwap transactions", () => {
-            
+
             beforeEach(async () => {
-                
+
             })//beforeEach - PARASWAP
 
             describe('executes paraSwap transactions: Flow 1 => BTC -> wBTC -> ERC20', async () => {
                 it('executes paraSwap transactions using simpleSwap', async () => {
-                   
+
                     /////////////////////////////// TEST FOR FAILURE //////////////////////////////////////////////
                     describe('Testing for flow 1 failure cases', async () => {
                         it('rejects transactions when msg.sender does not match beneficiary nor holder of tokens in tokens[][]', async () => {
-                           
+
                         })
                         it('rejects transactions when the contract caller matches the token holder in tokens[][], but beneficiary does not', async () => {
-                            
+
                         })
                     })
                 })//SimpleSwap flow 1
 
                 it('testing for other contract methods', async () => {
-                   
+
                 })//new contract methods - flow 1
             })//END FLOW 1
 
             it('executes paraSwap transactions: Flow 2a => ETH -> wETH -> wBTC -> BTC', async () => {
-                
+
             })//flow 2a: ETH -> wETH -> wBTC -> BTC
 
             it('executes paraSwap transactions: Flow 2b => ERC20 -> wBTC -> BTC', async () => {
