@@ -797,18 +797,8 @@ export default [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_destToken",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_to",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -816,9 +806,9 @@ export default [
         "type": "uint256"
       },
       {
-        "internalType": "bytes32[]",
-        "name": "_redeemedFloatTxIds",
-        "type": "bytes32[]"
+        "internalType": "uint256",
+        "name": "_rewardsAmount",
+        "type": "uint256"
       }
     ],
     "name": "recordSkyPoolsTX",

@@ -362,37 +362,23 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
      */
 
     /// @dev Record SkyPools TX - allocate tokens from float to user in tokens[][]
-    /// @param _destToken The address of target token.
     /// @param _to The address of recipient.
-    /// @param _amount The amount of tokens.
-    /// @param _redeemedFloatTxIds The txids which is for recording.
+    /// @param _totalSwapped The amount of swap amount.
+    /// @param _rewardsAmount The fees that should be paid.
     function recordSkyPoolsTX(
-        address _destToken,
         address _to,
-        uint256 _amount,
         uint256 _totalSwapped,
-        bytes32[] memory _redeemedFloatTxIds
+        uint256 _rewardsAmount
     ) external onlyOwner returns (bool) {
-        require(whitelist[_destToken], "_destToken is not whitelisted");
-        require(
-            _destToken != address(0),
-            "_destToken should not be address(0)"
-        );
-        address _feesToken;
-        if (_totalSwapped > 0) {
-            _swap(address(0), BTCT_ADDR, _totalSwapped);
-        } else {
-            _feesToken = BTCT_ADDR;
-        }
-        if (_destToken == lpToken) {
-            _feesToken = lpToken;
-        }
+        require(_totalSwapped != 0, "_totalSwapped must be non zero");
+        require(_rewardsAmount != 0, "_rewardsAmount must be non zero");
+        
+        _removeFloat(BTCT_ADDR, _totalSwapped);
 
-        _removeFloat(_destToken, _amount);
+        tokens[BTCT_ADDR][_to] = tokens[BTCT_ADDR][_to].add(_totalSwapped);
 
-        _addUsedTxs(_redeemedFloatTxIds);
-        tokens[_destToken][_to] = _amount;
-
+        _rewardsCollection(address(0), _rewardsAmount);
+                
         return true;
     }
 

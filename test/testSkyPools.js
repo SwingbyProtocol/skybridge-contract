@@ -100,7 +100,7 @@ describe("SkyPools", () => {
             //console.log(utils.formatEther(amount.mul(convertScale)).toString())
 
             //perform recordSkyPoolsTX to assign user1 tokens in the contract
-            await swap.recordSkyPoolsTX(btctTest.address, user1.address, amount, 0, redeemedFloatTxIds)
+            await swap.recordSkyPoolsTX(user1.address, amount, 0) // TODO: need to add rewwards
 
             //check ending balances
             balance = await swap.tokens(btctTest.address, user1.address)
@@ -306,7 +306,7 @@ describe("SkyPools", () => {
                 assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(newFloatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
 
                 //perform recordSkyPoolsTX to assign user1 btct tokens in the contract
-                await swap.recordSkyPoolsTX(wBTC, user1.address, endAmount, 0, redeemedFloatTxIds)
+                await swap.recordSkyPoolsTX(user1.address, endAmount, 0) // todo: need to add rewards
 
                 balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                 assert.equal(startingFloatAmount.sub(balance[1]).toString(), endAmount, "1 BTCt deducted from float") //1 BTCt -> decimal 8
