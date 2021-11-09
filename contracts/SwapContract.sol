@@ -375,7 +375,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(_totalSwapped != 0, "_totalSwapped must be non zero");
         require(_rewardsAmount != 0, "_rewardsAmount must be non zero");
         
-        _removeFloat(BTCT_ADDR, _totalSwapped);
+        _swap(address(0), BTCT_ADDR, _totalSwapped);
 
         tokens[BTCT_ADDR][_to] = tokens[BTCT_ADDR][_to].add(_totalSwapped);
 
