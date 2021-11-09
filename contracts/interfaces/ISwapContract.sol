@@ -5,6 +5,7 @@ pragma experimental ABIEncoderV2;
 import "./lib/Utils.sol";
 
 interface ISwapContract {
+
     function singleTransferERC20(
         address _destToken,
         address _to,
@@ -58,8 +59,6 @@ interface ISwapContract {
         bytes32 _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external;
-
-    function spGetPendingSwaps() external view;
 
     function spCleanUpOldTXs(uint256 _loopCount) external;
 

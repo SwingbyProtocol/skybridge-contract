@@ -636,6 +636,19 @@ export default [
   },
   {
     "inputs": [],
+    "name": "latestRemovedIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "lockedLPTokensForNode",
     "outputs": [
       {
@@ -879,7 +892,7 @@ export default [
     ],
     "name": "redeemEther",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1091,7 +1104,7 @@ export default [
     ],
     "name": "spParaSwapBTC2Token",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1222,6 +1235,19 @@ export default [
       {
         "internalType": "uint256",
         "name": "Timestamp",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
         "type": "uint256"
       }
     ],

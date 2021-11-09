@@ -35,8 +35,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
     //spPendingTx[] spPendingTXs;
-    uint256 private swapCount;
-    uint256 private latestRemovedIndex;
+    uint256 public swapCount;
+    uint256 public latestRemovedIndex;
 
     mapping(address => bool) public whitelist;
 

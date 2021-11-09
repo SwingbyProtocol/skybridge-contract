@@ -308,6 +308,40 @@ export default [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalSwapped",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rewardsAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "_usedTxIds",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "recordSkyPoolsTX",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_minerFee",
         "type": "uint256"
@@ -326,6 +360,37 @@ export default [
         "type": "bool"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "redeemERC20Token",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "redeemEther",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -370,6 +435,222 @@ export default [
         "type": "bool"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_loopCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "spCleanUpOldTXs",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "spDeposit",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "fromToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "toToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expectedAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "callees",
+            "type": "address[]"
+          },
+          {
+            "internalType": "bytes",
+            "name": "exchangeData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "startIndexes",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "values",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "address payable",
+            "name": "beneficiary",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "partner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "feePercent",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "permit",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "deadline",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes16",
+            "name": "uuid",
+            "type": "bytes16"
+          }
+        ],
+        "internalType": "struct Utils.SimpleData",
+        "name": "_data",
+        "type": "tuple"
+      }
+    ],
+    "name": "spParaSwapBTC2Token",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_destinationAddressForBTC",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "fromToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "toToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expectedAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "callees",
+            "type": "address[]"
+          },
+          {
+            "internalType": "bytes",
+            "name": "exchangeData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "startIndexes",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "values",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "address payable",
+            "name": "beneficiary",
+            "type": "address"
+          },
+          {
+            "internalType": "address payable",
+            "name": "partner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "feePercent",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "permit",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "deadline",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes16",
+            "name": "uuid",
+            "type": "bytes16"
+          }
+        ],
+        "internalType": "struct Utils.SimpleData",
+        "name": "_data",
+        "type": "tuple"
+      }
+    ],
+    "name": "spParaSwapToken2BTC",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }
