@@ -73,9 +73,9 @@ const srcAmountBTC = "10000000"//0.1 BTC
 
 async function main() {
     let getPrice = await paraswap.getPrice(
+        Tokens[mainnet]['UNI'],
         Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['WETH'],
-        srcAmountBTC,
+        srcAmountETH,
         mainnet
     )
 
@@ -85,25 +85,26 @@ async function main() {
         return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //Format ERC20 - 0.05
     }
 
-    let decimals = Tokens[mainnet]['WBTC'].decimals
+    let decimals = Tokens[mainnet]['UNI'].decimals
     let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload,
+        Tokens[mainnet]['UNI'],
         Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['WETH'],
-        srcAmountBTC,
+        srcAmountETH,
         minDestAmount.toString(),
         mainnet,
-        "0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417", //SWAP contract
+        "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
         true //only params - true for contract -> contract | false for standard transaction object
     )
     let data = txRequest.data //params to execute transaction contract -> contract  
     
     //console.log(data)
 
-    //megaSwap
+    /**
+     //megaSwap
     const dataArray = [
         data[0].fromToken,
         data[0].fromAmount,
@@ -122,12 +123,17 @@ async function main() {
     //console.log(data[0].path)
     //console.log(data[0].path[0].path)
     //console.log(data[0].path[0].path[0].adapters)
-    console.log(data[0].path[0].path[0].adapters[0].route)
+    //console.log(data[0].path[0].path[0].adapters[0].route)
+     */
+    
     
 
     /**
-     //simpleSwap
-     const dataArray = [
+     
+     */
+
+    //simpleSwap
+    const dataArray = [
         data[0].fromToken,
         data[0].toToken,
         data[0].fromAmount,
@@ -145,7 +151,6 @@ async function main() {
         data[0].uuid
     ]
     console.log(dataArray)
-     */
     
 }
 

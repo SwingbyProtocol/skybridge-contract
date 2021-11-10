@@ -290,7 +290,7 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1636498995879,
+      "lastModificationDate": 1636585156810,
       "contentHash": "bf45c6b5444b4e75774029c225d56792",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
@@ -339,7 +339,7 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ISwapContract.sol": {
-      "lastModificationDate": 1636499019042,
+      "lastModificationDate": 1636499112186,
       "contentHash": "7ab26f91d404af496f22aefc064f526b",
       "sourceName": "contracts/interfaces/ISwapContract.sol",
       "solcConfig": {

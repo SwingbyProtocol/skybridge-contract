@@ -59,7 +59,7 @@ class ParaSwap {
                     `&amount=${srcAmount}&srcDecimals=${from.decimals}&destDecimals` +
                     `=${to.decimals}&side=SELL&network=${network}&maxImpact=100`
                     //+ `&excludeContractMethods=multiSwap`
-                    +  `&includeContractMethods=megaSwap`
+                    +  `&includeContractMethods=simpleSwap`
                     const { data } = await axios.get(requestURL, {
                     headers: {
                         'partner': this.referrer,
