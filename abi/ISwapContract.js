@@ -554,7 +554,7 @@ export default [
         "type": "tuple"
       }
     ],
-    "name": "spParaSwapBTC2Token",
+    "name": "spFlow1SimpleSwap",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -649,7 +649,7 @@ export default [
         "type": "tuple"
       }
     ],
-    "name": "spParaSwapToken2BTC",
+    "name": "spFlow2SimpleSwap",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

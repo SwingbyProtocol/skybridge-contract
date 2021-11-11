@@ -374,13 +374,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     ) external onlyOwner returns (bool) {
         require(_totalSwapped != 0, "_totalSwapped must be non zero");
         require(_rewardsAmount != 0, "_rewardsAmount must be non zero");
-        
+
         _swap(address(0), BTCT_ADDR, _totalSwapped);
 
         tokens[BTCT_ADDR][_to] = tokens[BTCT_ADDR][_to].add(_totalSwapped);
 
         _rewardsCollection(address(0), _rewardsAmount);
-                
+
         _addUsedTxs(_usedTxIds);
 
         return true;
@@ -399,7 +399,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev spParaSwapBTC2Token - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
     /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
-    function spParaSwapBTC2Token(Utils.SimpleData calldata _data)
+    function spFlow1SimpleSwap(Utils.SimpleData calldata _data)
         external
         nonReentrant
     {
@@ -415,33 +415,68 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _data.fromToken == BTCT_ADDR,
             "fromToken must be the required BTCt token"
         );
-        _doParaSwap(_data); //no received amount, tokens to go user's wallet
+        _doSimpleSwap(_data); //no received amount, tokens to go user's wallet
 
         tokens[_data.fromToken][_data.beneficiary] = tokens[_data.fromToken][
             _data.beneficiary
         ].sub(_data.fromAmount);
     }
 
-    /// @dev _doParaSwap - performs paraswap transaction - BALANCE CHECKS MUST OCCUR BEFORE CALLING THIS
-    /// @param _data data from API call that is ready to be sent to paraswap
-    function _doParaSwap(Utils.SimpleData calldata _data) internal {
-        //address paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
+    /// @dev spFlow2UniswapFork - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
+    function spFlow2UniswapFork(
+        bytes32 _destinationAddressForBTC,
+        address _factory,
+        bytes32 _initCode,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path
+    ) external nonReentrant {
+        address fromToken = _path[0];
+        address endToken = _path[_path.length - 1];
 
-        require(_data.fromToken != ETHER, "Use path wETH -> wBTC");
-        require(_data.toToken != ETHER, "Use path wBTC -> wETH");
+        require(
+            tokens[fromToken][msg.sender] >= _amountIn,
+            "Balance is not sufficient"
+        );
+        require(fromToken != BTCT_ADDR);
+        require(endToken == BTCT_ADDR, "Must swap to BTC token");
 
-        address proxy = IAugustusSwapper(paraswapAddress)
-            .getTokenTransferProxy();
+        uint256 preSwapBalance = IERC20(endToken).balanceOf(address(this));
 
-        IERC20(_data.fromToken).safeIncreaseAllowance(proxy, _data.fromAmount);
+        tokens[fromToken][msg.sender] = tokens[fromToken][msg.sender].sub(
+            _amountIn
+        );
 
-        IParaswap(paraswapAddress).simpleSwap(_data);
+        //do swap
+        _doUniswapFork(
+            _factory,
+            _initCode,
+            _amountIn,
+            _amountOutMin,
+            _path
+        );
+
+        uint256 receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
+            preSwapBalance
+        );
+
+        require(
+            receivedAmount >= _amountOutMin,
+            "Received amount insufficient"
+        );
+        require(receivedAmount != 0, "Received amount can not be 0");
+
+        tokens[endToken][address(this)] = tokens[endToken][address(this)].add(
+            receivedAmount
+        );
+
+        _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
     }
 
     /// @dev spParaSwapToken2BTC - FLOW 2 -> swap ERC20 -> wBTC
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
-    /// @param _data data from API call that is ready to be sent to paraswap
-    function spParaSwapToken2BTC(
+    /// @param _data data from API call that is ready to be sent to paraswap interface
+    function spFlow2SimpleSwap(
         bytes32 _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external nonReentrant {
@@ -465,7 +500,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             msg.sender
         ].sub(_data.fromAmount);
 
-        _doParaSwap(_data);
+        _doSimpleSwap(_data);
 
         uint256 receivedAmount = IERC20(_data.toToken)
             .balanceOf(address(this))
@@ -482,6 +517,47 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         ].add(receivedAmount);
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
+    }
+
+    /// @dev _doUniswapFork - performs paraswap transaction - BALANCE CHECKS MUST OCCUR BEFORE CALLING THIS
+    function _doUniswapFork(
+        address _factory,
+        bytes32 _initCode,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path
+    ) internal {
+        address fromToken = _path[0];
+        require(fromToken != ETHER, "Use path wETH -> wBTC");
+
+        address proxy = IAugustusSwapper(paraswapAddress)
+            .getTokenTransferProxy();
+
+        IERC20(fromToken).safeIncreaseAllowance(proxy, _amountIn);
+
+        IParaswap(paraswapAddress).swapOnUniswapFork(
+            _factory,
+            _initCode,
+            _amountIn,
+            _amountOutMin,
+            _path
+        );
+    }
+
+    /// @dev _doSimpleSwap - performs paraswap transaction - BALANCE CHECKS MUST OCCUR BEFORE CALLING THIS
+    /// @param _data data from API call that is ready to be sent to paraswap interface
+    function _doSimpleSwap(Utils.SimpleData calldata _data) internal {
+        //address paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
+
+        require(_data.fromToken != ETHER, "Use path wETH -> wBTC");
+        require(_data.toToken != ETHER, "Use path wBTC -> wETH");
+
+        address proxy = IAugustusSwapper(paraswapAddress)
+            .getTokenTransferProxy();
+
+        IERC20(_data.fromToken).safeIncreaseAllowance(proxy, _data.fromAmount);
+
+        IParaswap(paraswapAddress).simpleSwap(_data);
     }
 
     /// @dev _spRecordPendingTx - hash a unique swap ID, and add it to the array of pending TXs, and then emit event
@@ -560,13 +636,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             }
         }
     }
-    
+
     /// @dev spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     /// @param _loopCount - max times the loop will run
     function spCleanUpOldTXs(uint256 _loopCount) external {
         uint256 max = latestRemovedIndex.add(_loopCount);
 
-        if(max >= swapCount){
+        if (max >= swapCount) {
             max = swapCount;
         }
 
@@ -640,7 +716,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         //sender.transfer(_amount);
 
         (bool sent, bytes memory data) = sender.call{value: _amount}("");
-        
+
         require(sent, "Failed to send Ether");
         emit Withdraw(
             ETHER,

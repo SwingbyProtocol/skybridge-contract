@@ -978,46 +978,6 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "spGetPendingSwaps",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "bytes32",
-            "name": "SwapID",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "DestAddr",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "RefundAddr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "AmountWBTC",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "Timestamp",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct SwapContract.spPendingTx[]",
-        "name": "data",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "components": [
@@ -1102,7 +1062,7 @@ export default [
         "type": "tuple"
       }
     ],
-    "name": "spParaSwapBTC2Token",
+    "name": "spFlow1SimpleSwap",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1197,9 +1157,87 @@ export default [
         "type": "tuple"
       }
     ],
-    "name": "spParaSwapToken2BTC",
+    "name": "spFlow2SimpleSwap",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_destinationAddressForBTC",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "_factory",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_initCode",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountOutMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_path",
+        "type": "address[]"
+      }
+    ],
+    "name": "spFlow2UniswapFork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "spGetPendingSwaps",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "SwapID",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "DestAddr",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "RefundAddr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "AmountWBTC",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "Timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct SwapContract.spPendingTx[]",
+        "name": "data",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

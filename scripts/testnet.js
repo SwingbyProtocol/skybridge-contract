@@ -72,6 +72,7 @@ const srcAmountBTC = "10000000"//0.1 BTC
 
 
 async function main() {
+    let data
     let getPrice = await paraswap.getPrice(
         Tokens[mainnet]['UNI'],
         Tokens[mainnet]['WBTC'],
@@ -88,6 +89,9 @@ async function main() {
     let decimals = Tokens[mainnet]['UNI'].decimals
     let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
+
+    
+
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload,
@@ -97,21 +101,46 @@ async function main() {
         minDestAmount.toString(),
         mainnet,
         "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
+        //"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address
         true //only params - true for contract -> contract | false for standard transaction object
     )
-    let data = txRequest.data //params to execute transaction contract -> contract  
-    
-    //console.log(data)
+    data = txRequest.data //params to execute transaction contract -> contract  
+    const output = txRequest.config.data
+    const { parse } = require('json-parser')
+    const parsedOutput = parse(output)
+    const contractMethod = parsedOutput.priceRoute.contractMethod
+    console.log("Recomended Contract Method:", contractMethod)
+    console.log(data)
 
     /**
      //megaSwap
-    const dataArray = [
+     let routeArray = [
+        data[0].path[0].path[0].adapters[0].route[0].index,
+        data[0].path[0].path[0].adapters[0].route[0].targetExchange,
+        data[0].path[0].path[0].adapters[0].route[0].percent,
+        data[0].path[0].path[0].adapters[0].route[0].payload,
+        data[0].path[0].path[0].adapters[0].route[0].networkFee
+    ]
+    let pathArray = [
+        data[0].path[0].fromAmountPercent,
+        [
+            data[0].path[0].path[0].to,
+            data[0].path[0].path[0].totalNetworkFee,
+            [ //adapters
+                data[0].path[0].path[0].adapters[0].adapter,
+                data[0].path[0].path[0].adapters[0].percent,
+                data[0].path[0].path[0].adapters[0].networkFee,
+                routeArray
+            ]
+        ]
+    ]
+    const megaDataArray = [
         data[0].fromToken,
         data[0].fromAmount,
         data[0].toAmount,
         data[0].expectedAmount,
         data[0].beneficiary,
-        data[0].path,
+        pathArray,
         data[0].partner,
         data[0].feePercent,
         data[0].permit,
@@ -119,20 +148,32 @@ async function main() {
         data[0].uuid
     ]
 
+    /**
+     console.log(dataArray)
+
+    console.log("PATH BELOW")
+    console.log(pathArray)
+
+    console.log("ROUTE BELOW")
+    console.log(routeArray)
+     */
+
+
+
+    //console.log(data[0].path[0].path[0].adapters[0].route[0].targetExchange)
+
     //console.log(dataArray)
     //console.log(data[0].path)
     //console.log(data[0].path[0].path)
     //console.log(data[0].path[0].path[0].adapters)
     //console.log(data[0].path[0].path[0].adapters[0].route)
-     */
-    
-    
+
+
+
+
 
     /**
-     
-     */
-
-    //simpleSwap
+     //simpleSwap
     const dataArray = [
         data[0].fromToken,
         data[0].toToken,
@@ -151,7 +192,10 @@ async function main() {
         data[0].uuid
     ]
     console.log(dataArray)
-    
+     */
+
+
+
 }
 
 
