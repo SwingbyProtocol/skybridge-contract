@@ -1170,6 +1170,11 @@ export default [
         "type": "bytes32"
       },
       {
+        "internalType": "bool",
+        "name": "_fork",
+        "type": "bool"
+      },
+      {
         "internalType": "address",
         "name": "_factory",
         "type": "address"
@@ -1195,7 +1200,7 @@ export default [
         "type": "address[]"
       }
     ],
-    "name": "spFlow2UniswapFork",
+    "name": "spFlow2Uniswap",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

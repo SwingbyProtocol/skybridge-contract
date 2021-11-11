@@ -85,7 +85,10 @@ describe("SkyPools", () => {
         ['0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
             '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']]
 
-
+    const swapOnUniswap = ['1000000000000000000',
+        '19439',
+        ['0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+            '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']]
 
 
     const endAmount = "100000000" //1 BTCt - decimal 8
@@ -602,9 +605,10 @@ describe("SkyPools", () => {
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                     assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
 
-
-                    const swapAndRecordResult = await swap.connect(user1).spFlow2UniswapFork(
+                    //fork = true
+                    const swapAndRecordResult = await swap.connect(user1).spFlow2Uniswap(
                         receivingBTC_Addr,
+                        true,
                         swapOnUniswapFork[0],
                         swapOnUniswapFork[1],
                         swapOnUniswapFork[2],
@@ -645,6 +649,70 @@ describe("SkyPools", () => {
                     data[0].Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
 
                 })//new contract methods - flow 2
+                it('testing for swapOnUniswap', async () => {
+                    let balance, amount, result, receipt, event
+                    amount = utils.parseEther("1")
+
+                    /////////////////////////////// TESTING DEPOSIT UNI TOKENS //////////////////////////////////////////////
+                    await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(2))//amount refers to number of UNI tokens here
+                    balance = await UNI_Contract.balanceOf(user1.address)
+                    assert.equal(balance.toString(), amount.mul(2).toString(), "User has correct number of UNI tokens in their personal wallet")
+
+                    await UNI_Contract.connect(user1).approve(swap.address, amount)
+                    result = await swap.connect(user1).spDeposit(UNI, amount)
+
+                    balance = await swap.connect(user1).balanceOf(UNI, user1.address)
+                    assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
+
+                    const receivingBTC_Addr = sampleTxs[0]
+
+                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
+                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
+
+                    //fork = true
+                    const swapAndRecordResult = await swap.connect(user1).spFlow2Uniswap(
+                        receivingBTC_Addr,
+                        false,
+                        swapOnUniswapFork[0],
+                        swapOnUniswapFork[1],
+                        swapOnUniswap[0],
+                        swapOnUniswap[1],
+                        swapOnUniswap[2],
+                    )
+                    receipt = await swapAndRecordResult.wait()
+
+                    /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
+                    balance = await swap.balanceOf(wBTC, swap.address)
+                    balance.toNumber().should.be.at.least(1, "Balance is present")
+                    const expectedSats = balance.toString() //~38878
+
+                    balance = await swap.balanceOf(wBTC, swap.address)
+                    assert.equal(balance.toString(), expectedSats, "Balance is correct in contract's address in tokens[][]")
+
+                    //check user balance on swap contract
+                    balance = await swap.connect(user1).balanceOf(UNI, user1.address)
+                    assert.equal(balance.toString(), "0", "Uni token has been swapped and user no longer holds it in tokens[][]")
+
+                    //check data from event emitted 
+                    event = receipt.events[receipt.events.length - 1]
+                    let args = event.args
+                    assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
+                    args.SwapID.toString().length.should.be.at.least(1, "SwapID is present")
+                    const TX_ID = args.SwapID
+                    assert.equal(args.DestAddr, sampleTxs[0], "DestAddr for BTC is correct")
+                    assert.equal(args.AmountWBTC.toString(), expectedSats, "AmountWBTC is correct amount")
+                    assert.equal(args.RefundAddr, user1.address, "RefundAddr is correct")
+                    args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
+
+                    //check spGetPendingSwaps()
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 1, "1 item in data array returned")
+                    assert.equal(data[0].SwapID.toString(), TX_ID, "Swap ID is correct")
+                    assert.equal(data[0].DestAddr, receivingBTC_Addr, "Dest BTC addr is correct")
+                    assert.equal(data[0].AmountWBTC.toString(), expectedSats, "Output amount matches float amount")
+                    data[0].Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
+                })//new contract methods - flow 2
+
             })//END FLOW 2
 
         })//END PARASWAP

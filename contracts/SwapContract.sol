@@ -422,9 +422,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         ].sub(_data.fromAmount);
     }
 
-    /// @dev spFlow2UniswapFork - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
-    function spFlow2UniswapFork(
+    /// @dev spFlow2Uniswap - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
+    function spFlow2Uniswap(
         bytes32 _destinationAddressForBTC,
+        bool _fork,
         address _factory,
         bytes32 _initCode,
         uint256 _amountIn,
@@ -448,13 +449,17 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
 
         //do swap
-        _doUniswapFork(
-            _factory,
-            _initCode,
-            _amountIn,
-            _amountOutMin,
-            _path
-        );
+        if (_fork) {
+            _doUniswapFork(
+                _factory,
+                _initCode,
+                _amountIn,
+                _amountOutMin,
+                _path
+            );
+        } else {
+            _doUniswap(_amountIn, _amountOutMin, _path);
+        }
 
         uint256 receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
             preSwapBalance
@@ -538,6 +543,26 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         IParaswap(paraswapAddress).swapOnUniswapFork(
             _factory,
             _initCode,
+            _amountIn,
+            _amountOutMin,
+            _path
+        );
+    }
+
+    function _doUniswap(
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path
+    ) internal {
+        address fromToken = _path[0];
+        require(fromToken != ETHER, "Use path wETH -> wBTC");
+
+        address proxy = IAugustusSwapper(paraswapAddress)
+            .getTokenTransferProxy();
+
+        IERC20(fromToken).safeIncreaseAllowance(proxy, _amountIn);
+
+        IParaswap(paraswapAddress).swapOnUniswap(
             _amountIn,
             _amountOutMin,
             _path
