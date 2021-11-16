@@ -6,20 +6,28 @@ module.exports = async function (deployer, net) {
   if (net == "development") {
     return
   }
-  let BTCT_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
-  let wETH_ADDR = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  //let BTCT_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
+  //let wETH_ADDR = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  let BTCT_ADDR, wETH_ADDR
   //0xc778417e063141139fce010982780140aa0cd5ab
   if (net == "goerli") {
     BTCT_ADDR = "0xEb47a21C1fC00D1E863019906df1771b80DBE182"
   }
   if (net == "mainnet") {
     BTCT_ADDR = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+    wETH_ADDR = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+    TOKEN_DECIMALS = 8
   }
   if (net == "bsc_testnet") {
     BTCT_ADDR = "0xa88921dc290f888b5ee574cf2cd1599f412f1534"
+    wETH_ADDR = "0x094616f0bdfb0b526bd735bf66eca0ad254ca81f"
+    TOKEN_DECIMALS = 18
   }
   if (net == "bsc_mainnet") {
     BTCT_ADDR = "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c"
+    wETH_ADDR = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
+    TOKEN_DECIMALS = 18
+    
   }
   if (net == "ropsten"){//token decimals must be 18
     wETH_ADDR = "0xc778417e063141139fce010982780140aa0cd5ab"

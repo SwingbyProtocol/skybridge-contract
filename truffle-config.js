@@ -142,7 +142,8 @@ module.exports = {
     },
   },
   api_keys: {//https://ethereum.stackexchange.com/questions/19437/etherscan-how-can-i-verify-a-contract-with-multiple-imports-deployed-with-truff/20887
-    etherscan: 'A7EAG5WB4FRAHIURRGWD8HSTM8CVYXZGZ4' //truffle run verify SwapContract LPToken --network ropsten
+    etherscan: 'A7EAG5WB4FRAHIURRGWD8HSTM8CVYXZGZ4', //truffle run verify SwapContract LPToken --network ropsten
+    bscscan: 'VDKSF7XEFIHS9JT8S5B5DH7H3MAIPGMBQ7'
     //https://www.npmjs.com/package/truffle-plugin-verify
   },
   plugins: [
