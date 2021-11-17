@@ -74,9 +74,9 @@ const srcAmountBTC = "10000000"//0.1 BTC
 async function main() {
     let data
     let getPrice = await paraswap.getPrice(
-        Tokens[mainnet]['UNI'],
         Tokens[mainnet]['WBTC'],
-        srcAmountETH,
+        Tokens[mainnet]['UNI'],
+        srcAmountBTC,
         mainnet
     )
 
@@ -95,9 +95,9 @@ async function main() {
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload,
-        Tokens[mainnet]['UNI'],
         Tokens[mainnet]['WBTC'],
-        srcAmountETH,
+        Tokens[mainnet]['UNI'],
+        srcAmountBTC,
         minDestAmount.toString(),
         mainnet,
         "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract

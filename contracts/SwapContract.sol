@@ -397,7 +397,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return tokens[_token][_user];
     }
 
-    /// @dev spParaSwapBTC2Token - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
+    /// @dev spFlow1SimpleSwap - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
     /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
     function spFlow1SimpleSwap(Utils.SimpleData calldata _data)
         external
@@ -420,6 +420,59 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         tokens[_data.fromToken][_data.beneficiary] = tokens[_data.fromToken][
             _data.beneficiary
         ].sub(_data.fromAmount);
+    }
+
+    function spFlow1Uniswap(
+        bool _fork,
+        address _factory,
+        bytes32 _initCode,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path
+    ) external nonReentrant {
+        address fromToken = _path[0];
+        address endToken = _path[_path.length - 1];
+
+        require(
+            tokens[fromToken][msg.sender] >= _amountIn,
+            "Balance is not sufficient"
+        );
+
+        require(fromToken == BTCT_ADDR, "Must swap from BTC token");
+        require(endToken != BTCT_ADDR);
+
+        uint256 preSwapBalance = IERC20(endToken).balanceOf(address(this));
+
+        tokens[fromToken][msg.sender] = tokens[fromToken][msg.sender].sub(
+            _amountIn
+        );
+
+        //do swap
+        if (_fork) {
+            _doUniswapFork(
+                _factory,
+                _initCode,
+                _amountIn,
+                _amountOutMin,
+                _path
+            );
+        } else {
+            _doUniswap(_amountIn, _amountOutMin, _path);
+        }
+
+        uint256 receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
+            preSwapBalance
+        );
+
+        require(
+            receivedAmount >= _amountOutMin,
+            "Received amount insufficient"
+        );
+        require(receivedAmount != 0, "Received amount can not be 0");
+
+        tokens[endToken][msg.sender] = tokens[endToken][msg.sender].add(
+            receivedAmount
+        );
     }
 
     /// @dev spFlow2Uniswap - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
