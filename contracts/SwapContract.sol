@@ -397,7 +397,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return tokens[_token][_user];
     }
 
-    /// @dev spFlow1SimpleSwap - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
+    /// @dev spFlow1SimpleSwap - FLOW 1 - execute paraswap TX using simpleSwap, ending tokens sent directly to user's wallet
     /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
     function spFlow1SimpleSwap(Utils.SimpleData calldata _data)
         external
@@ -421,7 +421,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _data.beneficiary
         ].sub(_data.fromAmount);
     }
-
+    /// @dev spFlow1Uniswap - FLOW 1 - execute paraswap TX using uniswap, ending tokens sent to users allocation in tokens[][] mapping
+    /// @param _fork - BOOL to determine if using swapOnUniswap or swapOnUniswapFork paraswap contract methods
+    /// @param _factory - param for swapOnUniswapFork
+    /// @param _initCode - param for swapOnUniswapFork
+    /// @param _amountIn - param for swapOnUniswapFork or swapOnUniswap
+    /// @param _amountOutMin - param for swapOnUniswapFork or swapOnUniswap
+    /// @param _path - param for swapOnUniswapFork or swapOnUniswap
     function spFlow1Uniswap(
         bool _fork,
         address _factory,
@@ -475,7 +481,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
     }
 
-    /// @dev spFlow2Uniswap - FLOW 1 - execute paraswap TX converting BTCT in users slot in tokens[][] to an ERC20 or ether of their choice, sent to their wallet address
+    /// @dev spFlow2Uniswap - FLOW 1 - execute paraswap TX using uniswap, ending tokens sent to users allocation in tokens[][] mapping
+    /// @param _fork - BOOL to determine if using swapOnUniswap or swapOnUniswapFork paraswap contract methods
+    /// @param _factory - param for swapOnUniswapFork
+    /// @param _initCode - param for swapOnUniswapFork
+    /// @param _amountIn - param for swapOnUniswapFork or swapOnUniswap
+    /// @param _amountOutMin - param for swapOnUniswapFork or swapOnUniswap
+    /// @param _path - param for swapOnUniswapFork or swapOnUniswap
     function spFlow2Uniswap(
         bytes32 _destinationAddressForBTC,
         bool _fork,
@@ -533,9 +545,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev spParaSwapToken2BTC - FLOW 2 -> swap ERC20 -> wBTC
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
-    /// @param _data data from API call that is ready to be sent to paraswap interface
+    /// @param _data simpleData from paraswap API call, param for simpleSwap
     function spFlow2SimpleSwap(
-        bytes32 _destinationAddressForBTC,
+        bytes32 _destinationAddressForBTC, 
         Utils.SimpleData calldata _data
     ) external nonReentrant {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
@@ -578,6 +590,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev _doUniswapFork - performs paraswap transaction - BALANCE CHECKS MUST OCCUR BEFORE CALLING THIS
+    /// @param _factory - param for swapOnUniswapFork
+    /// @param _initCode - param for swapOnUniswapFork
+    /// @param _amountIn - param for swapOnUniswapFork 
+    /// @param _amountOutMin - param for swapOnUniswapFork
+    /// @param _path - param for swapOnUniswapFork 
     function _doUniswapFork(
         address _factory,
         bytes32 _initCode,
@@ -602,6 +619,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
     }
 
+    /// @dev _doUniswap - performs paraswap transaction - BALANCE CHECKS MUST OCCUR BEFORE CALLING THIS
+    /// @param _amountIn - param for swapOnUniswap
+    /// @param _amountOutMin - param for swapOnUniswap
+    /// @param _path - param for swapOnUniswap
     function _doUniswap(
         uint256 _amountIn,
         uint256 _amountOutMin,
