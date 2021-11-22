@@ -55,8 +55,16 @@ const Tokens = {
             address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
             decimals: 18
         },
-        BAT: {
-            address: '0x0d8775f648430679a709e98d2b0cb6250d2887ef',
+        COMP: {
+            address: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+            decimals: 18
+        },
+        MKR: {
+            address: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+            decimals: 18
+        },
+        SWINGBY: {
+            address: '0x8287c7b963b405b7b8d467db9d79eec40625b13a',
             decimals: 18
         }
     },
@@ -75,7 +83,7 @@ async function main() {
     let data
     let getPrice = await paraswap.getPrice(
         Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['ETH'],
+        Tokens[mainnet]['SWINGBY'],
         srcAmountBTC,
         mainnet
     )
@@ -86,22 +94,22 @@ async function main() {
         return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //Format ERC20 - 0.05
     }
 
-    let decimals = Tokens[mainnet]['UNI'].decimals
+    let decimals = Tokens[mainnet]['MATIC'].decimals
     let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
 
-    
+
 
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload,
         Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['ETH'],
+        Tokens[mainnet]['SWINGBY'],
         srcAmountBTC,
         minDestAmount.toString(),
         mainnet,
         //"0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
-        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address
+        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address - Flow 1 simpleSwap
         true //only params - true for contract -> contract | false for standard transaction object
     )
     data = txRequest.data //params to execute transaction contract -> contract  
@@ -113,6 +121,36 @@ async function main() {
 
     console.log("Recomended Contract Method:", contractMethod)
     //console.log(data)
+
+    if (contractMethod == "simpleSwap") {
+        console.log(`Getting data for ${contractMethod}`)
+        const dataArray = [
+            data[0].fromToken,
+            data[0].toToken,
+            data[0].fromAmount,
+            data[0].toAmount,
+            data[0].expectedAmount,
+            data[0].callees,
+            data[0].exchangeData,
+            data[0].startIndexes,
+            data[0].values,
+            data[0].beneficiary,
+            data[0].partner,
+            data[0].feePercent,
+            data[0].permit,
+            data[0].deadline,
+            data[0].uuid
+        ]
+        console.log(dataArray)
+    } else if (contractMethod == "swapOnUniswap") {
+        console.log(`Getting data for ${contractMethod}`)
+        console.log(data)
+    } else if (contractMethod == "swapOnUniswapFork") {
+        console.log(`Getting data for ${contractMethod}`)
+        console.log(data)
+    }
+
+
 
     /**
      //megaSwap
@@ -197,24 +235,7 @@ async function main() {
      */
 
 
-    const dataArray = [
-        data[0].fromToken,
-        data[0].toToken,
-        data[0].fromAmount,
-        data[0].toAmount,
-        data[0].expectedAmount,
-        data[0].callees,
-        data[0].exchangeData,
-        data[0].startIndexes,
-        data[0].values,
-        data[0].beneficiary,
-        data[0].partner,
-        data[0].feePercent,
-        data[0].permit,
-        data[0].deadline,
-        data[0].uuid
-    ]
-    console.log(dataArray)
+
 
 
 

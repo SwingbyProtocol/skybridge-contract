@@ -121,7 +121,7 @@ describe("SkyPools", () => {
 
 
     const endAmount = "100000000" //1 BTCt - decimal 8
-    const btcStartingAmount = "500000000"
+    const btcStartingAmount = "500000000" //5 BTC decimal 8
     const highValueEthAccount = "0x10c6b61DbF44a083Aec3780aCF769C77BE747E23" // ~.8 wBTC       
 
     //const paraAPI_URL = "https://apiv4.paraswap.io/v2"//V4 API URL
@@ -371,11 +371,8 @@ describe("SkyPools", () => {
                     let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
                     await swap.recordSkyPoolsTX(user1.address, endAmount, swapFees, sampleTxs) // todo: need to add rewards
 
-
                 })
                 it('simpleSwap flow 1', async () => {
-
-
                     //Execute paraswap TX
                     const result = await swap.connect(user1).spFlow1SimpleSwap(
                         simpleDataFlow1
@@ -406,7 +403,6 @@ describe("SkyPools", () => {
                 })//simpleSwap ETH flow 1
 
                 it('swapOnUniswapFork flow 1', async () => {
-
 
                     //Execute paraswap TX
                     await swap.connect(user1).spFlow1Uniswap(
@@ -445,7 +441,6 @@ describe("SkyPools", () => {
                 })//swapOnUniswapFork flow 1
 
                 it('swapOnUniswap flow 1', async () => {
-
                     //Execute paraswap TX
                     await swap.connect(user1).spFlow1Uniswap(
                         false,
@@ -480,12 +475,136 @@ describe("SkyPools", () => {
                     assert.equal(balance.toString(), expectedUniTokens.toString(), "User has the correct amount of UNI tokens in wallet")
                 })//swapOnUniswap flow 1
 
-                describe('Flow 1 multi TX stress test', async () => {
 
-                    it('allows for multiple flow 1 TXs without failure', async () => {
-                        console.log("TEST")
-                    })
+                it('allows for multiple flow 1 TXs without failure', async () => {
+
+                    //repeat all previous TXs at once
+                    const spFlow1SimpleSwapResult = await swap.connect(user1).spFlow1SimpleSwap(
+                        simpleDataFlow1
+                    )
+
+                    const spFlow1SimpleSwapETHResult = await swap.connect(user1).spFlow1SimpleSwap(
+                        simpleDataFlow1ETH
+                    )
+
+                    await swap.connect(user1).spFlow1Uniswap(
+                        true,
+                        swapOnUniswapForkFlow1[0],
+                        swapOnUniswapForkFlow1[1],
+                        swapOnUniswapForkFlow1[2],
+                        swapOnUniswapForkFlow1[3],
+                        swapOnUniswapForkFlow1[4],
+                    )
+
+                    await swap.connect(user1).spFlow1Uniswap(
+                        false,
+                        swapOnUniswapForkFlow1[0],
+                        swapOnUniswapForkFlow1[1],
+                        swapOnUniswapFlow1[0],
+                        swapOnUniswapFlow1[1],
+                        swapOnUniswapFlow1[2],
+                    )
+
+                    //more TXs including less tokens w/o direct swap from wBTC
+                    //Contract methods were selected by paraswap API based on market conditions at the time of testing
+
+                    //swap wBTC -> COMP via swapOnUniswapFork
+                    const flow1ToCOMP = ['0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac',
+                        '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
+                        '10000000',
+                        '9784939186051670608',
+                        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            '0xc00e94cb662c3520282e6f5717214004a7f26888']]
+
+                    await swap.connect(user1).spFlow1Uniswap(
+                        true,
+                        flow1ToCOMP[0],
+                        flow1ToCOMP[1],
+                        flow1ToCOMP[2],
+                        flow1ToCOMP[3],
+                        flow1ToCOMP[4],
+                    )
+                    //CHECK BALANCE TODO
+
+
+                    //swap wBTC -> USDC via swapOnUniswapFork
+                    const flow1ToUSDC = ['0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac',
+                        '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
+                        '10000000',
+                        '2801097984',
+                        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48']]
+
+                    await swap.connect(user1).spFlow1Uniswap(
+                        true,
+                        flow1ToUSDC[0],
+                        flow1ToUSDC[1],
+                        flow1ToUSDC[2],
+                        flow1ToUSDC[3],
+                        flow1ToUSDC[4],
+                    )
+                    //CHECK BALANCE TODO
+
+                    //swap wBTC -> USDC via swapOnUniswap
+                    const flow1ToMATTIC = ['10000000',
+                        '1799754185989227903071',
+                        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0']]
+
+                    await swap.connect(user1).spFlow1Uniswap(
+                        false,
+                        flow1ToUSDC[0],
+                        flow1ToUSDC[1],
+                        flow1ToMATTIC[0],
+                        flow1ToMATTIC[1],
+                        flow1ToMATTIC[2]
+                    )
+                    //CHECK BALANCE TODO
+
+                    //swap wBTC -> MKR via simpleSwap
+                    const flow1ToMKR = ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                        '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+                        '10000000',
+                        '983574506400367217',
+                        '1967149012800734433',
+                        ['0x2F9EC37d6CcFFf1caB21733BdaDEdE11c823cCB0'],
+                        '0x569706eb00000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000098968000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599000000000000000000000000fee7eeaa0c2f3f7c7e6301751a8de55ce4d059ec0000000000000000000000001f573d6fb3f13d689ff844b4ce37794d79a7ff1c000000000000000000000000f553e6ea4ce2f7deecbe7837e27931850ec15fab0000000000000000000000009f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+                        [0, 356],
+                        ['0'],
+                        '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+                        '0x000000000000000000000000536b79506F6f6c73',
+                        '0',
+                        '0x',
+                        '1637641451',
+                        '0xeaae5b304be211ec9f59dd3d48aed4dd']
+
+                    await swap.connect(user1).spFlow1SimpleSwap(
+                        flow1ToMKR
+                    )
+                    //CHECK BALANCE TODO
+
+                    //swap wBTC -> SWINGBY via swapOnUniswap
+                    const flow1toSWINGBY = ['10000000',
+                        '38608541168427523513677',
+                        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            '0x8287c7b963b405b7b8d467db9d79eec40625b13a']]
+
+                            await swap.connect(user1).spFlow1Uniswap(
+                                false,
+                                flow1ToUSDC[0],
+                                flow1ToUSDC[1],
+                                flow1toSWINGBY[0],
+                                flow1toSWINGBY[1],
+                                flow1toSWINGBY[2]
+                            )
+                            //CHECK BALANCE TODO
+
                 })
+
 
                 /////////////////////////////// TEST FOR FAILURE //////////////////////////////////////////////
                 describe('Testing for flow 1 failure cases', async () => {
