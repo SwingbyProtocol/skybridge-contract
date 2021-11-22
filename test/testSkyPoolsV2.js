@@ -46,6 +46,23 @@ describe("SkyPools", () => {
         '1636607315',
         '0x219c6130427b11ec944a9952ba50eb97']
 
+    const simpleDataFlow1ETH = ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+        '10000000',
+        '690231785171252979',
+        '1380463570342505957',
+        ['0xdef1c0ded9bec7f1a1670819833240f027b25eff',
+            '0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57'],
+        '0xaa77476c000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599000000000000000000000000000000000000000000000000135d7b001eb3b40000000000000000000000000000000000000000000000000000000000009a4494000000000000000000000000b3c839dbde6b96d37c56ee4f9dad3390d49310aa000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee570000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000619c09880000000000000000000000000000000000000000000000000000017d49853b400000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000001cdf10b297e8aea756ba184e37aeb050cd7a7336323790e7f0e447ecc54e2bef704795fe48ffcbc0d2fdf0f0c642737f7e758e8e22367e07d75a6a6a0090243dcf0000000000000000000000000000000000000000000000000000000000989680e1829cfe000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        [0, 484, 520],
+        ['0', '0'],
+        '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+        '0x000000000000000000000000536b79506F6f6c73',
+        '0',
+        '0x',
+        '1637616008',
+        '0xb0e496c04bd911ecbcc39ff5b6a635aa']
+
     const simpleDataFlow2 = ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
         '1000000000000000000',
@@ -338,7 +355,7 @@ describe("SkyPools", () => {
             })//beforeEach - PARASWAP
 
             describe('executes paraSwap transactions: Flow 1 => BTC -> wBTC -> ERC20', async () => {
-                it('simpleSwap flow 1', async () => {
+                beforeEach(async () => {
                     //Allocate wBTC tokens to user in tokens[][]
                     await populateBalance(swap.address, wBTC, wBTC_SLOT, btcStartingAmount)
 
@@ -348,22 +365,16 @@ describe("SkyPools", () => {
                     let addressesAndAmountOfFloat = web3.utils.padLeft(newFloatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
                     await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
 
-                    //check float reserve
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    const startingFloatAmount = balance[1]
-                    assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(newFloatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
-
                     //perform recordSkyPoolsTX to assign user1 btct tokens in the contract
                     let swapFeesBPS = new BigNumber.from(20);
                     let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
                     let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
                     await swap.recordSkyPoolsTX(user1.address, endAmount, swapFees, sampleTxs) // todo: need to add rewards
 
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(startingFloatAmount.sub(balance[1]).toString(), endAmount, "1 BTCt deducted from float") //1 BTCt -> decimal 8
 
-                    balance = await swap.tokens(wBTC, user1.address)
-                    assert.equal(balance.toString(), endAmount, "User balance in tokens[][] is correct")
+                })
+                it('simpleSwap flow 1', async () => {
+
 
                     //Execute paraswap TX
                     const result = await swap.connect(user1).spFlow1SimpleSwap(
@@ -379,32 +390,23 @@ describe("SkyPools", () => {
 
                 })//SimpleSwap flow 1
 
+                it('simpleSwap ETH flow 1', async () => {
+
+                    const initEthBalance = await ethers.provider.getBalance(user1.address)
+
+                    //Execute paraswap TX
+                    const result = await swap.connect(user1).spFlow1SimpleSwap(
+                        simpleDataFlow1ETH
+                    )
+
+                    //Check ending balances
+                    balance = await ethers.provider.getBalance(user1.address)
+                    assert(balance > new BigNumber.from(initEthBalance), "User has received ETH")
+
+                })//simpleSwap ETH flow 1
+
                 it('swapOnUniswapFork flow 1', async () => {
-                    //Allocate wBTC tokens to user in tokens[][]
-                    await populateBalance(swap.address, wBTC, wBTC_SLOT, btcStartingAmount)
 
-                    let decimals = Tokens[mainnetNetworkID]['ETH'].decimals
-                    //set float reserve
-                    const newFloatAmount = new BigNumber.from("500000000")//5 tokens ERC20 - decimal 18
-                    let addressesAndAmountOfFloat = web3.utils.padLeft(newFloatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
-                    await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
-
-                    //check float reserve
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    const startingFloatAmount = balance[1]
-                    assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(newFloatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
-
-                    //perform recordSkyPoolsTX to assign user1 btct tokens in the contract
-                    let swapFeesBPS = new BigNumber.from(20);
-                    let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
-                    let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
-                    await swap.recordSkyPoolsTX(user1.address, endAmount, swapFees, sampleTxs) // todo: need to add rewards
-
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(startingFloatAmount.sub(balance[1]).toString(), endAmount, "1 BTCt deducted from float") //1 BTCt -> decimal 8
-
-                    balance = await swap.tokens(wBTC, user1.address)
-                    assert.equal(balance.toString(), endAmount, "User balance in tokens[][] is correct")
 
                     //Execute paraswap TX
                     await swap.connect(user1).spFlow1Uniswap(
@@ -415,7 +417,7 @@ describe("SkyPools", () => {
                         swapOnUniswapForkFlow1[3],
                         swapOnUniswapForkFlow1[4],
                     )
-                    
+
                     //check contract balance
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address) //254568805347400382633
                     const expectedUniTokens = balance
@@ -438,36 +440,11 @@ describe("SkyPools", () => {
                     //check wallet balance
                     balance = await UNI_Contract.balanceOf(user1.address)
                     assert.equal(balance.toString(), expectedUniTokens.toString(), "User has the correct amount of UNI tokens in wallet")
-                    
+
 
                 })//swapOnUniswapFork flow 1
 
                 it('swapOnUniswap flow 1', async () => {
-                    //Allocate wBTC tokens to user in tokens[][]
-                    await populateBalance(swap.address, wBTC, wBTC_SLOT, btcStartingAmount)
-
-                    let decimals = Tokens[mainnetNetworkID]['ETH'].decimals
-                    //set float reserve
-                    const newFloatAmount = new BigNumber.from("500000000")//5 tokens ERC20 - decimal 18
-                    let addressesAndAmountOfFloat = web3.utils.padLeft(newFloatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
-                    await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
-
-                    //check float reserve
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    const startingFloatAmount = balance[1]
-                    assert.equal(utils.formatEther(balance[1]).toString(), utils.formatEther(newFloatAmount.add(minerFees)).toString(), "Float Reserve of BTCT tokens on the contract BEFORE skypools transaction is correct")
-
-                    //perform recordSkyPoolsTX to assign user1 btct tokens in the contract
-                    let swapFeesBPS = new BigNumber.from(20);
-                    let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
-                    let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
-                    await swap.recordSkyPoolsTX(user1.address, endAmount, swapFees, sampleTxs) // todo: need to add rewards
-
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(startingFloatAmount.sub(balance[1]).toString(), endAmount, "1 BTCt deducted from float") //1 BTCt -> decimal 8
-
-                    balance = await swap.tokens(wBTC, user1.address)
-                    assert.equal(balance.toString(), endAmount, "User balance in tokens[][] is correct")
 
                     //Execute paraswap TX
                     await swap.connect(user1).spFlow1Uniswap(
@@ -478,7 +455,7 @@ describe("SkyPools", () => {
                         swapOnUniswapFlow1[1],
                         swapOnUniswapFlow1[2],
                     )
-                    
+
                     //check contract balance
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address) //254568805347400382633
                     const expectedUniTokens = balance
@@ -502,6 +479,13 @@ describe("SkyPools", () => {
                     balance = await UNI_Contract.balanceOf(user1.address)
                     assert.equal(balance.toString(), expectedUniTokens.toString(), "User has the correct amount of UNI tokens in wallet")
                 })//swapOnUniswap flow 1
+
+                describe('Flow 1 multi TX stress test', async () => {
+
+                    it('allows for multiple flow 1 TXs without failure', async () => {
+                        console.log("TEST")
+                    })
+                })
 
                 /////////////////////////////// TEST FOR FAILURE //////////////////////////////////////////////
                 describe('Testing for flow 1 failure cases', async () => {

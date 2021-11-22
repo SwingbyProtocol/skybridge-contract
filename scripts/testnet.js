@@ -75,7 +75,7 @@ async function main() {
     let data
     let getPrice = await paraswap.getPrice(
         Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['UNI'],
+        Tokens[mainnet]['ETH'],
         srcAmountBTC,
         mainnet
     )
@@ -96,12 +96,12 @@ async function main() {
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload,
         Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['UNI'],
+        Tokens[mainnet]['ETH'],
         srcAmountBTC,
         minDestAmount.toString(),
         mainnet,
-        "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
-        //"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address
+        //"0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
+        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address
         true //only params - true for contract -> contract | false for standard transaction object
     )
     data = txRequest.data //params to execute transaction contract -> contract  
@@ -109,8 +109,10 @@ async function main() {
     const { parse } = require('json-parser')
     const parsedOutput = parse(output)
     const contractMethod = parsedOutput.priceRoute.contractMethod
+
+
     console.log("Recomended Contract Method:", contractMethod)
-    console.log(data)
+    //console.log(data)
 
     /**
      //megaSwap
@@ -193,6 +195,26 @@ async function main() {
     ]
     console.log(dataArray)
      */
+
+
+    const dataArray = [
+        data[0].fromToken,
+        data[0].toToken,
+        data[0].fromAmount,
+        data[0].toAmount,
+        data[0].expectedAmount,
+        data[0].callees,
+        data[0].exchangeData,
+        data[0].startIndexes,
+        data[0].values,
+        data[0].beneficiary,
+        data[0].partner,
+        data[0].feePercent,
+        data[0].permit,
+        data[0].deadline,
+        data[0].uuid
+    ]
+    console.log(dataArray)
 
 
 
