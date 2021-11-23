@@ -10,6 +10,7 @@ const swapAddress = '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417'
 const swapABI = require('../abi/SwapContract.json')
 const { default: Web3 } = require('web3');
 
+//npx hardhat run testnet.js
 
 const Tokens = {
     [ropsten]: {
@@ -55,15 +56,24 @@ const Tokens = {
             address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
             decimals: 18
         },
-        BAT: {
-            address: '0x0d8775f648430679a709e98d2b0cb6250d2887ef',
+        COMP: {
+            address: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+            decimals: 18
+        },
+        MKR: {
+            address: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+            decimals: 18
+        },
+        SWINGBY: {
+            address: '0x8287c7b963b405b7b8d467db9d79eec40625b13a',
             decimals: 18
         }
     },
 }
 
-const srcAmountETH = "1000000000000000000"//1 ETHER
-const srcAmountBTC = "10000000"//0.1 BTC
+const srcAmountBTC = "10000000"//0.1 BTC //USE FOR FLOW 1
+const srcAmountETH = "1000000000000000000"//1 ETHER //USE FOR FLOW 2
+
 
 
 //const srcAmount = "147618252344340533"
@@ -72,10 +82,11 @@ const srcAmountBTC = "10000000"//0.1 BTC
 
 
 async function main() {
+    let data
     let getPrice = await paraswap.getPrice(
-        Tokens[mainnet]['UNI'],
-        Tokens[mainnet]['WBTC'],
-        srcAmountETH,
+        Tokens[mainnet]['WBTC'], // From token - CHANGE THIS
+        Tokens[mainnet]['WETH'], // To token - CHANGE THIS
+        srcAmountBTC, //Change this depending on flow 1 vs flow 2
         mainnet
     )
 
@@ -85,73 +96,117 @@ async function main() {
         return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //Format ERC20 - 0.05
     }
 
-    let decimals = Tokens[mainnet]['UNI'].decimals
+    let decimals = Tokens[mainnet]['ETH'].decimals
     let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
-        getPrice.payload,
-        Tokens[mainnet]['UNI'],
-        Tokens[mainnet]['WBTC'],
-        srcAmountETH,
-        minDestAmount.toString(),
+        getPrice.payload, //data from GET request
+        Tokens[mainnet]['WBTC'], // From token - CHANGE THIS
+        Tokens[mainnet]['WETH'], // To token - CHANGE THIS
+        srcAmountBTC, //Change this depending on flow 1 vs flow 2
+        minDestAmount.toString(), //this param is not used for paraswap V5 anymore, redundant
         mainnet,
-        "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
+        //"0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract - flow 2 simpleSwap - uniswap functions don't care about this param
+        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address - Flow 1 simpleSwap
         true //only params - true for contract -> contract | false for standard transaction object
     )
-    let data = txRequest.data //params to execute transaction contract -> contract  
-    
+    data = txRequest.data //params to execute transaction contract -> contract  
+    const output = txRequest.config.data
+    const { parse } = require('json-parser')
+    const parsedOutput = parse(output)
+    const contractMethod = parsedOutput.priceRoute.contractMethod
+
+
+    console.log("Recomended Contract Method:", contractMethod)
     //console.log(data)
+
+    if (contractMethod == "simpleSwap") {
+        console.log(`Getting data for ${contractMethod}`)
+        const dataArray = [
+            data[0].fromToken,
+            data[0].toToken,
+            data[0].fromAmount,
+            data[0].toAmount,
+            data[0].expectedAmount,
+            data[0].callees,
+            data[0].exchangeData,
+            data[0].startIndexes,
+            data[0].values,
+            data[0].beneficiary,
+            data[0].partner,
+            data[0].feePercent,
+            data[0].permit,
+            data[0].deadline,
+            data[0].uuid
+        ]
+        console.log(dataArray)
+    } else if (contractMethod == "swapOnUniswap") {
+        console.log(`Getting data for ${contractMethod}`)
+        console.log(data)
+    } else if (contractMethod == "swapOnUniswapFork") {
+        console.log(`Getting data for ${contractMethod}`)
+        console.log(data)
+    }
+
+
 
     /**
      //megaSwap
-    const dataArray = [
+     let routeArray = [
+        data[0].path[0].path[0].adapters[0].route[0].index,
+        data[0].path[0].path[0].adapters[0].route[0].targetExchange,
+        data[0].path[0].path[0].adapters[0].route[0].percent,
+        data[0].path[0].path[0].adapters[0].route[0].payload,
+        data[0].path[0].path[0].adapters[0].route[0].networkFee
+    ]
+    let pathArray = [
+        data[0].path[0].fromAmountPercent,
+        [
+            data[0].path[0].path[0].to,
+            data[0].path[0].path[0].totalNetworkFee,
+            [ //adapters
+                data[0].path[0].path[0].adapters[0].adapter,
+                data[0].path[0].path[0].adapters[0].percent,
+                data[0].path[0].path[0].adapters[0].networkFee,
+                routeArray
+            ]
+        ]
+    ]
+    const megaDataArray = [
         data[0].fromToken,
         data[0].fromAmount,
         data[0].toAmount,
         data[0].expectedAmount,
         data[0].beneficiary,
-        data[0].path,
+        pathArray,
         data[0].partner,
         data[0].feePercent,
         data[0].permit,
         data[0].deadline,
         data[0].uuid
     ]
+
+    /**
+     console.log(dataArray)
+
+    console.log("PATH BELOW")
+    console.log(pathArray)
+
+    console.log("ROUTE BELOW")
+    console.log(routeArray)
+     */
+
+
+
+    //console.log(data[0].path[0].path[0].adapters[0].route[0].targetExchange)
 
     //console.log(dataArray)
     //console.log(data[0].path)
     //console.log(data[0].path[0].path)
     //console.log(data[0].path[0].path[0].adapters)
     //console.log(data[0].path[0].path[0].adapters[0].route)
-     */
-    
-    
 
-    /**
-     
-     */
-
-    //simpleSwap
-    const dataArray = [
-        data[0].fromToken,
-        data[0].toToken,
-        data[0].fromAmount,
-        data[0].toAmount,
-        data[0].expectedAmount,
-        data[0].callees,
-        data[0].exchangeData,
-        data[0].startIndexes,
-        data[0].values,
-        data[0].beneficiary,
-        data[0].partner,
-        data[0].feePercent,
-        data[0].permit,
-        data[0].deadline,
-        data[0].uuid
-    ]
-    console.log(dataArray)
-    
 }
 
 

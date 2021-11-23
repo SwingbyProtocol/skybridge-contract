@@ -53,9 +53,28 @@ interface ISwapContract {
         bytes32[] memory _usedTxIds
     ) external returns (bool);
 
-    function spParaSwapBTC2Token(Utils.SimpleData calldata _data) external;
+    function spFlow1SimpleSwap(Utils.SimpleData calldata _data) external;
 
-    function spParaSwapToken2BTC(
+    function spFlow1Uniswap(
+        bool _fork,
+        address _factory,
+        bytes32 _initCode,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path
+    ) external;
+
+    function spFlow2Uniswap(
+        bytes32 _destinationAddressForBTC,
+        bool _fork,
+        address _factory,
+        bytes32 _initCode,
+        uint256 _amountIn,
+        uint256 _amountOutMin,
+        address[] calldata _path
+    ) external;
+
+    function spFlow2SimpleSwap(
         bytes32 _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external;
