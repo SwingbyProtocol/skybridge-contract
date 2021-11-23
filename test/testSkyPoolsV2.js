@@ -382,7 +382,7 @@ describe("SkyPools", () => {
                     balance = await UNI_Contract.balanceOf(user1.address)
                     assert(balance > new BigNumber.from(0), "User has UNI tokens in wallet")
 
-                    balance = await swap.connect(user1).balanceOf(user1.address, UNI)
+                    balance = await swap.connect(user1).balanceOf(UNI, user1.address)
                     assert.equal(balance.toString(), "0", "User balance of UNI tokens on swap contract is 0")
 
                 })//SimpleSwap flow 1
@@ -474,6 +474,51 @@ describe("SkyPools", () => {
                     balance = await UNI_Contract.balanceOf(user1.address)
                     assert.equal(balance.toString(), expectedUniTokens.toString(), "User has the correct amount of UNI tokens in wallet")
                 })//swapOnUniswap flow 1
+
+                it('swapOnUniswap flow 1 -> wETH and withdraw naitive ETH', async () => {
+                    //Use path wBTC -> wETH, user withdraws ETH to their wallet
+
+                    const initEthBalance = await ethers.provider.getBalance(user1.address)
+                    const ETHER = Tokens[mainnetNetworkID]['ETH'].address
+                    const flow1ToETHUniswap = [ '0x115934131916C8b277DD010Ee02de363c09d037c',
+                    '0x65d1a3b1e46c6e4f1be1ad5f99ef14dc488ae0549dc97db9b30afe2241ce1c7a',
+                    '10000000',
+                    '659829776477491556',
+                    [ '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                      '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ] ]
+
+                      await swap.connect(user1).spFlow1Uniswap(
+                        true,
+                        flow1ToETHUniswap[0],
+                        flow1ToETHUniswap[1],
+                        flow1ToETHUniswap[2],
+                        flow1ToETHUniswap[3],
+                        flow1ToETHUniswap[4],
+                    )
+
+                    balance = await swap.balanceOf(wETH, user1.address)
+                    const receivedAmount = balance
+                    assert(receivedAmount > 0, "User received wETH to their allocation on the swap contract")
+
+                    //withdraw and receive ETH
+                    const result = await swap.connect(user1).redeemEther(receivedAmount)
+                    balance = await swap.balanceOf(wETH, user1.address)
+                    assert.equal(balance.toString(), "0", "Balance is correct after depositing ETHER")
+                    const receipt = await result.wait()
+                    const event = receipt.events[receipt.events.length - 1].args
+
+                    //verify event receipt is correct
+                    event.token.toString().should.equal(ETHER, 'token is correct')
+                    event.user.toString().should.equal(user1.address, 'user address is correct')
+                    event.amount.toString().should.equal(receivedAmount.toString(), 'amount is correct')
+                    event.balance.toString().should.equal("0", 'balance is correct')
+                    event.Timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
+
+                    //verify user balance is correct 
+                    balance = await ethers.provider.getBalance(user1.address)
+                    assert(balance > initEthBalance, "User received ETHER to their personal wallet")
+                    
+                })
 
 
                 it('allows for multiple flow 1 TXs without failure', async () => {
@@ -593,15 +638,15 @@ describe("SkyPools", () => {
                             '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
                             '0x8287c7b963b405b7b8d467db9d79eec40625b13a']]
 
-                            await swap.connect(user1).spFlow1Uniswap(
-                                false,
-                                flow1ToUSDC[0],
-                                flow1ToUSDC[1],
-                                flow1toSWINGBY[0],
-                                flow1toSWINGBY[1],
-                                flow1toSWINGBY[2]
-                            )
-                            //CHECK BALANCE TODO
+                    await swap.connect(user1).spFlow1Uniswap(
+                        false,
+                        flow1ToUSDC[0],
+                        flow1ToUSDC[1],
+                        flow1toSWINGBY[0],
+                        flow1toSWINGBY[1],
+                        flow1toSWINGBY[2]
+                    )
+                    //CHECK BALANCE TODO
 
                 })
 

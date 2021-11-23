@@ -58,8 +58,12 @@ class ParaSwap {
                     `${this.apiURL}/prices/?srcToken=${from.address}&destToken=${to.address}` +
                     `&amount=${srcAmount}&srcDecimals=${from.decimals}&destDecimals` +
                     `=${to.decimals}&side=SELL&network=${network}&maxImpact=100`
-                    //+ `&excludeContractMethods=multiSwap`
+                    //PICK WHICH CONTRACT METHODS TO INCLUDE
+                    //+  `&includeContractMethods=swapOnUniswapFork`
+                    //+  `&includeContractMethods=swapOnUniswap`
+                    //+  `&includeContractMethods=simpleSwap`
                     +  `&includeContractMethods=simpleSwap,swapOnUniswap,swapOnUniswapFork`
+                    
                     const { data } = await axios.get(requestURL, {
                     headers: {
                         'partner': this.referrer,

@@ -10,6 +10,7 @@ const swapAddress = '0xf73D63C3eB97389cB5A28C4aD5e8AC428cb16417'
 const swapABI = require('../abi/SwapContract.json')
 const { default: Web3 } = require('web3');
 
+//npx hardhat run testnet.js
 
 const Tokens = {
     [ropsten]: {
@@ -70,8 +71,9 @@ const Tokens = {
     },
 }
 
-const srcAmountETH = "1000000000000000000"//1 ETHER
-const srcAmountBTC = "10000000"//0.1 BTC
+const srcAmountBTC = "10000000"//0.1 BTC //USE FOR FLOW 1
+const srcAmountETH = "1000000000000000000"//1 ETHER //USE FOR FLOW 2
+
 
 
 //const srcAmount = "147618252344340533"
@@ -82,9 +84,9 @@ const srcAmountBTC = "10000000"//0.1 BTC
 async function main() {
     let data
     let getPrice = await paraswap.getPrice(
-        Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['SWINGBY'],
-        srcAmountBTC,
+        Tokens[mainnet]['WBTC'], // From token - CHANGE THIS
+        Tokens[mainnet]['WETH'], // To token - CHANGE THIS
+        srcAmountBTC, //Change this depending on flow 1 vs flow 2
         mainnet
     )
 
@@ -94,21 +96,18 @@ async function main() {
         return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //Format ERC20 - 0.05
     }
 
-    let decimals = Tokens[mainnet]['MATIC'].decimals
+    let decimals = Tokens[mainnet]['ETH'].decimals
     let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
-
-
-
 
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
-        getPrice.payload,
-        Tokens[mainnet]['WBTC'],
-        Tokens[mainnet]['SWINGBY'],
-        srcAmountBTC,
-        minDestAmount.toString(),
+        getPrice.payload, //data from GET request
+        Tokens[mainnet]['WBTC'], // From token - CHANGE THIS
+        Tokens[mainnet]['WETH'], // To token - CHANGE THIS
+        srcAmountBTC, //Change this depending on flow 1 vs flow 2
+        minDestAmount.toString(), //this param is not used for paraswap V5 anymore, redundant
         mainnet,
-        //"0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract
+        //"0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract - flow 2 simpleSwap - uniswap functions don't care about this param
         "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address - Flow 1 simpleSwap
         true //only params - true for contract -> contract | false for standard transaction object
     )
@@ -207,37 +206,6 @@ async function main() {
     //console.log(data[0].path[0].path)
     //console.log(data[0].path[0].path[0].adapters)
     //console.log(data[0].path[0].path[0].adapters[0].route)
-
-
-
-
-
-    /**
-     //simpleSwap
-    const dataArray = [
-        data[0].fromToken,
-        data[0].toToken,
-        data[0].fromAmount,
-        data[0].toAmount,
-        data[0].expectedAmount,
-        data[0].callees,
-        data[0].exchangeData,
-        data[0].startIndexes,
-        data[0].values,
-        data[0].beneficiary,
-        data[0].partner,
-        data[0].feePercent,
-        data[0].permit,
-        data[0].deadline,
-        data[0].uuid
-    ]
-    console.log(dataArray)
-     */
-
-
-
-
-
 
 }
 
