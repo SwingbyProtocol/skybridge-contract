@@ -600,9 +600,9 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "bytes",
         "name": "_destinationAddressForBTC",
-        "type": "bytes32"
+        "type": "bytes"
       },
       {
         "components": [
@@ -695,9 +695,9 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "bytes",
         "name": "_destinationAddressForBTC",
-        "type": "bytes32"
+        "type": "bytes"
       },
       {
         "internalType": "bool",

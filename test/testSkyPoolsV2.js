@@ -28,6 +28,10 @@ describe("SkyPools", () => {
     const srcAmountETH = "1000000000000000000"//1 ETHER
     const srcAmountBTC = "10000000"//.1 wBTC
 
+    //for Flow 2 - hex of utf-8 string BTC addr tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv
+    const receivingBTC_Addr = "0x74623170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a77756470787170336d767a76"
+
+
     //Store hard coded transactions from API PUT request
     const simpleDataFlow1 = [
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', //fromToken
@@ -713,7 +717,6 @@ describe("SkyPools", () => {
                     await swap.connect(user1).spDeposit("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", amount, overrides)
 
                     /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
-                    const receivingBTC_Addr = sampleTxs[0]
 
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                     assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
@@ -745,7 +748,7 @@ describe("SkyPools", () => {
                     assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
                     args.SwapID.toString().length.should.be.at.least(1, "SwapID is present")
                     const TX_ID = args.SwapID
-                    assert.equal(args.DestAddr, sampleTxs[0], "DestAddr for BTC is correct")
+                    assert.equal(args.DestAddr, receivingBTC_Addr, "DestAddr for BTC is correct")
                     assert.equal(args.AmountWBTC.toString(), expectedSats, "AmountWBTC is correct amount")
                     assert.equal(args.RefundAddr, user1.address, "RefundAddr is correct")
                     args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
@@ -830,7 +833,6 @@ describe("SkyPools", () => {
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
                     assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
 
-                    const receivingBTC_Addr = sampleTxs[0]
 
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                     assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
@@ -860,7 +862,7 @@ describe("SkyPools", () => {
                     assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
                     args.SwapID.toString().length.should.be.at.least(1, "SwapID is present")
                     const TX_ID = args.SwapID
-                    assert.equal(args.DestAddr, sampleTxs[0], "DestAddr for BTC is correct")
+                    assert.equal(args.DestAddr, receivingBTC_Addr, "DestAddr for BTC is correct")
                     assert.equal(args.AmountWBTC.toString(), expectedSats, "AmountWBTC is correct amount")
                     assert.equal(args.RefundAddr, user1.address, "RefundAddr is correct")
                     args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
@@ -888,8 +890,6 @@ describe("SkyPools", () => {
 
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
                     assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
-
-                    const receivingBTC_Addr = sampleTxs[0]
 
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                     assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
@@ -924,7 +924,7 @@ describe("SkyPools", () => {
                     assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
                     args.SwapID.toString().length.should.be.at.least(1, "SwapID is present")
                     const TX_ID = args.SwapID
-                    assert.equal(args.DestAddr, sampleTxs[0], "DestAddr for BTC is correct")
+                    assert.equal(args.DestAddr, receivingBTC_Addr, "DestAddr for BTC is correct")
                     assert.equal(args.AmountWBTC.toString(), expectedSats, "AmountWBTC is correct amount")
                     assert.equal(args.RefundAddr, user1.address, "RefundAddr is correct")
                     args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
@@ -952,8 +952,6 @@ describe("SkyPools", () => {
 
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
                     assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
-
-                    const receivingBTC_Addr = sampleTxs[0]
 
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                     assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
@@ -988,7 +986,7 @@ describe("SkyPools", () => {
                     assert.equal(event.event, "SwapTokensToBTC", "Correct event name")
                     args.SwapID.toString().length.should.be.at.least(1, "SwapID is present")
                     const TX_ID = args.SwapID
-                    assert.equal(args.DestAddr, sampleTxs[0], "DestAddr for BTC is correct")
+                    assert.equal(args.DestAddr, receivingBTC_Addr, "DestAddr for BTC is correct")
                     assert.equal(args.AmountWBTC.toString(), expectedSats, "AmountWBTC is correct amount")
                     assert.equal(args.RefundAddr, user1.address, "RefundAddr is correct")
                     args.Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
