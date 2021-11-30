@@ -737,8 +737,7 @@ describe("SkyPools", () => {
 
                     balance = await swap.balanceOf(wBTC, swap.address)
                     balance.toNumber().should.be.at.least(1, "Balance is present")
-                    const expectedSats = balance.toString()
-
+                    const expectedSats = balance.toString() //7111530
 
                     receipt = await swapAndRecordResult.wait()
 

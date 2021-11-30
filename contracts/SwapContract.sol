@@ -26,7 +26,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     struct spPendingTx {
         bytes32 SwapID; //swap hash for identification of this swap.
-        bytes DestAddr; //destination BTC address for the swap
+        string DestAddr; //destination BTC address for the swap
         address RefundAddr; //refund address on evm source chain for if the swap fails.
         uint256 AmountWBTC; //outbound amount for this swap.
         uint256 Timestamp; // block timestamp that is set by EVM
@@ -117,7 +117,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     event SwapTokensToBTC(
         bytes32 SwapID,
-        bytes DestAddr,
+        string DestAddr,
         address RefundAddr,
         uint256 AmountWBTC,
         uint256 Timestamp
@@ -492,7 +492,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _amountOutMin - param for swapOnUniswapFork or swapOnUniswap
     /// @param _path - param for swapOnUniswapFork or swapOnUniswap
     function spFlow2Uniswap(
-        bytes memory _destinationAddressForBTC,
+        string memory _destinationAddressForBTC,
         bool _fork,
         address _factory,
         bytes32 _initCode,
@@ -551,7 +551,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _data simpleData from paraswap API call, param for simpleSwap
     function spFlow2SimpleSwap(
-        bytes memory _destinationAddressForBTC,
+        string memory _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external nonReentrant {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
@@ -660,8 +660,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _btctAmount amount in BTC decimal 8.
     function _spRecordPendingTx(
-        //string memory _destinationAddressForBTC,
-        bytes memory _destinationAddressForBTC,
+        string memory _destinationAddressForBTC,
         uint256 _btctAmount
     ) internal {
         //hash TX data for unique ID

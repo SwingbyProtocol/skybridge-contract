@@ -604,9 +604,9 @@
     {
       "inputs": [
         {
-          "internalType": "bytes",
+          "internalType": "string",
           "name": "_destinationAddressForBTC",
-          "type": "bytes"
+          "type": "string"
         },
         {
           "components": [
@@ -699,9 +699,9 @@
     {
       "inputs": [
         {
-          "internalType": "bytes",
+          "internalType": "string",
           "name": "_destinationAddressForBTC",
-          "type": "bytes"
+          "type": "string"
         },
         {
           "internalType": "bool",

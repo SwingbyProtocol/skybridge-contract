@@ -65,7 +65,7 @@ interface ISwapContract {
     ) external;
 
     function spFlow2Uniswap(
-        bytes memory _destinationAddressForBTC,
+        string memory _destinationAddressForBTC,
         bool _fork,
         address _factory,
         bytes32 _initCode,
@@ -75,7 +75,7 @@ interface ISwapContract {
     ) external;
 
     function spFlow2SimpleSwap(
-        bytes memory _destinationAddressForBTC,
+        string memory _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external;
 

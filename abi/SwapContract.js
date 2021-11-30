@@ -266,9 +266,9 @@ export default [
       },
       {
         "indexed": false,
-        "internalType": "bytes",
+        "internalType": "string",
         "name": "DestAddr",
-        "type": "bytes"
+        "type": "string"
       },
       {
         "indexed": false,
@@ -1108,9 +1108,9 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "bytes",
+        "internalType": "string",
         "name": "_destinationAddressForBTC",
-        "type": "bytes"
+        "type": "string"
       },
       {
         "components": [
@@ -1203,9 +1203,9 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "bytes",
+        "internalType": "string",
         "name": "_destinationAddressForBTC",
-        "type": "bytes"
+        "type": "string"
       },
       {
         "internalType": "bool",
@@ -1255,9 +1255,9 @@ export default [
             "type": "bytes32"
           },
           {
-            "internalType": "bytes",
+            "internalType": "string",
             "name": "DestAddr",
-            "type": "bytes"
+            "type": "string"
           },
           {
             "internalType": "address",
@@ -1299,9 +1299,9 @@ export default [
         "type": "bytes32"
       },
       {
-        "internalType": "bytes",
+        "internalType": "string",
         "name": "DestAddr",
-        "type": "bytes"
+        "type": "string"
       },
       {
         "internalType": "address",
