@@ -36,7 +36,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
     //spPendingTx[] spPendingTXs;
     uint256 public swapCount;
-    uint256 public latestRemovedIndex;
+    uint256 public oldestActiveIndex;
 
     mapping(address => bool) public whitelist;
 
@@ -142,7 +142,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         //set default expiration time for pending TX
         expirationTime = 172800; //2 days
         //init latest removed index and swapCount
-        latestRemovedIndex = 0;
+        oldestActiveIndex = 0;
         swapCount = 0;
         //set address for wETH
         wETH = _wETH;
@@ -492,7 +492,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _amountOutMin - param for swapOnUniswapFork or swapOnUniswap
     /// @param _path - param for swapOnUniswapFork or swapOnUniswap
     function spFlow2Uniswap(
-        string memory _destinationAddressForBTC,
+        string calldata _destinationAddressForBTC,
         bool _fork,
         address _factory,
         bytes32 _initCode,
@@ -551,7 +551,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _data simpleData from paraswap API call, param for simpleSwap
     function spFlow2SimpleSwap(
-        string memory _destinationAddressForBTC,
+        string calldata _destinationAddressForBTC,
         Utils.SimpleData calldata _data
     ) external nonReentrant {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
@@ -657,7 +657,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _destinationAddressForBTC The BTC address to send BTC to.
     /// @param _btctAmount amount in BTC decimal 8.
     function _spRecordPendingTx(
-        string memory _destinationAddressForBTC,
+        string calldata _destinationAddressForBTC,
         uint256 _btctAmount
     ) internal {
         //hash TX data for unique ID
@@ -707,41 +707,27 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         view
         returns (spPendingTx[] memory data)
     {
-        require(swapCount != 0);
-        /**
-        //VM Exception while processing transaction: reverted with panic code 0x32 (Array accessed at an out-of-bounds or negative index)
+        //require(swapCount != 0);
+        
         uint256 index = 0;
+        data = new spPendingTx[](swapCount.sub(oldestActiveIndex));
 
-        if (latestRemovedIndex == 0) {
-            data = new spPendingTx[](swapCount.sub(latestRemovedIndex));
-        } else {
-            data[index] = spPendingTXs[index.add(latestRemovedIndex)];
-        }
-
-        for (uint256 i = latestRemovedIndex.add(1); i <= swapCount; i++) {
-            data[index] = spPendingTXs[index.add(latestRemovedIndex)];
+        for (uint256 i = oldestActiveIndex.add(1); i <= swapCount; i++) {
+            data[index] = spPendingTXs[index.add(oldestActiveIndex)];
             index = index.add(1);
-        }
-         */
-
-        uint256 index = 0;
-        data = new spPendingTx[](swapCount.sub(latestRemovedIndex));
-        for (uint256 i = latestRemovedIndex.add(1); i <= swapCount; i++) {
-            data[index] = spPendingTXs[index.add(latestRemovedIndex)];
-            index = index.add(1);
-        }
+        }         
     }
 
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     function _spCleanUpOldTXs() internal {
         uint256 current = block.timestamp;
-        for (uint256 i = latestRemovedIndex; i <= swapCount; i++) {
+        for (uint256 i = oldestActiveIndex; i <= swapCount; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
                 tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
                     address(this)
                 ].sub(spPendingTXs[i].AmountWBTC);
                 delete spPendingTXs[i];
-                latestRemovedIndex = i;
+                oldestActiveIndex = i.add(1); //next index to be deleted
             }
         }
     }
@@ -749,20 +735,20 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     /// @param _loopCount - max times the loop will run
     function spCleanUpOldTXs(uint256 _loopCount) external {
-        uint256 max = latestRemovedIndex.add(_loopCount);
+        uint256 max = oldestActiveIndex.add(_loopCount);
 
         if (max >= swapCount) {
             max = swapCount;
         }
 
         uint256 current = block.timestamp;
-        for (uint256 i = latestRemovedIndex; i <= max; i++) {
+        for (uint256 i = oldestActiveIndex; i <= max; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
                 tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
                     address(this)
                 ].sub(spPendingTXs[i].AmountWBTC);
                 delete spPendingTXs[i];
-                latestRemovedIndex = i;
+                oldestActiveIndex = i.add(1);
             }
         }
     }
@@ -901,24 +887,19 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _expirationTime //set to 0 to keep existing expiration time
     ) external override onlyOwner returns (bool) {
         require(
-            _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
-            "_tssThreshold should be >= tssThreshold"
+            _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1
         );
         require(
-            _churnedInCount >= _tssThreshold + uint8(1),
-            "n should be >= t+1"
+            _churnedInCount >= _tssThreshold + uint8(1)
         );
         require(
-            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
-            "_nodeRewardsRatio is not valid"
+            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100
         );
         require(
-            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
-            "_withdrawalFeeBPS is invalid"
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100
         );
         require(
-            _rewardAddressAndAmounts.length == _isRemoved.length,
-            "_rewardAddressAndAmounts and _isRemoved length is not match"
+            _rewardAddressAndAmounts.length == _isRemoved.length
         );
         if (_expirationTime != 0) {
             _setExpirationTime(_expirationTime);

@@ -1003,8 +1003,8 @@ describe("SkyPools", () => {
                     let swapCount = await swap.swapCount()
                     assert.equal(swapCount, 3, "swapCount is correct")
 
-                    let latestRemovedIndex = await swap.latestRemovedIndex()
-                    assert.equal(latestRemovedIndex, 0, "latestRemovedIndex is correct")
+                    let oldestActiveIndex = await swap.oldestActiveIndex()
+                    assert.equal(oldestActiveIndex, 0, "oldestActiveIndex is correct")
 
 
                     //ADVANCE 2 DAYS
@@ -1021,8 +1021,8 @@ describe("SkyPools", () => {
                     swapCount = await swap.swapCount()
                     assert.equal(swapCount, 3, "swapCount is correct after elapsed time")
 
-                    latestRemovedIndex = await swap.latestRemovedIndex()
-                    assert.equal(latestRemovedIndex, 0, "latestRemovedIndex is correct after elapsed time")
+                    oldestActiveIndex = await swap.oldestActiveIndex()
+                    assert.equal(oldestActiveIndex, 0, "oldestActiveIndex is correct after elapsed time")
 
                     //perform swap eth -> wBTC
                     await swap.connect(user1).spFlow2SimpleSwap(
@@ -1038,17 +1038,13 @@ describe("SkyPools", () => {
 
                     data = await swap.spGetPendingSwaps()
                     console.log("data length", data.length)
-                    console.log(data[0])
-                    console.log(data[1])
-                    console.log(data[2])
-                    console.log(data[3])
-                    console.log(data[4])
+                    
 
                     swapCount = await swap.swapCount()
                     console.log("swapCount", swapCount.toString())
 
-                    latestRemovedIndex = await swap.latestRemovedIndex()
-                    console.log("latestRemovedIndex", latestRemovedIndex.toString())
+                    oldestActiveIndex = await swap.oldestActiveIndex()
+                    console.log("oldestActiveIndex", oldestActiveIndex.toString())
 
 
 
