@@ -73,6 +73,7 @@ const Tokens = {
 
 const srcAmountBTC = "10000000"//0.1 BTC //USE FOR FLOW 1
 const srcAmountETH = "1000000000000000000"//1 ETHER //USE FOR FLOW 2
+const smallSrcAmountETH = "100000000000000000"//0.1 ETHER //USE FOR FLOW 2
 
 
 
@@ -84,9 +85,9 @@ const srcAmountETH = "1000000000000000000"//1 ETHER //USE FOR FLOW 2
 async function main() {
     let data
     let getPrice = await paraswap.getPrice(
-        Tokens[mainnet]['WBTC'], // From token - CHANGE THIS
-        Tokens[mainnet]['WETH'], // To token - CHANGE THIS
-        srcAmountBTC, //Change this depending on flow 1 vs flow 2
+        Tokens[mainnet]['WETH'], // From token - CHANGE THIS
+        Tokens[mainnet]['WBTC'], // To token - CHANGE THIS
+        smallSrcAmountETH, //Change this depending on flow 1 vs flow 2
         mainnet
     )
 
@@ -102,13 +103,13 @@ async function main() {
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload, //data from GET request
-        Tokens[mainnet]['WBTC'], // From token - CHANGE THIS
-        Tokens[mainnet]['WETH'], // To token - CHANGE THIS
-        srcAmountBTC, //Change this depending on flow 1 vs flow 2
+        Tokens[mainnet]['WETH'], // From token - CHANGE THIS
+        Tokens[mainnet]['WBTC'], // To token - CHANGE THIS
+        smallSrcAmountETH, //Change this depending on flow 1 vs flow 2
         minDestAmount.toString(), //this param is not used for paraswap V5 anymore, redundant
         mainnet,
-        //"0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract - flow 2 simpleSwap - uniswap functions don't care about this param
-        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address - Flow 1 simpleSwap
+        "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract - flow 2 simpleSwap - uniswap functions don't care about this param
+        //"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address - Flow 1 simpleSwap
         true //only params - true for contract -> contract | false for standard transaction object
     )
     data = txRequest.data //params to execute transaction contract -> contract  

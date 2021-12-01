@@ -290,8 +290,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1638319469028,
-      "contentHash": "34ebd28938dd5abb74d50e3fcd550dff",
+      "lastModificationDate": 1638398410608,
+      "contentHash": "06ce7b0fbfb3f99392eaa492455fe6f7",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -339,8 +339,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ISwapContract.sol": {
-      "lastModificationDate": 1638305279172,
-      "contentHash": "334f8cf9cf9c43fb526f69c5b410b9c2",
+      "lastModificationDate": 1638397776665,
+      "contentHash": "9ce086c677b666d0196c63a2dbc88920",
       "sourceName": "contracts/interfaces/ISwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -755,36 +755,6 @@
       "artifacts": [
         "ReentrancyGuard"
       ]
-    },
-    "/mnt/c/pr0/SWINGBY/DEV/contracts/Flattened.sol": {
-      "lastModificationDate": 1634677551306,
-      "contentHash": "d41d8cd98f00b204e9800998ecf8427e",
-      "sourceName": "contracts/Flattened.sol",
-      "solcConfig": {
-        "version": "0.8.9",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [],
-      "artifacts": []
     }
   }
 }

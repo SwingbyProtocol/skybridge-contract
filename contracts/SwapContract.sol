@@ -437,7 +437,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _amountIn,
         uint256 _amountOutMin,
         address[] calldata _path
-    ) external nonReentrant {
+    ) external nonReentrant returns (uint256 receivedAmount){
         address fromToken = _path[0];
         address endToken = _path[_path.length - 1];
 
@@ -469,7 +469,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _doUniswap(_amountIn, _amountOutMin, _path);
         }
 
-        uint256 receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
+        receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
             preSwapBalance
         );
 
@@ -482,6 +482,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         tokens[endToken][msg.sender] = tokens[endToken][msg.sender].add(
             receivedAmount
         );
+
+        return receivedAmount;
     }
 
     /// @dev spFlow2Uniswap - FLOW 1 - execute paraswap TX using uniswap, ending tokens sent to users allocation in tokens[][] mapping
@@ -499,7 +501,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _amountIn,
         uint256 _amountOutMin,
         address[] calldata _path
-    ) external nonReentrant {
+    ) external nonReentrant returns (uint256 receivedAmount) {
         address fromToken = _path[0];
         address endToken = _path[_path.length - 1];
 
@@ -507,7 +509,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             tokens[fromToken][msg.sender] >= _amountIn,
             "Balance is not sufficient"
         );
-        require(fromToken != BTCT_ADDR);
+        require(fromToken != BTCT_ADDR, "Must swap from BTC token");
         require(fromToken != ETHER, "Use path wETH -> wBTC");
         require(endToken == BTCT_ADDR, "Must swap to BTC token");
 
@@ -545,6 +547,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
+
+        return receivedAmount;
     }
 
     /// @dev spParaSwapToken2BTC - FLOW 2 -> swap ERC20 -> wBTC
@@ -553,13 +557,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     function spFlow2SimpleSwap(
         string calldata _destinationAddressForBTC,
         Utils.SimpleData calldata _data
-    ) external nonReentrant {
+    ) external nonReentrant returns (uint256 receivedAmount) {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
         //console.log("Converted to bytes32 and back to String:",_bytes32ToString(destBytes32));
 
-        require(_data.fromToken != BTCT_ADDR);
+        require(_data.fromToken != BTCT_ADDR, "Must swap from BTC token");
         require(_data.toToken == BTCT_ADDR, "Must swap to BTC token");
-        require(_data.beneficiary == address(this));
+        require(_data.beneficiary == address(this), "Beneficiary must be this contract");
         require(
             tokens[_data.fromToken][msg.sender] >= _data.fromAmount,
             "Balance is not sufficient"
@@ -588,6 +592,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         ].add(receivedAmount);
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
+
+        return receivedAmount;
     }
 
     /// @dev _doUniswapFork - performs paraswap transaction - BALANCE & TOKEN CHECKS MUST OCCUR BEFORE CALLING THIS
@@ -715,7 +721,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         for (uint256 i = oldestActiveIndex.add(1); i <= swapCount; i++) {
             data[index] = spPendingTXs[index.add(oldestActiveIndex)];
             index = index.add(1);
-        }         
+        } 
+
+        return data;        
     }
 
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
@@ -887,19 +895,24 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _expirationTime //set to 0 to keep existing expiration time
     ) external override onlyOwner returns (bool) {
         require(
-            _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1
+            _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
+            "_tssThreshold should be >= tssThreshold"
         );
         require(
-            _churnedInCount >= _tssThreshold + uint8(1)
+            _churnedInCount >= _tssThreshold + uint8(1),
+            "n should be >= t+1"
         );
         require(
-            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100
+            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
+            "_nodeRewardsRatio is not valid"
         );
         require(
-            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
+            "_withdrawalFeeBPS is invalid"
         );
         require(
-            _rewardAddressAndAmounts.length == _isRemoved.length
+            _rewardAddressAndAmounts.length == _isRemoved.length,
+            "_rewardAddressAndAmounts and _isRemoved length do not match"
         );
         if (_expirationTime != 0) {
             _setExpirationTime(_expirationTime);

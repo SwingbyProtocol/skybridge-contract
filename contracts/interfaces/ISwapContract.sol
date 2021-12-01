@@ -62,7 +62,7 @@ interface ISwapContract {
         uint256 _amountIn,
         uint256 _amountOutMin,
         address[] calldata _path
-    ) external;
+    ) external returns (uint256 receivedAmount);
 
     function spFlow2Uniswap(
         string memory _destinationAddressForBTC,
@@ -72,12 +72,12 @@ interface ISwapContract {
         uint256 _amountIn,
         uint256 _amountOutMin,
         address[] calldata _path
-    ) external;
+    ) external returns (uint256 receivedAmount);
 
     function spFlow2SimpleSwap(
         string memory _destinationAddressForBTC,
         Utils.SimpleData calldata _data
-    ) external;
+    ) external returns (uint256 receivedAmount);
 
     function spCleanUpOldTXs(uint256 _loopCount) external;
 

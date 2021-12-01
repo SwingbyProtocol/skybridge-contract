@@ -30,8 +30,8 @@ describe("SkyPools", () => {
     const srcAmountBTC = "10000000"//.1 wBTC
 
     //for Flow 2 - hex of utf-8 string BTC addr tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv
-    const receivingBTC_Addr = "0x74623170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a77756470787170336d767a76"
-
+    //const receivingBTC_Addr = "0x74623170356379786e75786d65757775766b7766656d39366c717a737a6430326e367864636a727332306361633679716a6a77756470787170336d767a76"
+    const receivingBTC_Addr = "bc1pt5rdh83k9v04kjcdkuw6f6072f3yaregu087hk3grpk4uhjauujspg9w6s"
 
     //Store hard coded transactions from API PUT request
     const simpleDataFlow1 = [
@@ -1006,10 +1006,9 @@ describe("SkyPools", () => {
                     let oldestActiveIndex = await swap.oldestActiveIndex()
                     assert.equal(oldestActiveIndex, 0, "oldestActiveIndex is correct")
 
-
+                    const TwoDaysSeconds = 172800
                     //ADVANCE 2 DAYS
                     let currentBlock = await ethers.provider.getBlockNumber()
-                    const TwoDaysSeconds = 172800
                     await ethers.provider.send("evm_increaseTime", [TwoDaysSeconds]) //set EVM time, will be applied to next block
                     await ethers.provider.send("evm_mine") //next block
                     currentBlock = await ethers.provider.getBlockNumber()
@@ -1037,21 +1036,52 @@ describe("SkyPools", () => {
                     )
 
                     data = await swap.spGetPendingSwaps()
-                    console.log("data length", data.length)
-                    
+                    assert.equal(data.length, 2, "The first 3 pending swaps have been cleaned up, the newest 2 remain")
 
                     swapCount = await swap.swapCount()
-                    console.log("swapCount", swapCount.toString())
+                    assert.equal(swapCount, 5, "5 total swaps, swapCount index is correct")
 
                     oldestActiveIndex = await swap.oldestActiveIndex()
-                    console.log("oldestActiveIndex", oldestActiveIndex.toString())
+                    assert.equal(oldestActiveIndex, 3, "oldest active index is correct")
 
 
+                    //ADVANCE 2 DAYS
+                    currentBlock = await ethers.provider.getBlockNumber()
+                    await ethers.provider.send("evm_increaseTime", [TwoDaysSeconds]) //set EVM time, will be applied to next block
+                    await ethers.provider.send("evm_mine") //next block
+                    currentBlock = await ethers.provider.getBlockNumber()
+                    blockObj = await ethers.provider.getBlock(currentBlock) //https://docs.ethers.io/v5/api/providers/types/#providers-Block
 
+                    /////////////////////////////// DO ANOTHER TX - SHOULD CLEAN UP PREVIOUS 2 //////////////////////////////////////////////
+
+                    //swapOnUniswapFork wETH -> wBTC
+                    const finalTX = ['0x75e48C954594d64ef9613AeEF97Ad85370F13807',
+                        '0xb2b53dca60cae1d1f93f64d80703b888689f28b63c483459183f2f4271fa0308',
+                        '100000000000000000',
+                        '408244',
+                        ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']]
+
+                    await swap.connect(user1).spFlow2Uniswap(
+                        receivingBTC_Addr,
+                        true,
+                        finalTX[0],
+                        finalTX[1],
+                        finalTX[2],
+                        finalTX[3],
+                        finalTX[4],
+                    )
+
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 1, "The first 5 pending swaps have been cleaned up, only the newest one remains")
+
+                    swapCount = await swap.swapCount()
+                    assert.equal(swapCount, 6, "6 total swaps, swapCount index is correct")
+
+                    oldestActiveIndex = await swap.oldestActiveIndex()
+                    assert.equal(oldestActiveIndex, 5, "oldest active index is correct")
                 })
-
             })//END FLOW 2
-
         })//END PARASWAP
     })//END SKYPOOLS FUNCTIONS
 })//END SKYPOOLS
