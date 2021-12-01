@@ -477,7 +477,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             receivedAmount >= _amountOutMin,
             "Received amount insufficient"
         );
-        require(receivedAmount != 0, "Received amount can not be 0");
+        require(receivedAmount != 0);
 
         tokens[endToken][msg.sender] = tokens[endToken][msg.sender].add(
             receivedAmount
@@ -538,7 +538,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             receivedAmount >= _amountOutMin,
             "Received amount insufficient"
         );
-        require(receivedAmount != 0, "Received amount can not be 0");
+        require(receivedAmount != 0);
 
         tokens[endToken][address(this)] = tokens[endToken][address(this)].add(
             receivedAmount
@@ -559,10 +559,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         require(_data.fromToken != BTCT_ADDR);
         require(_data.toToken == BTCT_ADDR, "Must swap to BTC token");
-        require(
-            _data.beneficiary == address(this),
-            "You can only execute flow 2 swaps to this contract's address"
-        );
+        require(_data.beneficiary == address(this));
         require(
             tokens[_data.fromToken][msg.sender] >= _data.fromAmount,
             "Balance is not sufficient"
@@ -584,7 +581,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             receivedAmount >= _data.expectedAmount,
             "Received amount insufficient"
         );
-        require(receivedAmount != 0, "Received amount can not be 0");
+        require(receivedAmount != 0);
 
         tokens[_data.toToken][address(this)] = tokens[_data.toToken][
             address(this)
@@ -703,13 +700,30 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         emit SetExpirationTime(_expirationTime, block.timestamp);
     }
 
-    /// @dev spGetPendingSwaps - returns array of pending swap data and oldest pending swap
+    /// @dev spGetPendingSwaps - returns array of pending swaps
     /// @return data - returns array of pending swap struct objects
     function spGetPendingSwaps()
         external
         view
         returns (spPendingTx[] memory data)
     {
+        require(swapCount != 0);
+        /**
+        //VM Exception while processing transaction: reverted with panic code 0x32 (Array accessed at an out-of-bounds or negative index)
+        uint256 index = 0;
+
+        if (latestRemovedIndex == 0) {
+            data = new spPendingTx[](swapCount.sub(latestRemovedIndex));
+        } else {
+            data[index] = spPendingTXs[index.add(latestRemovedIndex)];
+        }
+
+        for (uint256 i = latestRemovedIndex.add(1); i <= swapCount; i++) {
+            data[index] = spPendingTXs[index.add(latestRemovedIndex)];
+            index = index.add(1);
+        }
+         */
+
         uint256 index = 0;
         data = new spPendingTx[](swapCount.sub(latestRemovedIndex));
         for (uint256 i = latestRemovedIndex.add(1); i <= swapCount; i++) {
@@ -812,7 +826,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         (bool sent, bytes memory data) = sender.call{value: _amount}("");
 
-        require(sent, "Failed to send Ether");
+        require(sent);
         emit Withdraw(
             ETHER,
             msg.sender,

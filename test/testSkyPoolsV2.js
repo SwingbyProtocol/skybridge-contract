@@ -6,6 +6,7 @@ const { ZERO_ADDRESS } = constants
 const TOKEN_DECIMALS = process.env.TOKEN_DECIMALS || 18
 const utils = require('ethers').utils
 const ParaSwap = require('../scripts/paraswap.js')
+const { web3 } = require('@openzeppelin/test-helpers/src/setup')
 const paraV5 = "https://apiv5.paraswap.io"
 const paraswap = new ParaSwap(paraV5, 5)
 //Web3 init
@@ -51,8 +52,8 @@ describe("SkyPools", () => {
         '1636607315', //deadline
         '0x219c6130427b11ec944a9952ba50eb97'] //uuid
 
-    const simpleDataFlow1ETH = ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    const simpleDataFlow1ETH = ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', //wBTC
+        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', //naitive ETH
         '10000000',
         '690231785171252979',
         '1380463570342505957',
@@ -68,7 +69,7 @@ describe("SkyPools", () => {
         '1637616008',
         '0xb0e496c04bd911ecbcc39ff5b6a635aa']
 
-    const simpleDataFlow2 = ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    const simpleDataFlow2 = ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', //wETH9 https://etherscan.io/address/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
         '1000000000000000000',
         '3554121',
@@ -84,7 +85,7 @@ describe("SkyPools", () => {
         '1636608105',
         '0xf80afb90427c11ecb8ec7d3e271a910f']
 
-    const simpleDataFlow2B = ['0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+    const simpleDataFlow2B = ['0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', //UNI token 
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
         '1000000000000000000',
         '19439',
@@ -487,14 +488,14 @@ describe("SkyPools", () => {
 
                     const initEthBalance = await ethers.provider.getBalance(user1.address)
                     const ETHER = Tokens[mainnetNetworkID]['ETH'].address
-                    const flow1ToETHUniswap = [ '0x115934131916C8b277DD010Ee02de363c09d037c',
-                    '0x65d1a3b1e46c6e4f1be1ad5f99ef14dc488ae0549dc97db9b30afe2241ce1c7a',
-                    '10000000',
-                    '659829776477491556',
-                    [ '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-                      '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ] ]
+                    const flow1ToETHUniswap = ['0x115934131916C8b277DD010Ee02de363c09d037c',
+                        '0x65d1a3b1e46c6e4f1be1ad5f99ef14dc488ae0549dc97db9b30afe2241ce1c7a',
+                        '10000000',
+                        '659829776477491556',
+                        ['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+                            '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']]
 
-                      await swap.connect(user1).spFlow1Uniswap(
+                    await swap.connect(user1).spFlow1Uniswap(
                         true,
                         flow1ToETHUniswap[0],
                         flow1ToETHUniswap[1],
@@ -524,7 +525,7 @@ describe("SkyPools", () => {
                     //verify user balance is correct 
                     balance = await ethers.provider.getBalance(user1.address)
                     assert(balance > initEthBalance, "User received ETHER to their personal wallet")
-                    
+
                 })
 
 
@@ -677,29 +678,37 @@ describe("SkyPools", () => {
             })//END FLOW 1
 
             describe('executes paraSwap transactions: Flow 2 => ERC-20 -> wBTC -> BTC', async () => {
-                it('simpleSwap Flow 2a => ETH -> wETH -> wBTC -> BTC', async () => {
-                    const ETHER = Tokens[mainnetNetworkID]['ETH'].address
-                    let amount = utils.parseEther("1")
-                    overrides = {
-                        value: amount
-                    }
+                let balance, result, receipt, event
+                const ETHER = Tokens[mainnetNetworkID]['ETH'].address
+                const amount = utils.parseEther("1")
+                const overrides = {
+                    value: amount.mul(5)
+                }
+                beforeEach(async () => {
+                    /////////////////////////////// DEPOSIT UNI TOKENS //////////////////////////////////////////////
+                    await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(5))//amount refers to number of UNI tokens here
+                    await UNI_Contract.connect(user1).approve(swap.address, amount)
+                    result = await swap.connect(user1).spDeposit(UNI, amount)
 
                     /////////////////////////////// TESTING DEPOSIT ETHER //////////////////////////////////////////////                
                     result = await swap.connect(user1).spDeposit("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", amount, overrides)
                     balance = await swap.balanceOf(wETH, user1.address)
-                    assert.equal(balance._hex, amount._hex, "Balance of wETH is correct after depositing ETHER")
+                    assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH is correct after depositing ETHER")
                     receipt = await result.wait()
 
-                    let event = receipt.events[receipt.events.length - 1].args
+                    event = receipt.events[receipt.events.length - 1].args
 
                     //verify event receipt is correct
                     event.token.toString().should.equal(ETHER, 'token is correct')
                     event.user.toString().should.equal(user1.address, 'user address is correct')
-                    event.amount.toString().should.equal(amount.toString(), 'amount is correct')
-                    event.balance.toString().should.equal(amount.toString(), 'balance is correct')
+                    event.amount.toString().should.equal(amount.mul(5).toString(), 'amount is correct')
+                    event.balance.toString().should.equal(amount.mul(5).toString(), 'balance is correct')
                     event.Timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
 
-                    /////////////////////////////// TESTING WITHDRAW ETHER //////////////////////////////////////////////
+                })
+
+                it("converts wETH to naitive ETH on withdraw", async () => {
+                    const initEthBalance = await ethers.provider.getBalance(user1.address)
                     result = await swap.connect(user1).redeemEther(amount)
                     balance = await swap.balanceOf(ETHER, user1.address)
                     assert.equal(balance.toString(), "0", "Balance is correct after depositing ETHER")
@@ -710,19 +719,21 @@ describe("SkyPools", () => {
                     event.token.toString().should.equal(ETHER, 'token is correct')
                     event.user.toString().should.equal(user1.address, 'user address is correct')
                     event.amount.toString().should.equal(amount.toString(), 'amount is correct')
-                    event.balance.toString().should.equal("0", 'balance is correct')
+                    event.balance.toString().should.equal(amount.mul(4).toString(), 'balance is correct')
                     event.Timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
 
-                    //Deposit ETHER again for flow 2 transaction
-                    await swap.connect(user1).spDeposit("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", amount, overrides)
+                    //verify user balance is correct 
+                    balance = await ethers.provider.getBalance(user1.address)
+                    assert(balance > initEthBalance, "User received ETHER to their personal wallet")
+                })
 
+                it('simpleSwap Flow 2a => ETH -> wETH -> wBTC -> BTC', async () => {
                     /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
-
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
                     assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
 
                     balance = await wETH_Contract.balanceOf(swap.address)
-                    assert.equal(balance.toString(), amount.toString(), "Balance of wETH on swap contract before swap is correct")
+                    assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
 
                     //perform swap
                     const swapAndRecordResult = await swap.connect(user1).spFlow2SimpleSwap(
@@ -733,7 +744,7 @@ describe("SkyPools", () => {
                     /////////////////////////////// CHECK ENDING BALANCES //////////////////////////////////////////////
 
                     balance = await wETH_Contract.balanceOf(swap.address)
-                    assert.equal(balance.toString(), "0", "Balance of wETH on swap contract after swap is correct")
+                    assert.equal(balance.toString(), amount.mul(4).toString(), "Balance of wETH on swap contract after swap is correct")
 
                     balance = await swap.balanceOf(wBTC, swap.address)
                     balance.toNumber().should.be.at.least(1, "Balance is present")
@@ -770,8 +781,6 @@ describe("SkyPools", () => {
                     await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
                     await swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, zeroFees, sampleTxs[1])
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    //console.log("Starting BTC Balance: ", balance[0].toString())
-                    //console.log("Starting wBTC Balance: ", balance[1].toString())
 
 
                     //prep to collectSwapFeesForBTC
@@ -783,8 +792,6 @@ describe("SkyPools", () => {
                     //allocate floats to wBTC ~1wBTC decimal 8
                     await swap.collectSwapFeesForBTC(ZERO_ADDRESS, incomingAmount, minerFees, swapFees)
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    //console.log("BTC Balance AFTER collectSwapFeesForBTC: ", balance[0].toString())
-                    //console.log("wBTC Balance AFTER collectSwapFeesForBTC: ", balance[1].toString())
 
                     //init refund flow for skypools TX
                     const refundSwapID = data[0].SwapID.toString()
@@ -817,24 +824,6 @@ describe("SkyPools", () => {
                 })//flow 2a: ETH -> wETH -> wBTC -> BTC
 
                 it('simpleSwap Flow 2b => ERC20 -> wBTC -> BTC', async () => {
-
-                    let balance, amount, result, receipt, event
-                    amount = utils.parseEther("1")
-
-                    /////////////////////////////// TESTING DEPOSIT UNI TOKENS //////////////////////////////////////////////
-                    await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(2))//amount refers to number of UNI tokens here
-                    balance = await UNI_Contract.balanceOf(user1.address)
-                    assert.equal(balance.toString(), amount.mul(2).toString(), "User has correct number of UNI tokens in their personal wallet")
-
-                    await UNI_Contract.connect(user1).approve(swap.address, amount)
-                    result = await swap.connect(user1).spDeposit(UNI, amount)
-
-                    balance = await swap.connect(user1).balanceOf(UNI, user1.address)
-                    assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
-
-
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
 
                     const swapAndRecordResult = await swap.connect(user1).spFlow2SimpleSwap(
                         receivingBTC_Addr,
@@ -876,24 +865,8 @@ describe("SkyPools", () => {
 
                 })//Flow 2b => ERC20 -> wBTC -> BTC
                 it('swapOnUniswapForkFlow2', async () => {
-                    let balance, amount, result, receipt, event
-                    amount = utils.parseEther("1")
 
-                    /////////////////////////////// TESTING DEPOSIT UNI TOKENS //////////////////////////////////////////////
-                    await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(2))//amount refers to number of UNI tokens here
-                    balance = await UNI_Contract.balanceOf(user1.address)
-                    assert.equal(balance.toString(), amount.mul(2).toString(), "User has correct number of UNI tokens in their personal wallet")
-
-                    await UNI_Contract.connect(user1).approve(swap.address, amount)
-                    result = await swap.connect(user1).spDeposit(UNI, amount)
-
-                    balance = await swap.connect(user1).balanceOf(UNI, user1.address)
-                    assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
-
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
-
-                    //fork = true
+                    //fork = true  -  use paraswap function swapOnUniswapFork
                     const swapAndRecordResult = await swap.connect(user1).spFlow2Uniswap(
                         receivingBTC_Addr,
                         true,
@@ -938,22 +911,6 @@ describe("SkyPools", () => {
 
                 })//new contract methods - flow 2
                 it('swapOnUniswap', async () => {
-                    let balance, amount, result, receipt, event
-                    amount = utils.parseEther("1")
-
-                    /////////////////////////////// TESTING DEPOSIT UNI TOKENS //////////////////////////////////////////////
-                    await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(2))//amount refers to number of UNI tokens here
-                    balance = await UNI_Contract.balanceOf(user1.address)
-                    assert.equal(balance.toString(), amount.mul(2).toString(), "User has correct number of UNI tokens in their personal wallet")
-
-                    await UNI_Contract.connect(user1).approve(swap.address, amount)
-                    result = await swap.connect(user1).spDeposit(UNI, amount)
-
-                    balance = await swap.connect(user1).balanceOf(UNI, user1.address)
-                    assert.equal(balance._hex, amount._hex, "Balance is correct after depositing UNI")
-
-                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
 
                     //fork = true
                     const swapAndRecordResult = await swap.connect(user1).spFlow2Uniswap(
@@ -998,6 +955,104 @@ describe("SkyPools", () => {
                     assert.equal(data[0].AmountWBTC.toString(), expectedSats, "Output amount matches float amount")
                     data[0].Timestamp.toString().length.should.be.at.least(1, "Timestamp is present")
                 })//new contract methods - flow 2
+
+                it('cleans up old TXs and correctly moves the indexes', async () => {
+                    /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
+                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
+                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
+
+                    balance = await wETH_Contract.balanceOf(swap.address)
+                    assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
+
+                    //perform swap eth -> wBTC
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    //check spGetPendingSwaps()
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 1, "1 item in data array returned")
+
+                    //perform swap eth -> wBTC
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    //check spGetPendingSwaps()
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 2, "2 items in data array returned")
+
+                    //perform swap UNI -> wBTC
+                    await swap.connect(user1).spFlow2Uniswap(
+                        receivingBTC_Addr,
+                        true,
+                        swapOnUniswapForkFlow2[0],
+                        swapOnUniswapForkFlow2[1],
+                        swapOnUniswapForkFlow2[2],
+                        swapOnUniswapForkFlow2[3],
+                        swapOnUniswapForkFlow2[4],
+                    )
+
+                    //check spGetPendingSwaps()
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 3, "3 items in data array returned")
+
+                    //check swapCount index before advancing time
+                    let swapCount = await swap.swapCount()
+                    assert.equal(swapCount, 3, "swapCount is correct")
+
+                    let latestRemovedIndex = await swap.latestRemovedIndex()
+                    assert.equal(latestRemovedIndex, 0, "latestRemovedIndex is correct")
+
+
+                    //ADVANCE 2 DAYS
+                    let currentBlock = await ethers.provider.getBlockNumber()
+                    const TwoDaysSeconds = 172800
+                    await ethers.provider.send("evm_increaseTime", [TwoDaysSeconds]) //set EVM time, will be applied to next block
+                    await ethers.provider.send("evm_mine") //next block
+                    currentBlock = await ethers.provider.getBlockNumber()
+                    let blockObj = await ethers.provider.getBlock(currentBlock) //https://docs.ethers.io/v5/api/providers/types/#providers-Block
+
+                    /////////////////////////////// DO ANOTHER TX - SHOULD CLEAN UP THE FIRST 3 //////////////////////////////////////////////
+
+                    //check swapCount index before advancing time
+                    swapCount = await swap.swapCount()
+                    assert.equal(swapCount, 3, "swapCount is correct after elapsed time")
+
+                    latestRemovedIndex = await swap.latestRemovedIndex()
+                    assert.equal(latestRemovedIndex, 0, "latestRemovedIndex is correct after elapsed time")
+
+                    //perform swap eth -> wBTC
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    //perform swap eth -> wBTC again 
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    data = await swap.spGetPendingSwaps()
+                    console.log("data length", data.length)
+                    console.log(data[0])
+                    console.log(data[1])
+                    console.log(data[2])
+                    console.log(data[3])
+                    console.log(data[4])
+
+                    swapCount = await swap.swapCount()
+                    console.log("swapCount", swapCount.toString())
+
+                    latestRemovedIndex = await swap.latestRemovedIndex()
+                    console.log("latestRemovedIndex", latestRemovedIndex.toString())
+
+
+
+                })
 
             })//END FLOW 2
 
