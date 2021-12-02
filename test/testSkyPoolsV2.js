@@ -1081,6 +1081,118 @@ describe("SkyPools", () => {
                     oldestActiveIndex = await swap.oldestActiveIndex()
                     assert.equal(oldestActiveIndex, 5, "oldest active index is correct")
                 })
+                it('allows for manual cleanup of old TXs after changing expiration times', async () => {
+                    /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
+                    balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
+                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
+
+                    balance = await wETH_Contract.balanceOf(swap.address)
+                    assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
+
+                    //perform swap eth -> wBTC
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    //perform swap eth -> wBTC
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    //perform swap UNI -> wBTC
+                    await swap.connect(user1).spFlow2Uniswap(
+                        receivingBTC_Addr,
+                        true,
+                        swapOnUniswapForkFlow2[0],
+                        swapOnUniswapForkFlow2[1],
+                        swapOnUniswapForkFlow2[2],
+                        swapOnUniswapForkFlow2[3],
+                        swapOnUniswapForkFlow2[4],
+                    )
+
+                    //check spGetPendingSwaps()
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 3, "3 items in data array returned")
+
+                    const TwoDaysSeconds = 172800
+                    //ADVANCE 2 DAYS
+                    let currentBlock = await ethers.provider.getBlockNumber()
+                    await ethers.provider.send("evm_increaseTime", [TwoDaysSeconds]) //set EVM time, will be applied to next block
+                    await ethers.provider.send("evm_mine") //next block
+                    currentBlock = await ethers.provider.getBlockNumber()
+                    let blockObj = await ethers.provider.getBlock(currentBlock) //https://docs.ethers.io/v5/api/providers/types/#providers-Block
+
+                    /////////////////////////////// DO ANOTHER TX - SHOULD CLEAN UP THE FIRST 3 //////////////////////////////////////////////
+
+                    //check swapCount index before advancing time
+                    swapCount = await swap.swapCount()
+                    assert.equal(swapCount, 3, "swapCount is correct after elapsed time")
+
+                    oldestActiveIndex = await swap.oldestActiveIndex()
+                    assert.equal(oldestActiveIndex, 0, "oldestActiveIndex is correct after elapsed time")
+
+                    //perform swap eth -> wBTC
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    //perform swap eth -> wBTC again 
+                    await swap.connect(user1).spFlow2SimpleSwap(
+                        receivingBTC_Addr,
+                        simpleDataFlow2
+                    )
+
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 2, "The first 3 pending swaps have been cleaned up, the newest 2 remain")
+
+                    /////////////////////////////// CHURN AND SHORTEN EXPIRATION TIME //////////////////////////////////////////////
+                    let currentExpirationTime = await swap.expirationTime()
+                    assert.equal(currentExpirationTime, 172800, "Expiration time is 2 days")
+
+                    let rewardAddressAndAmounts = []
+                    let isRemoved = []
+                    let churnedInCount = 25
+                    let tssThreshold = 16
+                    let nodeRewardsRatio = 66
+                    let withdrawalFeeBPS = new BigNumber.from(20);
+                    let newExpirationTime = 86400 //1 day seconds
+                    for (i = 0; i < 1; i++) {
+                        let staked = new BigNumber.from(3000000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
+                        let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + owner.address.slice(2), 64)
+                        rewardAddressAndAmounts.push(addressesAndAmountStaked)
+                        isRemoved.push(false)
+                    }
+                    const tx1 = await swap.churn(user1.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, newExpirationTime, {
+                        value: 0,
+                        gasPrice: new BigNumber.from(35174145060)
+                    })
+
+                    currentExpirationTime = await swap.expirationTime()
+                    assert.equal(currentExpirationTime, 86400, "Expiration time is 1 day")
+
+                    /////////////////////////////// MANUAL CLEANUP OF OLD TXS WITH HIGH LOOP COUNT //////////////////////////////////////////////
+                                       
+                    await swap.spCleanUpOldTXs(data.length + 5)
+
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 2, "No TXs cleaned up yet, expiration time not yet elapsed")
+
+                    //ADVANCE 2 DAYS
+                    currentBlock = await ethers.provider.getBlockNumber()
+                    await ethers.provider.send("evm_increaseTime", [TwoDaysSeconds]) //set EVM time, will be applied to next block
+                    await ethers.provider.send("evm_mine") //next block
+                    currentBlock = await ethers.provider.getBlockNumber()
+                    blockObj = await ethers.provider.getBlock(currentBlock) //https://docs.ethers.io/v5/api/providers/types/#providers-Block
+
+                    await swap.spCleanUpOldTXs(data.length + 5)
+                    data = await swap.spGetPendingSwaps()
+                    assert.equal(data.length, 0, "All TXs have been cleaned up")
+
+
+                })
             })//END FLOW 2
         })//END PARASWAP
     })//END SKYPOOLS FUNCTIONS

@@ -729,7 +729,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     function _spCleanUpOldTXs() internal {
         uint256 current = block.timestamp;
-        for (uint256 i = oldestActiveIndex; i <= swapCount; i++) {
+        for (uint256 i = oldestActiveIndex; i < swapCount; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
                 tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
                     address(this)
@@ -750,7 +750,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
 
         uint256 current = block.timestamp;
-        for (uint256 i = oldestActiveIndex; i <= max; i++) {
+        for (uint256 i = oldestActiveIndex; i < max; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
                 tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
                     address(this)
