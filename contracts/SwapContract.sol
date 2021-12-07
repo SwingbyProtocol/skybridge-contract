@@ -561,7 +561,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
         //console.log("Converted to bytes32 and back to String:",_bytes32ToString(destBytes32));
 
-        require(_data.fromToken != BTCT_ADDR, "Must swap from BTC token");
+        require(_data.fromToken != BTCT_ADDR, "Must not swap from BTC token");
         require(_data.toToken == BTCT_ADDR, "Must swap to BTC token");
         require(_data.beneficiary == address(this), "Beneficiary must be this contract");
         require(
@@ -907,8 +907,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "_nodeRewardsRatio is not valid"
         );
         require(
-            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
-            "_withdrawalFeeBPS is invalid"
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100
         );
         require(
             _rewardAddressAndAmounts.length == _isRemoved.length,
