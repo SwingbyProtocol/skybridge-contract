@@ -547,9 +547,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         require(receivedAmount != 0);
 
-        tokens[endToken][address(this)] = tokens[endToken][address(this)].add(
-            receivedAmount
-        );
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
 
         return receivedAmount;
@@ -590,10 +587,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "Received amount insufficient"
         );
         require(receivedAmount != 0);
-
-        tokens[_data.toToken][address(this)] = tokens[_data.toToken][
-            address(this)
-        ].add(receivedAmount);
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
 
@@ -737,9 +730,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < swapCount; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
-                tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
-                    address(this)
-                ].sub(spPendingTXs[i].AmountWBTC);
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1); //next index to be deleted
             }
@@ -758,9 +748,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < max; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
-                tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
-                    address(this)
-                ].sub(spPendingTXs[i].AmountWBTC);
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1);
             }
