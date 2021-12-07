@@ -51,6 +51,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     uint256 public lockedLPTokensForNode;
     uint256 public feesLPTokensForNode;
     uint256 public initialExchangeRate;
+    uint256 public limitBTCForSPFlow2;
 
     uint256 private immutable convertScale;
     uint256 private immutable lpDecimals;
@@ -260,7 +261,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address _destToken,
         uint256 _incomingAmount,
         uint256 _minerFee,
-        uint256 _rewardsAmount
+        uint256 _rewardsAmount,
+        bool    _isUpdatelimitBTCForSPFlow2
     ) external override onlyOwner returns (bool) {
         require(_destToken == address(0), "_destToken should be address(0)");
         address _feesToken = BTCT_ADDR;
@@ -273,6 +275,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _feesToken = address(0);
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
+        if (_isUpdatelimitBTCForSPFlow2) {
+            _updateLimitBTCForSPFlow2();
+        }
         return true;
     }
 
@@ -542,10 +547,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         require(receivedAmount != 0);
 
-        tokens[endToken][address(this)] = tokens[endToken][address(this)].add(
-            receivedAmount
-        );
-
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
 
         return receivedAmount;
@@ -586,10 +587,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "Received amount insufficient"
         );
         require(receivedAmount != 0);
-
-        tokens[_data.toToken][address(this)] = tokens[_data.toToken][
-            address(this)
-        ].add(receivedAmount);
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
 
@@ -690,6 +687,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         swapCount = swapCount.add(1); //increment TX count after cleaning up pending TXs to not loop over next empty index
 
+        _reduceLimitBTCForSPFlow2(_btctAmount);
+
         emit SwapTokensToBTC(
             ID,
             _destinationAddressForBTC,
@@ -731,9 +730,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < swapCount; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
-                tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
-                    address(this)
-                ].sub(spPendingTXs[i].AmountWBTC);
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1); //next index to be deleted
             }
@@ -752,9 +748,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < max; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
-                tokens[BTCT_ADDR][address(this)] = tokens[BTCT_ADDR][
-                    address(this)
-                ].sub(spPendingTXs[i].AmountWBTC);
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1);
             }
@@ -1237,6 +1230,22 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _txid The array of txid.
     function _addUsedTx(bytes32 _txid) internal {
         used[_txid] = true;
+    }
+
+    /// @dev _updateLimitBTCForSPFlow2 udpates limitBTCForSPFlow2
+    function _updateLimitBTCForSPFlow2() internal {
+        // Update limitBTCForSPFlow2 by adding BTC floats
+        limitBTCForSPFlow2 = floatAmountOf[address(0)];
+    }
+
+    /// @dev _reduceLimitBTCForSPFlow2 reduces limitBTCForSPFlow2 when new sp flow2 txs are coming.
+    /// @param _amount The amount of BTCT, (use BTCT amount insatead of BTC amount for enough. always BTCT > BTC)
+    function _reduceLimitBTCForSPFlow2(uint256 _amount) internal {
+        if (limitBTCForSPFlow2 == 0 ) {
+            // initialize when initial Flow2 tx has been called.
+            _updateLimitBTCForSPFlow2();
+        }
+        limitBTCForSPFlow2 = limitBTCForSPFlow2.sub(_amount, "insufficient BTC floats for SPFlow2");
     }
 
     /// @dev _addUsedTxs updates txid list which is spent. (multiple hashes)
