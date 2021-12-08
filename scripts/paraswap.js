@@ -62,7 +62,7 @@ class ParaSwap {
                     //+  `&includeContractMethods=swapOnUniswapFork`
                     //+  `&includeContractMethods=swapOnUniswap`
                     //+  `&includeContractMethods=simpleSwap`
-                    +  `&includeContractMethods=simpleSwap,swapOnUniswap,swapOnUniswapFork`
+                    +  `&includeContractMethods=swapOnUniswap,swapOnUniswapFork`
                     
                     const { data } = await axios.get(requestURL, {
                     headers: {

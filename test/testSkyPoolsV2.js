@@ -696,13 +696,13 @@ describe("SkyPools", () => {
 
                     await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
                     await swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, zeroFees, sampleTxs[1])
-                    
+
 
 
                     //prep to collectSwapFeesForBTC
                     let swapFeesBPS = new BigNumber.from(20);
                     //let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
-                
+
                     let swapAmount = new BigNumber.from(1000000) //.01 BTC
                     let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
                     let incomingAmount = swapAmount.add(swapFees) //100200000 sats = 1.002 BTC                
@@ -773,7 +773,7 @@ describe("SkyPools", () => {
                     balance = await wETH_Contract.balanceOf(swap.address)
                     assert.equal(balance.toString(), amount.mul(4).toString(), "Balance of wETH on swap contract after swap is correct")
 
-                    
+
                     const expectedSats = '7111530'
 
                     receipt = await swapAndRecordResult.wait()
@@ -859,8 +859,8 @@ describe("SkyPools", () => {
 
 
                     /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
-                    
-                    const expectedSats = '38878'                    
+
+                    const expectedSats = '38878'
 
                     //check user balance on swap contract
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
@@ -901,10 +901,10 @@ describe("SkyPools", () => {
                     receipt = await swapAndRecordResult.wait()
 
                     /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
-                    
+
                     const expectedSats = '38878'
 
-                    
+
 
                     //check user balance on swap contract
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
@@ -945,10 +945,10 @@ describe("SkyPools", () => {
                     receipt = await swapAndRecordResult.wait()
 
                     /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
-                    
+
                     const expectedSats = '38878'
 
-                    
+
 
                     //check user balance on swap contract
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
@@ -1211,6 +1211,37 @@ describe("SkyPools", () => {
 
 
                 })
+                /////////////////////////////// TEST FOR FAILURE //////////////////////////////////////////////
+                describe('Testing for flow 2 failure cases', async () => {
+                    it('Existing BTC floats must be sufficient', async () => {
+                        //swapOnUniswap
+                        const giantAmountData = ['15000000000000000000',
+                            '65138277',
+                            ['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                                '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']]
+
+
+
+                        const amount = utils.parseEther("1")
+                        const overrides = {
+                            value: amount.mul(16)
+                        }
+
+
+                        await swap.connect(user1).spDeposit("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", amount.mul(16), overrides)
+                        
+
+                        await swap.connect(user1).spFlow2Uniswap(
+                            receivingBTC_Addr,
+                            false,
+                            swapOnUniswapForkFlow1[0],
+                            swapOnUniswapForkFlow1[1],
+                            giantAmountData[0],
+                            giantAmountData[1],
+                            giantAmountData[2],
+                        ).should.be.rejectedWith("insufficient BTC floats for SPFlow2")
+                    })
+                })//END FLOW 2 FAILURE
             })//END FLOW 2
         })//END PARASWAP
     })//END SKYPOOLS FUNCTIONS
