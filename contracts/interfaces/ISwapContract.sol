@@ -27,7 +27,8 @@ interface ISwapContract {
         address _destToken,
         uint256 _incomingAmount,
         uint256 _minerFee,
-        uint256 _rewardsAmount
+        uint256 _rewardsAmount,
+        bool    _isUpdatelimitBTCForSPFlow2
     ) external returns (bool);
 
     function recordIncomingFloat(
