@@ -74,6 +74,11 @@ export default [
         "internalType": "uint256",
         "name": "_rewardsAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isUpdatelimitBTCForSPFlow2",
+        "type": "bool"
       }
     ],
     "name": "collectSwapFeesForBTC",
