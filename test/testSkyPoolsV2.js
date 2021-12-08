@@ -684,7 +684,32 @@ describe("SkyPools", () => {
                 const overrides = {
                     value: amount.mul(5)
                 }
+
+                const expectedFloats = new BigNumber.from(101032000)
+
                 beforeEach(async () => {
+                    //set float reserve
+                    decimals = Tokens[mainnetNetworkID]['wBTC'].decimals
+                    floatAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
+                    let addressesAndAmountOfFloat = web3.utils.padLeft(floatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
+
+
+                    await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
+                    await swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, zeroFees, sampleTxs[1])
+                    
+
+
+                    //prep to collectSwapFeesForBTC
+                    let swapFeesBPS = new BigNumber.from(20);
+                    //let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
+                
+                    let swapAmount = new BigNumber.from(1000000) //.01 BTC
+                    let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
+                    let incomingAmount = swapAmount.add(swapFees) //100200000 sats = 1.002 BTC                
+
+                    //allocate floats to wBTC ~1wBTC decimal 8
+                    await swap.collectSwapFeesForBTC(ZERO_ADDRESS, incomingAmount, minerFees, swapFees, true)
+
                     /////////////////////////////// DEPOSIT UNI TOKENS //////////////////////////////////////////////
                     await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(5))//amount refers to number of UNI tokens here
                     await UNI_Contract.connect(user1).approve(swap.address, amount)
@@ -704,6 +729,8 @@ describe("SkyPools", () => {
                     event.amount.toString().should.equal(amount.mul(5).toString(), 'amount is correct')
                     event.balance.toString().should.equal(amount.mul(5).toString(), 'balance is correct')
                     event.Timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
+
+
 
                 })
 
@@ -730,7 +757,7 @@ describe("SkyPools", () => {
                 it('simpleSwap Flow 2a => ETH -> wETH -> wBTC -> BTC', async () => {
                     /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
+                    assert.equal(balance[1].toString(), expectedFloats.toString(), "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is correct")
 
                     balance = await wETH_Contract.balanceOf(swap.address)
                     assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
@@ -746,9 +773,8 @@ describe("SkyPools", () => {
                     balance = await wETH_Contract.balanceOf(swap.address)
                     assert.equal(balance.toString(), amount.mul(4).toString(), "Balance of wETH on swap contract after swap is correct")
 
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    balance.toNumber().should.be.at.least(1, "Balance is present")
-                    const expectedSats = balance.toString() //7111530
+                    
+                    const expectedSats = '7111530'
 
                     receipt = await swapAndRecordResult.wait()
 
@@ -778,8 +804,8 @@ describe("SkyPools", () => {
                     decimals = Tokens[mainnetNetworkID]['wBTC'].decimals
                     floatAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
                     let addressesAndAmountOfFloat = web3.utils.padLeft(floatAmount.add(minerFees)._hex + owner.address.slice(2), 64)
-                    await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[0])
-                    await swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, zeroFees, sampleTxs[1])
+                    await swap.recordIncomingFloat(wBTC, addressesAndAmountOfFloat, zeroFees, sampleTxs[2])
+                    await swap.recordIncomingFloat(ZERO_ADDRESS, addressesAndAmountOfFloat, zeroFees, sampleTxs[3])
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
 
 
@@ -790,7 +816,7 @@ describe("SkyPools", () => {
                     let incomingAmount = swapAmount.add(swapFees) //100200000 sats = 1.002 BTC                
 
                     //allocate floats to wBTC ~1wBTC decimal 8
-                    await swap.collectSwapFeesForBTC(ZERO_ADDRESS, incomingAmount, minerFees, swapFees)
+                    await swap.collectSwapFeesForBTC(ZERO_ADDRESS, incomingAmount, minerFees, swapFees, true)
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
 
                     //init refund flow for skypools TX
@@ -833,12 +859,8 @@ describe("SkyPools", () => {
 
 
                     /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    balance.toNumber().should.be.at.least(1, "Balance is present")
-                    const expectedSats = balance.toString() // ~38878
-
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    assert.equal(balance.toString(), expectedSats, "Balance is correct in contract's address in tokens[][]")
+                    
+                    const expectedSats = '38878'                    
 
                     //check user balance on swap contract
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
@@ -879,12 +901,10 @@ describe("SkyPools", () => {
                     receipt = await swapAndRecordResult.wait()
 
                     /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    balance.toNumber().should.be.at.least(1, "Balance is present")
-                    const expectedSats = balance.toString() //~38878
+                    
+                    const expectedSats = '38878'
 
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    assert.equal(balance.toString(), expectedSats, "Balance is correct in contract's address in tokens[][]")
+                    
 
                     //check user balance on swap contract
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
@@ -925,12 +945,10 @@ describe("SkyPools", () => {
                     receipt = await swapAndRecordResult.wait()
 
                     /////////////////////////////// CHECK BALANCES AND RECORDED DATA //////////////////////////////////////////////
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    balance.toNumber().should.be.at.least(1, "Balance is present")
-                    const expectedSats = balance.toString() //~38878
+                    
+                    const expectedSats = '38878'
 
-                    balance = await swap.balanceOf(wBTC, swap.address)
-                    assert.equal(balance.toString(), expectedSats, "Balance is correct in contract's address in tokens[][]")
+                    
 
                     //check user balance on swap contract
                     balance = await swap.connect(user1).balanceOf(UNI, user1.address)
@@ -959,7 +977,7 @@ describe("SkyPools", () => {
                 it('cleans up old TXs and correctly moves the indexes', async () => {
                     /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
+                    assert.equal(balance[1].toString(), expectedFloats.toString(), "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is correct")
 
                     balance = await wETH_Contract.balanceOf(swap.address)
                     assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
@@ -1084,7 +1102,7 @@ describe("SkyPools", () => {
                 it('allows for manual cleanup of old TXs after changing expiration times', async () => {
                     /////////////////////////////// EXECUTE SWAP AND RECORD //////////////////////////////////////////////
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
-                    assert.equal(balance[1].toString(), "0", "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is 0")
+                    assert.equal(balance[1].toString(), expectedFloats.toString(), "Float Reserve of BTCT tokens on the contract BEFORE spFlow2SimpleSwap is correct")
 
                     balance = await wETH_Contract.balanceOf(swap.address)
                     assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
@@ -1174,7 +1192,7 @@ describe("SkyPools", () => {
                     assert.equal(currentExpirationTime, 86400, "Expiration time is 1 day")
 
                     /////////////////////////////// MANUAL CLEANUP OF OLD TXS WITH HIGH LOOP COUNT //////////////////////////////////////////////
-                                       
+
                     await swap.spCleanUpOldTXs(data.length + 5)
 
                     data = await swap.spGetPendingSwaps()
