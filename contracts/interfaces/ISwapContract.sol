@@ -116,5 +116,7 @@ interface ISwapContract {
         external
         returns (uint256 reserveA, uint256 reserveB);
 
+    function getNodeStake(address _user) external returns (uint256 staked);
+
     function getActiveNodes() external returns (bytes32[] memory);
 }
