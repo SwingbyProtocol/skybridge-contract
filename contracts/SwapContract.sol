@@ -982,6 +982,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         (reserveA, reserveB) = (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
     }
 
+    /// @dev getNodeStake returns amount of staked on the network
+    function getNodeStake(address _user) public view override returns (uint256 staked) {
+        (, staked) = _splitToValues(nodes[_user]);
+    }
+
     /// @dev getActiveNodes returns active nodes list (stakes and amount)
     function getActiveNodes() public view override returns (bytes32[] memory) {
         uint256 nodeCount = 0;
