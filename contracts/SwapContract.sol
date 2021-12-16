@@ -10,15 +10,16 @@ import "./interfaces/ITokenTransferProxy.sol";
 import "./interfaces/IParaswap.sol";
 import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
-//import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-//import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./interfaces/lib/SafeERC20.sol";
-import "hardhat/console.sol";
-//skypools - needed for address => tokenBalance
 import "./LPToken.sol";
+
+//import "hardhat/console.sol"; //console.log()
+
+//import "./interfaces/lib/SafeERC20.sol";
+
+
 
 contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     using SafeMath for uint256;
@@ -537,7 +538,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _doUniswap(_amountIn, _amountOutMin, _path);
         }
 
-        uint256 receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
+        receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
             preSwapBalance
         );
 
@@ -578,7 +579,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         _doSimpleSwap(_data);
 
-        uint256 receivedAmount = IERC20(_data.toToken)
+        receivedAmount = IERC20(_data.toToken)
             .balanceOf(address(this))
             .sub(preSwapBalance);
 
@@ -809,11 +810,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         IWETH(wETH).withdraw(_amount);
         tokens[wETH][msg.sender] = tokens[wETH][msg.sender].sub(_amount);
         address payable sender = payable(msg.sender);
-        //sender.transfer(_amount);
+        
+        (bool success, /*bytes memory data*/) = sender.call{value: _amount}("");
 
-        (bool sent, bytes memory data) = sender.call{value: _amount}("");
-
-        require(sent);
+        require(success, "receiver rejected ETH transfer");
         emit Withdraw(
             ETHER,
             msg.sender,
