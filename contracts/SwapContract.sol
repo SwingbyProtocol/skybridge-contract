@@ -33,6 +33,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 Timestamp; // block timestamp that is set by EVM
     }
     uint256 public expirationTime;
+    uint256 public minimumSwapAmountForWBTC;
 
     mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
     //spPendingTx[] spPendingTXs;
@@ -143,6 +144,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     ) {
         //set default expiration time for pending TX
         expirationTime = 172800; //2 days
+        //min amount to swap for FLOW 2
+        minimumSwapAmountForWBTC = 24000;
         //init latest removed index and swapCount
         oldestActiveIndex = 0;
         swapCount = 0;
@@ -546,7 +549,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             receivedAmount >= _amountOutMin,
             "Received amount insufficient"
         );
-        require(receivedAmount != 0);
+        require(
+            receivedAmount >= minimumSwapAmountForWBTC,
+            "Received amount has not met the min for FLOW 2 swaps"
+        );       
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
 
@@ -587,7 +593,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             receivedAmount >= _data.expectedAmount,
             "Received amount insufficient"
         );
-        require(receivedAmount != 0);
+        require(
+            receivedAmount >= minimumSwapAmountForWBTC,
+            "Received amount has not met the min for FLOW 2 swaps"
+        );
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
 
@@ -885,6 +894,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint8 _tssThreshold,
         uint8 _nodeRewardsRatio,
         uint8 _withdrawalFeeBPS,
+        uint256 _minimumSwapAmountForWBTC, //set to 0 to keep existing expiration time
         uint256 _expirationTime //set to 0 to keep existing expiration time
     ) external override onlyOwner returns (bool) {
         require(
@@ -896,16 +906,17 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "n should be >= t+1"
         );
         require(
-            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
-            "_nodeRewardsRatio is not valid"
+            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100
         );
         require(
             _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100
         );
         require(
-            _rewardAddressAndAmounts.length == _isRemoved.length,
-            "_rewardAddressAndAmounts and _isRemoved length do not match"
+            _rewardAddressAndAmounts.length == _isRemoved.length
         );
+        if (_minimumSwapAmountForWBTC != 0){
+            minimumSwapAmountForWBTC = _minimumSwapAmountForWBTC;
+        }
         if (_expirationTime != 0) {
             _setExpirationTime(_expirationTime);
         }
