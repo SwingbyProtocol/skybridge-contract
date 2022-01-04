@@ -19,7 +19,8 @@ const Tokens = {
             decimals: 18
         },
         WBTC: {
-            address: '0x442be68395613bdcd19778e761f03261ec46c06d',
+            //address: '0x442be68395613bdcd19778e761f03261ec46c06d',
+            address: '0x7cb2eac36b4bb7c36640f32e806d33e474d1d427',
             decimals: 8
         },
         DAI: {
@@ -87,10 +88,10 @@ const giantAmountFlow2 = "15000000000000000000" // 15 ETH
 async function main() {
     let data
     let getPrice = await paraswap.getPrice(
-        Tokens[mainnet]['WETH'], // From token - CHANGE THIS
-        Tokens[mainnet]['WBTC'], // To token - CHANGE THIS
-        giantAmountFlow2, //Change this depending on flow 1 vs flow 2
-        mainnet
+        Tokens[ropsten]['WETH'], // From token - CHANGE THIS
+        Tokens[ropsten]['WBTC'], // To token - CHANGE THIS
+        srcAmountETH, //Change this depending on flow 1 vs flow 2
+        ropsten
     )
 
     //console.log(getPrice)
@@ -99,17 +100,17 @@ async function main() {
         return new BigNumber.from(3).mul(new BigNumber.from(10).pow(decimals - 2)).toString() //Format ERC20 - 0.05
     }
 
-    let decimals = Tokens[mainnet]['ETH'].decimals
+    let decimals = Tokens[ropsten]['WETH'].decimals
     let minDestAmount = new BigNumber.from(getPrice.price).sub(slippage(decimals))
 
     //POST request - build TX data to send to contract
     const txRequest = await paraswap.buildTransaction(
         getPrice.payload, //data from GET request
-        Tokens[mainnet]['WETH'], // From token - CHANGE THIS
-        Tokens[mainnet]['WBTC'], // To token - CHANGE THIS
-        giantAmountFlow2, //Change this depending on flow 1 vs flow 2
+        Tokens[ropsten]['WETH'], // From token - CHANGE THIS
+        Tokens[ropsten]['WBTC'], // To token - CHANGE THIS
+        srcAmountETH, //Change this depending on flow 1 vs flow 2
         minDestAmount.toString(), //this param is not used for paraswap V5 anymore, redundant
-        mainnet,
+        ropsten,
         "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB", //SWAP contract - flow 2 simpleSwap - uniswap functions don't care about this param
         //"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", //user1.address - Flow 1 simpleSwap
         true //only params - true for contract -> contract | false for standard transaction object
