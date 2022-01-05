@@ -761,11 +761,17 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     function _spCleanUpOldTXs() internal {
+        uint256 max = oldestActiveIndex.add(10);
+
+        if (max >= swapCount) {
+            max = swapCount;
+        }
+
         uint256 current = block.timestamp;
-        for (uint256 i = oldestActiveIndex; i < swapCount; i++) {
+        for (uint256 i = oldestActiveIndex; i < max; i++) {
             if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
                 delete spPendingTXs[i];
-                oldestActiveIndex = i.add(1); //next index to be deleted
+                oldestActiveIndex = i.add(1);
             }
         }
     }
@@ -898,8 +904,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     {
         require(!isTxUsed(_txid), "The txid is already used");
         floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
-            _minerFee,
-            "BTC float amount insufficient"
+            _minerFee
         );
         _addUsedTx(_txid);
         return true;
