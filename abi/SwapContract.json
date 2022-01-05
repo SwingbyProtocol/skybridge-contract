@@ -718,6 +718,40 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32[]",
+        "name": "_addressesAndAmounts",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalSwapped",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rewardsAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "_usedTxIds",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "multiRecordSkyPoolsTX",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_destToken",
         "type": "address"
