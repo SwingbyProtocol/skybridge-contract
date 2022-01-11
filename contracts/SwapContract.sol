@@ -194,10 +194,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
-        require(whitelist[_destToken], "_destToken is not whitelisted");
+        require(whitelist[_destToken], "14"); //_destToken is not whitelisted
         require(
             _destToken != address(0),
-            "_destToken should not be address(0)"
+            "15" //_destToken should not be address(0)
         );
         address _feesToken;
         if (_totalSwapped > 0) {
@@ -227,9 +227,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _rewardsAmount,
         bytes32[] memory _redeemedFloatTxIds
     ) external override onlyOwner returns (bool) {
-        require(whitelist[_destToken]);
+        require(whitelist[_destToken], "14"); //_destToken is not whitelisted
         require(
-            _destToken != address(0)
+            _destToken != address(0),
+            "15" //_destToken should not be address(0)
         );
         address _feesToken;
         if (_totalSwapped > 0) {
@@ -264,7 +265,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _rewardsAmount,
         bool _isUpdatelimitBTCForSPFlow2
     ) external override onlyOwner returns (bool) {
-        require(_destToken == address(0));
+        require(
+            _destToken != address(0),
+            "15" //_destToken should not be address(0)
+        );
         address _feesToken = BTCT_ADDR;
         if (_incomingAmount > 0) {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
@@ -295,7 +299,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bool _zerofee,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
-        require(whitelist[_token]);
+        require(whitelist[_token], "16");//_token is invalid
         require(
             _issueLPTokensForFloat(
                 _token,
@@ -318,7 +322,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _minerFee,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
-        require(whitelist[_token]);
+        require(whitelist[_token], "16");//_token is invalid
         require(
             _burnLPTokensForFloat(
                 _token,
@@ -336,8 +340,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 rewardLPTsForNodes = lockedLPTokensForNode.add(
             feesLPTokensForNode
         );
-        require(
-            rewardLPTsForNodes > 0
+         require(
+            rewardLPTsForNodes > 0,
+            "17"//"totalRewardLPsForNode is not positive"
         );
         bytes32[] memory nodeList = getActiveNodes();
         uint256 totalStaked = 0;
@@ -389,6 +394,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         return true;
     }
+
     /// @dev multiRecordSkyPoolsTX - allocate tokens from float to user in tokens[][] in batches
     /// @param _addressesAndAmounts The address of recipientand amount.
     /// @param _totalSwapped The amount of swap amount.
@@ -408,9 +414,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         _rewardsCollection(address(0), _rewardsAmount);
 
         _addUsedTxs(_usedTxIds);
-       
+
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
-            tokens[BTCT_ADDR][address(uint160(uint256(_addressesAndAmounts[i])))] = tokens[BTCT_ADDR][address(uint160(uint256(_addressesAndAmounts[i])))].add(uint256(uint96(bytes12(_addressesAndAmounts[i]))));
+            tokens[BTCT_ADDR][
+                address(uint160(uint256(_addressesAndAmounts[i])))
+            ] = tokens[BTCT_ADDR][
+                address(uint160(uint256(_addressesAndAmounts[i])))
+            ].add(uint256(uint96(bytes12(_addressesAndAmounts[i]))));
         }
 
         return true;
@@ -893,7 +903,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
      * Life cycle part
      */
 
-    /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
+     /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
     /// @param _minerFee The miner fees of BTC transaction.
     /// @param _txid The txid which is for recording.
     function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
@@ -904,7 +914,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     {
         require(!isTxUsed(_txid), "The txid is already used");
         floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
-            _minerFee
+            _minerFee,
+            "12"//"BTC float amount insufficient"
         );
         _addUsedTx(_txid);
         return true;
@@ -931,15 +942,24 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     ) external override onlyOwner returns (bool) {
         require(
             _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
-            "_tssThreshold should be >= tssThreshold"
+            "01" //"_tssThreshold should be >= tssThreshold"
         );
         require(
             _churnedInCount >= _tssThreshold + uint8(1),
-            "n should be >= t+1"
+            "02" //"n should be >= t+1"
         );
-        require(_nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100);
-        require(_withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100);
-        require(_rewardAddressAndAmounts.length == _isRemoved.length);
+        require(
+            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
+            "03" //"_nodeRewardsRatio is not valid"
+        );
+        require(
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
+            "04" //"_withdrawalFeeBPS is invalid"
+        );
+        require(
+            _rewardAddressAndAmounts.length == _isRemoved.length,
+            "05" //"_rewardAddressAndAmounts and _isRemoved length is not match"
+        );
         if (_minimumSwapAmountForWBTC != 0) {
             minimumSwapAmountForWBTC = _minimumSwapAmountForWBTC;
         }
@@ -954,7 +974,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
         bytes32[] memory nodeList = getActiveNodes();
         if (nodeList.length > 100) {
-            revert("Stored node size should be <= 100");
+            revert("13"); //Stored node size should be <= 100
         }
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
@@ -1060,8 +1080,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bool _zerofee,
         bytes32 _txid
     ) internal returns (bool) {
-        require(!isTxUsed(_txid), "The txid is already used");
-        require(_transaction != 0x0, "The transaction is not valid");
+        require(!isTxUsed(_txid), "06"); //"The txid is already used");
+        require(_transaction != 0x0, "07"); //"The transaction is not valid");
         // Define target address which is recorded on the tx data (20 bytes)
         // Define amountOfFloat which is recorded top on tx data (12 bytes)
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
@@ -1105,8 +1125,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _minerFee,
         bytes32 _txid
     ) internal returns (bool) {
-        require(!isTxUsed(_txid), "The txid is already used");
-        require(_transaction != 0x0, "The transaction is not valid");
+        require(!isTxUsed(_txid), "06"); //"The txid is already used");
+        require(_transaction != 0x0, "07"); //"The transaction is not valid");
         // Define target address which is recorded on the tx data (20bytes)
         // Define amountLP which is recorded top on tx data (12bytes)
         (address to, uint256 amountOfLP) = _splitToValues(_transaction);
@@ -1117,7 +1137,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             amountOfFloat.sub(withdrawalFees) >= _minerFee,
-            "Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
+            "09" //"Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
         );
         uint256 withdrawal = amountOfFloat.sub(withdrawalFees).sub(_minerFee);
         (uint256 reserveA, uint256 reserveB) = getFloatReserve(
@@ -1127,12 +1147,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         if (_token == address(0)) {
             require(
                 reserveA >= amountOfFloat.sub(withdrawalFees),
-                "The float balance insufficient."
+                "08" //"The float balance insufficient."
             );
         } else if (_token == BTCT_ADDR) {
             require(
                 reserveB >= amountOfFloat.sub(withdrawalFees),
-                "The float balance insufficient."
+                "12" //"BTC float amount insufficient"
             );
         }
         // Collect fees before remove float
@@ -1198,7 +1218,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     function _removeFloat(address _token, uint256 _amount) internal {
         floatAmountOf[_token] = floatAmountOf[_token].sub(
             _amount,
-            "_removeFloat: float amount insufficient"
+            "10" //"_removeFloat: float amount insufficient"
         );
     }
 
@@ -1213,7 +1233,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     ) internal {
         floatAmountOf[_destToken] = floatAmountOf[_destToken].sub(
             _swapAmount,
-            "_swap: float amount insufficient"
+            "11" //"_swap: float amount insufficient"
         );
         floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
             _swapAmount
@@ -1293,7 +1313,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
         limitBTCForSPFlow2 = limitBTCForSPFlow2.sub(
             _amount,
-            "insufficient BTC floats for SPFlow2"
+            "12" //"BTC float amount insufficient"
         );
     }
 
