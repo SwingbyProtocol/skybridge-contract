@@ -1311,7 +1311,7 @@ describe("SkyPools", () => {
                             giantAmountData[0],
                             giantAmountData[1],
                             giantAmountData[2],
-                        ).should.be.rejectedWith("insufficient BTC floats for SPFlow2")
+                        ).should.be.rejectedWith("reverted with reason string \'12\'")
                     })
                 })//END FLOW 2 FAILURE
             })//END FLOW 2
