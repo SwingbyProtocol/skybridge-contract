@@ -266,7 +266,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bool _isUpdatelimitBTCForSPFlow2
     ) external override onlyOwner returns (bool) {
         require(
-            _destToken != address(0),
+            _destToken == address(0),
             "15" //_destToken should not be address(0)
         );
         address _feesToken = BTCT_ADDR;
