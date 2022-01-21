@@ -60,7 +60,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     // Node lists
     mapping(address => bool) private nodes;
-    uint256 public totalNodeStaked;
+    uint256 public totalStakedAmount;
 
     //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
     mapping(address => mapping(address => uint256)) public tokens;
