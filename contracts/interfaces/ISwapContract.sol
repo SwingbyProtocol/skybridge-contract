@@ -94,12 +94,13 @@ interface ISwapContract {
 
     function churn(
         address _newOwner,
-        bytes32[] memory _rewardAddressAndAmounts,
+        address[] memory _nodes,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
         uint8 _nodeRewardsRatio,
         uint8 _withdrawalFeeBPS,
+        uint256 _totalStakedAmount,
         uint256 _minimumSwapAmountForWBTC,
         uint256 _expirationTime
     ) external returns (bool);
@@ -117,7 +118,5 @@ interface ISwapContract {
         external
         returns (uint256 reserveA, uint256 reserveB);
 
-    function getNodeStake(address _user) external returns (uint256 staked);
-
-    function getActiveNodes() external returns (bytes32[] memory);
+    function isNodeStake(address _user) external returns (bool);
 }
