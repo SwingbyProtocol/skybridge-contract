@@ -45,8 +45,6 @@ interface ISwapContract {
         bytes32 _txid
     ) external returns (bool);
 
-    function distributeNodeRewards() external returns (bool);
-
     function recordSkyPoolsTX(
         address _to,
         uint256 _totalSwapped,
@@ -108,11 +106,6 @@ interface ISwapContract {
     function isTxUsed(bytes32 _txid) external view returns (bool);
 
     function getCurrentPriceLP() external view returns (uint256);
-
-    function getDepositFeeRate(address _token, uint256 _amountOfFloat)
-        external
-        view
-        returns (uint256);
 
     function getFloatReserve(address _tokenA, address _tokenB)
         external
