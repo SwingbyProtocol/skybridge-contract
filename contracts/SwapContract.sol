@@ -47,8 +47,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
-    uint256 public lockedLPTokensForNode;
-    uint256 public feesLPTokensForNode;
     uint256 public initialExchangeRate;
     uint256 public limitBTCForSPFlow2;
 
@@ -168,10 +166,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         convertScale = 10**(IERC20(_btct).decimals() - 8);
         // Set initialExchangeRate
         initialExchangeRate = 10**IERC20(_lpToken).decimals();
-        // Set lockedLPTokensForNode
-        lockedLPTokensForNode = 0;
-        // Set feesLPTokensForNode
-        feesLPTokensForNode = 0;
         // Set whitelist addresses
         whitelist[_btct] = true;
         whitelist[_lpToken] = true;
@@ -335,24 +329,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
                 _txid
             )
         );
-        return true;
-    }
-
-    /// @dev distributeNodeRewards sends rewards for Nodes. (send to sbBTC pool)
-    function distributeNodeRewards() external override returns (bool) {
-        // Reduce Gas
-        uint256 rewardLPTsForNodes = lockedLPTokensForNode.add(
-            feesLPTokensForNode
-        );
-        require(
-            rewardLPTsForNodes > 0,
-            "17"//"totalRewardLPsForNode is not positive"
-        );
-        IBurnableToken(lpToken).mint(address(this), lockedLPTokensForNode);
-        IBurnableToken(lpToken).transfer(sbBTCPool, rewardLPTsForNodes);
-        emit DistributeNodeRewards(rewardLPTsForNodes);
-        lockedLPTokensForNode = 0;
-        feesLPTokensForNode = 0;
         return true;
     }
 
@@ -995,9 +971,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
         nowPrice = totalLPs == 0
             ? initialExchangeRate
-            : (reserveA.add(reserveB)).mul(lpDecimals).div(
-                totalLPs.add(lockedLPTokensForNode)
-            );
+            : (reserveA.add(reserveB)).mul(lpDecimals).div(totalLPs);
         return nowPrice;
     }
 
@@ -1059,18 +1033,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
         uint256 amountOfLP = amountOfFloat.mul(lpDecimals).div(nowPrice);
-        uint256 depositFeeRate = getDepositFeeRate(_token, amountOfFloat);
-        uint256 depositFees = depositFeeRate != 0
-            ? amountOfLP.mul(depositFeeRate).div(10000)
-            : 0;
 
         if (_zerofee && depositFees != 0) {
             revert();
         }
         // Send LP tokens to LP
-        IBurnableToken(lpToken).mint(to, amountOfLP.sub(depositFees));
-        // Add deposit fees
-        lockedLPTokensForNode = lockedLPTokensForNode.add(depositFees);
+        IBurnableToken(lpToken).mint(to, amountOfLP);
+
         // Add float amount
         _addFloat(_token, amountOfFloat);
         _addUsedTx(_txid);
@@ -1150,32 +1119,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return true;
     }
 
-    /// @dev _checkFlips checks whether the fees are activated.
-    /// @param _token The address of target token.
-    /// @param _amountOfFloat The amount of float.
-    function _checkFlips(address _token, uint256 _amountOfFloat)
-        internal
-        view
-        returns (uint8)
-    {
-        (uint256 reserveA, uint256 reserveB) = getFloatReserve(
-            address(0),
-            BTCT_ADDR
-        );
-        uint256 threshold = reserveA
-            .add(reserveB)
-            .add(_amountOfFloat)
-            .mul(2)
-            .div(3);
-        if (_token == BTCT_ADDR && reserveB.add(_amountOfFloat) >= threshold) {
-            return 1; // BTC float insufficient
-        }
-        if (_token == address(0) && reserveA.add(_amountOfFloat) >= threshold) {
-            return 2; // BTCT float insufficient
-        }
-        return 0;
-    }
-
     /// @dev _addFloat updates one side of the float.
     /// @param _token The address of target token.
     /// @param _amount The amount of float.
@@ -1236,8 +1179,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     {
         if (_rewardsAmount == 0) return;
         if (_feesToken == lpToken) {
-            feesLPTokensForNode = feesLPTokensForNode.add(_rewardsAmount);
-            emit RewardsCollection(_feesToken, _rewardsAmount, 0, 0);
+            IBurnableToken(lpToken).transfer(sbBTCPool, _rewardsAmount);
+            emit RewardsCollection(_feesToken, 0, _rewardsAmount, 0);
             return;
         }
         // Get current LP token price.
@@ -1251,10 +1194,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 amountLPTokensForNode = amountForNodes.mul(lpDecimals).div(
             nowPrice
         );
-        // Add minted LP tokens for Nodes
-        lockedLPTokensForNode = lockedLPTokensForNode.add(
-            amountLPTokensForNode
-        );
+        // Mints LP tokens for Nodes
+        IBurnableToken(lpToken).mint(sbBTCPool, amountLPTokensForNode);
+
         emit RewardsCollection(
             _feesToken,
             _rewardsAmount,
