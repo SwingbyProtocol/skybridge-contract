@@ -11,6 +11,7 @@ contract SwapContractFactory {
         address _owner,
         address _wbtc,
         address _wETH,
+        address _sbBTCPool,
         uint8   _decimals,
         uint256 _existingBTCFloat
     ) external returns (address) {
@@ -19,6 +20,7 @@ contract SwapContractFactory {
             address(lpToken),
             _wbtc,
             _wETH,
+            _sbBTCPool,
             _existingBTCFloat
         );
         lpToken.transferOwnership(address(sc));
