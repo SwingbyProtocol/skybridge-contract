@@ -45,7 +45,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     uint8 public churnedInCount;
     uint8 public tssThreshold;
     uint8 public nodeRewardsRatio;
-    uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
     uint256 public initialExchangeRate;
     uint256 public limitBTCForSPFlow2;
@@ -158,8 +157,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         BTCT_ADDR = _btct;
         // Set nodeRewardsRatio
         nodeRewardsRatio = 66;
-        // Set depositFeesBPS
-        depositFeesBPS = 50;
         // Set withdrawalFeeBPS
         withdrawalFeeBPS = 20;
         // Set convertScale
@@ -975,23 +972,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return nowPrice;
     }
 
-    /// @dev getDepositFeeRate returns deposit fees rate
-    /// @param _token The address of target token.
-    /// @param _amountOfFloat The amount of float.
-    function getDepositFeeRate(address _token, uint256 _amountOfFloat)
-        public
-        view
-        override
-        returns (uint256 depositFeeRate)
-    {
-        uint8 isFlip = _checkFlips(_token, _amountOfFloat);
-        if (isFlip == 1) {
-            depositFeeRate = _token == BTCT_ADDR ? depositFeesBPS : 0;
-        } else if (isFlip == 2) {
-            depositFeeRate = _token == address(0) ? depositFeesBPS : 0;
-        }
-    }
-
     /// @dev getFloatReserve returns float reserves
     /// @param _tokenA The address of target tokenA.
     /// @param _tokenB The address of target tokenB.
@@ -1033,10 +1013,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
         uint256 amountOfLP = amountOfFloat.mul(lpDecimals).div(nowPrice);
-
-        if (_zerofee && depositFees != 0) {
-            revert();
-        }
         // Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP);
 
@@ -1048,7 +1024,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             amountOfFloat,
             amountOfLP,
             nowPrice,
-            depositFees,
+            0,
             _txid
         );
         return true;
