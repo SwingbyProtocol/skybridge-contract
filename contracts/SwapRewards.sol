@@ -14,6 +14,8 @@ contract SwapRewards is Ownable {
     ISwapContract public swapContract;
     uint256 public rebateRate = 30;
 
+    event Paid(address to, uint256 amount);
+
     constructor(
         address _owner,
         address _swingby,
@@ -24,11 +26,10 @@ contract SwapRewards is Ownable {
 
         transferOwnership(_owner);
         rewardToken = IERC20(_swingby);
-        swapContract = IERC20(_swap);
+        swapContract = ISwapContract(_swap);
     }
 
     function setSwap(address _swap, uint256 _newRebateRate) public {
-        require(swapContract != address(0), "barn address must not be 0x0");
         require(msg.sender == owner(), "!owner");
         swapContract = ISwapContract(_swap);
         rebateRate = _newRebateRate;
@@ -37,15 +38,47 @@ contract SwapRewards is Ownable {
     // pullRewards transfers the funds to the user
     function pullRewards(
         address _dest,
-        address[] memory _receiver,
-        uint256[] memory _swapped
-    ) public returns (uint256) {
+        address _receiver,
+        uint256 _swapped
+    ) public {
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
         );
         address tokenB = swapContract.BTCT_ADDR();
-        (balA, balB) = swapContract.getFloatReserve(address(0), tokenB);
+        (uint256 balA, uint256 balB) = swapContract.getFloatReserve(
+            address(0),
+            tokenB
+        );
+        uint256 threshold = balA.add(balB).mul(2).div(3);
+        if (
+            (_dest == tokenB && balA <= threshold) ||
+            (_dest == address(0) && balB <= threshold)
+        ) {
+            rewardToken.transfer(
+                _receiver,
+                _swapped.mul(rebateRate).div(100).mul(1e10)
+            ); // decimals == 18 for payout
+            emit Paid(_receiver, _swapped.mul(rebateRate).div(100).mul(1e10));
+        }
+    }
+
+    // pullRewardsMulti transfers the funds to the user
+    function pullRewardsMulti(
+        address _dest,
+        address[] memory _receiver,
+        uint256[] memory _swapped
+    ) public {
+        require(
+            msg.sender == address(swapContract),
+            "caller is not swap contact"
+        );
+        require(_receiver.length == _swapped.length, "array size is not match");
+        address tokenB = swapContract.BTCT_ADDR();
+        (uint256 balA, uint256 balB) = swapContract.getFloatReserve(
+            address(0),
+            tokenB
+        );
         uint256 threshold = balA.add(balB).mul(2).div(3);
         if (
             (_dest == tokenB && balA <= threshold) ||
@@ -56,8 +89,11 @@ contract SwapRewards is Ownable {
                     _receiver[i],
                     _swapped[i].mul(rebateRate).div(100).mul(1e10)
                 ); // decimals == 18 for payout
+                emit Paid(
+                    _receiver[i],
+                    _swapped[i].mul(rebateRate).div(100).mul(1e10)
+                );
             }
         }
-        return rewards;
     }
 }

@@ -2,5 +2,7 @@
 pragma solidity >=0.6.0 <=0.8.9;
 
 interface ISwapRewards {
-    function pullRewards(address _dest, address[] memory _receiver, uint256[] memory _swapped) external returns (uint256);
+    function pullRewards(address _dest, address _receiver, uint256 _swapped) external returns (bool);
+
+    function pullRewardsMulti(address _dest, address[] memory _receiver, uint256[] memory _swapped) external returns (bool);
 }

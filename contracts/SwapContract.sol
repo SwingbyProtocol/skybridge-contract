@@ -202,7 +202,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         address _feesToken;
         if (_totalSwapped > 0) {
-            ISwapRewards(swapRewards).pullRewards(_destToken, [_to], [_totalSwapped]);
+            ISwapRewards(swapRewards).pullRewards(_destToken, _to, _totalSwapped);
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = BTCT_ADDR;
@@ -278,7 +278,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
                 _minerFee
             );
-            ISwapRewards(swapRewards).pullRewards(_destToken, _spenders, _amounts);
+            ISwapRewards(swapRewards).pullRewardsMulti(_destToken, _spenders, _amounts);
             _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
