@@ -5,6 +5,7 @@ import "./interfaces/IWETH.sol";
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
+import "./interfaces/ISwapRewards.sol";
 import "./interfaces/IAugustusSwapper.sol";
 import "./interfaces/ITokenTransferProxy.sol";
 import "./interfaces/IParaswap.sol";
@@ -69,6 +70,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     address public immutable wETH;
 
     address public immutable sbBTCPool;
+
+    address public immutable swapRewards;
 
     /**
      * Events
@@ -136,6 +139,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address _btct,
         address _wETH,
         address _sbBTCPool,
+        address _swapRewards,
         uint256 _existingBTCFloat
     ) {
         //set default expiration time for pending TX
@@ -149,6 +153,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         wETH = _wETH;
         //set address for sbBTCpool
         sbBTCPool = _sbBTCPool;
+        //set address for swapRewards
+        swapRewards = _swapRewards;
         // Set lpToken address
         lpToken = _lpToken;
         // Set initial lpDecimals of LP token
@@ -196,6 +202,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         address _feesToken;
         if (_totalSwapped > 0) {
+            ISwapRewards(swapRewards).pullRewards(_destToken, [_to], [_totalSwapped]);
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = BTCT_ADDR;
@@ -258,6 +265,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _incomingAmount,
         uint256 _minerFee,
         uint256 _rewardsAmount,
+        address[] memory _spenders,
+        uint256[] memory _amounts,
         bool _isUpdatelimitBTCForSPFlow2
     ) external override onlyOwner returns (bool) {
         require(
@@ -269,6 +278,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
                 _minerFee
             );
+            ISwapRewards(swapRewards).pullRewards(_destToken, _spenders, _amounts);
             _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);

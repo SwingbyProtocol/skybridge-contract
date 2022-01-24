@@ -5,6 +5,8 @@ pragma experimental ABIEncoderV2;
 import "./lib/Utils.sol";
 
 interface ISwapContract {
+    
+    function BTCT_ADDR() external returns (address);
 
     function singleTransferERC20(
         address _destToken,
@@ -28,6 +30,8 @@ interface ISwapContract {
         uint256 _incomingAmount,
         uint256 _minerFee,
         uint256 _rewardsAmount,
+        address[] memory _spenders,
+        uint256[] memory _amounts,
         bool    _isUpdatelimitBTCForSPFlow2
     ) external returns (bool);
 
