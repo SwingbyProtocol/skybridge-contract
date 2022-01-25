@@ -13,6 +13,7 @@ contract SwapRewards is Ownable {
     IERC20 public immutable rewardToken;
     ISwapContract public swapContract;
     uint256 public rebateRate = 30;
+    uint256 public thresholdRatio = 60;
 
     event Paid(address to, uint256 amount);
 
@@ -29,10 +30,23 @@ contract SwapRewards is Ownable {
         swapContract = ISwapContract(_swap);
     }
 
-    function setSwap(address _swap, uint256 _newRebateRate) public {
+    function setSwap(
+        address _swap,
+        uint256 _newRebateRate,
+        uint256 _thresholdRatio
+    ) public {
         require(msg.sender == owner(), "!owner");
+        require(
+            _newRebateRate >= 0 && _newRebateRate <= 100,
+            "_newRebateRate is not valid"
+        );
+        require(
+            _thresholdRatio >= 20 && _thresholdRatio <= 100,
+            "_thresholdRatio is not valid"
+        );
         swapContract = ISwapContract(_swap);
         rebateRate = _newRebateRate;
+        thresholdRatio = _thresholdRatio;
     }
 
     // pullRewards transfers the funds to the user
@@ -50,7 +64,7 @@ contract SwapRewards is Ownable {
             address(0),
             tokenB
         );
-        uint256 threshold = balA.add(balB).mul(2).div(3);
+        uint256 threshold = balA.add(balB).mul(thresholdRatio).div(100);
         if (
             (_dest == tokenB && balA <= threshold) ||
             (_dest == address(0) && balB <= threshold)
@@ -79,7 +93,7 @@ contract SwapRewards is Ownable {
             address(0),
             tokenB
         );
-        uint256 threshold = balA.add(balB).mul(2).div(3);
+        uint256 threshold = balA.add(balB).mul(thresholdRatio).div(100);
         if (
             (_dest == tokenB && balA <= threshold) ||
             (_dest == address(0) && balB <= threshold)
