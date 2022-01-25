@@ -58,7 +58,7 @@ type UtilsSimpleData struct {
 
 // SwapContractMetaData contains all meta data concerning the SwapContract contract.
 var SwapContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_btct\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wETH\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawal\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"BurnLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"Deposit\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardLPTsForNodes\",\"type\":\"uint256\"}],\"name\":\"DistributeNodeRewards\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"depositFees\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"IssueLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feesToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewards\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountLPTokensForNode\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"}],\"name\":\"RewardsCollection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"ExpirationTime\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"SetExpirationTime\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Swap\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"SwapTokensToBTC\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"BTCT_ADDR\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_rewardAddressAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_minimumSwapAmountForWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_expirationTime\",\"type\":\"uint256\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"churnedInCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"_isUpdatelimitBTCForSPFlow2\",\"type\":\"bool\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"depositFeesBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"distributeNodeRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"expirationTime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"feesLPTokensForNode\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"nowPrice\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amountOfFloat\",\"type\":\"uint256\"}],\"name\":\"getDepositFeeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"depositFeeRate\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"getNodeStake\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"staked\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"initialExchangeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"limitBTCForSPFlow2\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lockedLPTokensForNode\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lpToken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"minimumSwapAmountForWBTC\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nodeRewardsRatio\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"oldestActiveIndex\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"_zerofee\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_usedTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"recordSkyPoolsTX\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"redeemERC20Token\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"redeemEther\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_loopCount\",\"type\":\"uint256\"}],\"name\":\"spCleanUpOldTXs\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"spDeposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"fromToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"toToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"fromAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"toAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expectedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"callees\",\"type\":\"address[]\"},{\"internalType\":\"bytes\",\"name\":\"exchangeData\",\"type\":\"bytes\"},{\"internalType\":\"uint256[]\",\"name\":\"startIndexes\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"addresspayable\",\"name\":\"beneficiary\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"partner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"feePercent\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"permit\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes16\",\"name\":\"uuid\",\"type\":\"bytes16\"}],\"internalType\":\"structUtils.SimpleData\",\"name\":\"_data\",\"type\":\"tuple\"}],\"name\":\"spFlow1SimpleSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"_fork\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_initCode\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_path\",\"type\":\"address[]\"}],\"name\":\"spFlow1Uniswap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_destinationAddressForBTC\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"fromToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"toToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"fromAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"toAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expectedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"callees\",\"type\":\"address[]\"},{\"internalType\":\"bytes\",\"name\":\"exchangeData\",\"type\":\"bytes\"},{\"internalType\":\"uint256[]\",\"name\":\"startIndexes\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"addresspayable\",\"name\":\"beneficiary\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"partner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"feePercent\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"permit\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes16\",\"name\":\"uuid\",\"type\":\"bytes16\"}],\"internalType\":\"structUtils.SimpleData\",\"name\":\"_data\",\"type\":\"tuple\"}],\"name\":\"spFlow2SimpleSwap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_destinationAddressForBTC\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"_fork\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_initCode\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_path\",\"type\":\"address[]\"}],\"name\":\"spFlow2Uniswap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spGetPendingSwaps\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"internalType\":\"structSwapContract.spPendingTx[]\",\"name\":\"data\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"spPendingTXs\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"tokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tssThreshold\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wETH\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"whitelist\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawalFeeBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_btct\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wETH\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sbBTCPool\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swapRewards\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawal\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"BurnLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"Deposit\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardLPTsForNodes\",\"type\":\"uint256\"}],\"name\":\"DistributeNodeRewards\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"depositFees\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"IssueLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feesToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewards\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountLPTokensForNode\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"}],\"name\":\"RewardsCollection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"ExpirationTime\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"SetExpirationTime\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Swap\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"SwapTokensToBTC\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"BTCT_ADDR\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_nodes\",\"type\":\"address[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_totalStakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_minimumSwapAmountForWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_expirationTime\",\"type\":\"uint256\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"churnedInCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_spenders\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_amounts\",\"type\":\"uint256[]\"},{\"internalType\":\"bool\",\"name\":\"_isUpdatelimitBTCForSPFlow2\",\"type\":\"bool\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"expirationTime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"nowPrice\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"initialExchangeRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"isNodeStake\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"limitBTCForSPFlow2\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lpToken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"minimumSwapAmountForWBTC\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_usedTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiRecordSkyPoolsTX\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nodeRewardsRatio\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"oldestActiveIndex\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"_zerofee\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_usedTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"recordSkyPoolsTX\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"redeemERC20Token\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"redeemEther\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sbBTCPool\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_loopCount\",\"type\":\"uint256\"}],\"name\":\"spCleanUpOldTXs\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"spDeposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"fromToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"toToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"fromAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"toAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expectedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"callees\",\"type\":\"address[]\"},{\"internalType\":\"bytes\",\"name\":\"exchangeData\",\"type\":\"bytes\"},{\"internalType\":\"uint256[]\",\"name\":\"startIndexes\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"addresspayable\",\"name\":\"beneficiary\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"partner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"feePercent\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"permit\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes16\",\"name\":\"uuid\",\"type\":\"bytes16\"}],\"internalType\":\"structUtils.SimpleData\",\"name\":\"_data\",\"type\":\"tuple\"}],\"name\":\"spFlow1SimpleSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"_fork\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_initCode\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_path\",\"type\":\"address[]\"}],\"name\":\"spFlow1Uniswap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_destinationAddressForBTC\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"fromToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"toToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"fromAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"toAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expectedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"callees\",\"type\":\"address[]\"},{\"internalType\":\"bytes\",\"name\":\"exchangeData\",\"type\":\"bytes\"},{\"internalType\":\"uint256[]\",\"name\":\"startIndexes\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"addresspayable\",\"name\":\"beneficiary\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"partner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"feePercent\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"permit\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes16\",\"name\":\"uuid\",\"type\":\"bytes16\"}],\"internalType\":\"structUtils.SimpleData\",\"name\":\"_data\",\"type\":\"tuple\"}],\"name\":\"spFlow2SimpleSwap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_destinationAddressForBTC\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"_fork\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_initCode\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_path\",\"type\":\"address[]\"}],\"name\":\"spFlow2Uniswap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spGetPendingSwaps\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"internalType\":\"structSwapContract.spPendingTx[]\",\"name\":\"data\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"spPendingTXs\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapRewards\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"tokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalStakedAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tssThreshold\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wETH\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"whitelist\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawalFeeBPS\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]",
 }
 
 // SwapContractABI is the input ABI used to generate the binding from.
@@ -300,37 +300,6 @@ func (_SwapContract *SwapContractCallerSession) ChurnedInCount() (uint8, error) 
 	return _SwapContract.Contract.ChurnedInCount(&_SwapContract.CallOpts)
 }
 
-// DepositFeesBPS is a free data retrieval call binding the contract method 0x42419255.
-//
-// Solidity: function depositFeesBPS() view returns(uint8)
-func (_SwapContract *SwapContractCaller) DepositFeesBPS(opts *bind.CallOpts) (uint8, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "depositFeesBPS")
-
-	if err != nil {
-		return *new(uint8), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
-
-	return out0, err
-
-}
-
-// DepositFeesBPS is a free data retrieval call binding the contract method 0x42419255.
-//
-// Solidity: function depositFeesBPS() view returns(uint8)
-func (_SwapContract *SwapContractSession) DepositFeesBPS() (uint8, error) {
-	return _SwapContract.Contract.DepositFeesBPS(&_SwapContract.CallOpts)
-}
-
-// DepositFeesBPS is a free data retrieval call binding the contract method 0x42419255.
-//
-// Solidity: function depositFeesBPS() view returns(uint8)
-func (_SwapContract *SwapContractCallerSession) DepositFeesBPS() (uint8, error) {
-	return _SwapContract.Contract.DepositFeesBPS(&_SwapContract.CallOpts)
-}
-
 // ExpirationTime is a free data retrieval call binding the contract method 0xda284dcc.
 //
 // Solidity: function expirationTime() view returns(uint256)
@@ -362,68 +331,6 @@ func (_SwapContract *SwapContractCallerSession) ExpirationTime() (*big.Int, erro
 	return _SwapContract.Contract.ExpirationTime(&_SwapContract.CallOpts)
 }
 
-// FeesLPTokensForNode is a free data retrieval call binding the contract method 0xf7824bc7.
-//
-// Solidity: function feesLPTokensForNode() view returns(uint256)
-func (_SwapContract *SwapContractCaller) FeesLPTokensForNode(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "feesLPTokensForNode")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// FeesLPTokensForNode is a free data retrieval call binding the contract method 0xf7824bc7.
-//
-// Solidity: function feesLPTokensForNode() view returns(uint256)
-func (_SwapContract *SwapContractSession) FeesLPTokensForNode() (*big.Int, error) {
-	return _SwapContract.Contract.FeesLPTokensForNode(&_SwapContract.CallOpts)
-}
-
-// FeesLPTokensForNode is a free data retrieval call binding the contract method 0xf7824bc7.
-//
-// Solidity: function feesLPTokensForNode() view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) FeesLPTokensForNode() (*big.Int, error) {
-	return _SwapContract.Contract.FeesLPTokensForNode(&_SwapContract.CallOpts)
-}
-
-// GetActiveNodes is a free data retrieval call binding the contract method 0x6b51e919.
-//
-// Solidity: function getActiveNodes() view returns(bytes32[])
-func (_SwapContract *SwapContractCaller) GetActiveNodes(opts *bind.CallOpts) ([][32]byte, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "getActiveNodes")
-
-	if err != nil {
-		return *new([][32]byte), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new([][32]byte)).(*[][32]byte)
-
-	return out0, err
-
-}
-
-// GetActiveNodes is a free data retrieval call binding the contract method 0x6b51e919.
-//
-// Solidity: function getActiveNodes() view returns(bytes32[])
-func (_SwapContract *SwapContractSession) GetActiveNodes() ([][32]byte, error) {
-	return _SwapContract.Contract.GetActiveNodes(&_SwapContract.CallOpts)
-}
-
-// GetActiveNodes is a free data retrieval call binding the contract method 0x6b51e919.
-//
-// Solidity: function getActiveNodes() view returns(bytes32[])
-func (_SwapContract *SwapContractCallerSession) GetActiveNodes() ([][32]byte, error) {
-	return _SwapContract.Contract.GetActiveNodes(&_SwapContract.CallOpts)
-}
-
 // GetCurrentPriceLP is a free data retrieval call binding the contract method 0x45137e27.
 //
 // Solidity: function getCurrentPriceLP() view returns(uint256 nowPrice)
@@ -453,37 +360,6 @@ func (_SwapContract *SwapContractSession) GetCurrentPriceLP() (*big.Int, error) 
 // Solidity: function getCurrentPriceLP() view returns(uint256 nowPrice)
 func (_SwapContract *SwapContractCallerSession) GetCurrentPriceLP() (*big.Int, error) {
 	return _SwapContract.Contract.GetCurrentPriceLP(&_SwapContract.CallOpts)
-}
-
-// GetDepositFeeRate is a free data retrieval call binding the contract method 0x3b6fa127.
-//
-// Solidity: function getDepositFeeRate(address _token, uint256 _amountOfFloat) view returns(uint256 depositFeeRate)
-func (_SwapContract *SwapContractCaller) GetDepositFeeRate(opts *bind.CallOpts, _token common.Address, _amountOfFloat *big.Int) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "getDepositFeeRate", _token, _amountOfFloat)
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// GetDepositFeeRate is a free data retrieval call binding the contract method 0x3b6fa127.
-//
-// Solidity: function getDepositFeeRate(address _token, uint256 _amountOfFloat) view returns(uint256 depositFeeRate)
-func (_SwapContract *SwapContractSession) GetDepositFeeRate(_token common.Address, _amountOfFloat *big.Int) (*big.Int, error) {
-	return _SwapContract.Contract.GetDepositFeeRate(&_SwapContract.CallOpts, _token, _amountOfFloat)
-}
-
-// GetDepositFeeRate is a free data retrieval call binding the contract method 0x3b6fa127.
-//
-// Solidity: function getDepositFeeRate(address _token, uint256 _amountOfFloat) view returns(uint256 depositFeeRate)
-func (_SwapContract *SwapContractCallerSession) GetDepositFeeRate(_token common.Address, _amountOfFloat *big.Int) (*big.Int, error) {
-	return _SwapContract.Contract.GetDepositFeeRate(&_SwapContract.CallOpts, _token, _amountOfFloat)
 }
 
 // GetFloatReserve is a free data retrieval call binding the contract method 0xec482729.
@@ -531,37 +407,6 @@ func (_SwapContract *SwapContractCallerSession) GetFloatReserve(_tokenA common.A
 	return _SwapContract.Contract.GetFloatReserve(&_SwapContract.CallOpts, _tokenA, _tokenB)
 }
 
-// GetNodeStake is a free data retrieval call binding the contract method 0xcfbf92a9.
-//
-// Solidity: function getNodeStake(address _user) view returns(uint256 staked)
-func (_SwapContract *SwapContractCaller) GetNodeStake(opts *bind.CallOpts, _user common.Address) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "getNodeStake", _user)
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// GetNodeStake is a free data retrieval call binding the contract method 0xcfbf92a9.
-//
-// Solidity: function getNodeStake(address _user) view returns(uint256 staked)
-func (_SwapContract *SwapContractSession) GetNodeStake(_user common.Address) (*big.Int, error) {
-	return _SwapContract.Contract.GetNodeStake(&_SwapContract.CallOpts, _user)
-}
-
-// GetNodeStake is a free data retrieval call binding the contract method 0xcfbf92a9.
-//
-// Solidity: function getNodeStake(address _user) view returns(uint256 staked)
-func (_SwapContract *SwapContractCallerSession) GetNodeStake(_user common.Address) (*big.Int, error) {
-	return _SwapContract.Contract.GetNodeStake(&_SwapContract.CallOpts, _user)
-}
-
 // InitialExchangeRate is a free data retrieval call binding the contract method 0x6d019f35.
 //
 // Solidity: function initialExchangeRate() view returns(uint256)
@@ -591,6 +436,37 @@ func (_SwapContract *SwapContractSession) InitialExchangeRate() (*big.Int, error
 // Solidity: function initialExchangeRate() view returns(uint256)
 func (_SwapContract *SwapContractCallerSession) InitialExchangeRate() (*big.Int, error) {
 	return _SwapContract.Contract.InitialExchangeRate(&_SwapContract.CallOpts)
+}
+
+// IsNodeStake is a free data retrieval call binding the contract method 0xa742329d.
+//
+// Solidity: function isNodeStake(address _user) view returns(bool)
+func (_SwapContract *SwapContractCaller) IsNodeStake(opts *bind.CallOpts, _user common.Address) (bool, error) {
+	var out []interface{}
+	err := _SwapContract.contract.Call(opts, &out, "isNodeStake", _user)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// IsNodeStake is a free data retrieval call binding the contract method 0xa742329d.
+//
+// Solidity: function isNodeStake(address _user) view returns(bool)
+func (_SwapContract *SwapContractSession) IsNodeStake(_user common.Address) (bool, error) {
+	return _SwapContract.Contract.IsNodeStake(&_SwapContract.CallOpts, _user)
+}
+
+// IsNodeStake is a free data retrieval call binding the contract method 0xa742329d.
+//
+// Solidity: function isNodeStake(address _user) view returns(bool)
+func (_SwapContract *SwapContractCallerSession) IsNodeStake(_user common.Address) (bool, error) {
+	return _SwapContract.Contract.IsNodeStake(&_SwapContract.CallOpts, _user)
 }
 
 // IsTxUsed is a free data retrieval call binding the contract method 0xe6ca2084.
@@ -653,37 +529,6 @@ func (_SwapContract *SwapContractSession) LimitBTCForSPFlow2() (*big.Int, error)
 // Solidity: function limitBTCForSPFlow2() view returns(uint256)
 func (_SwapContract *SwapContractCallerSession) LimitBTCForSPFlow2() (*big.Int, error) {
 	return _SwapContract.Contract.LimitBTCForSPFlow2(&_SwapContract.CallOpts)
-}
-
-// LockedLPTokensForNode is a free data retrieval call binding the contract method 0x2d55282d.
-//
-// Solidity: function lockedLPTokensForNode() view returns(uint256)
-func (_SwapContract *SwapContractCaller) LockedLPTokensForNode(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "lockedLPTokensForNode")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// LockedLPTokensForNode is a free data retrieval call binding the contract method 0x2d55282d.
-//
-// Solidity: function lockedLPTokensForNode() view returns(uint256)
-func (_SwapContract *SwapContractSession) LockedLPTokensForNode() (*big.Int, error) {
-	return _SwapContract.Contract.LockedLPTokensForNode(&_SwapContract.CallOpts)
-}
-
-// LockedLPTokensForNode is a free data retrieval call binding the contract method 0x2d55282d.
-//
-// Solidity: function lockedLPTokensForNode() view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) LockedLPTokensForNode() (*big.Int, error) {
-	return _SwapContract.Contract.LockedLPTokensForNode(&_SwapContract.CallOpts)
 }
 
 // LpToken is a free data retrieval call binding the contract method 0x5fcbd285.
@@ -841,6 +686,37 @@ func (_SwapContract *SwapContractCallerSession) Owner() (common.Address, error) 
 	return _SwapContract.Contract.Owner(&_SwapContract.CallOpts)
 }
 
+// SbBTCPool is a free data retrieval call binding the contract method 0x0085aea1.
+//
+// Solidity: function sbBTCPool() view returns(address)
+func (_SwapContract *SwapContractCaller) SbBTCPool(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _SwapContract.contract.Call(opts, &out, "sbBTCPool")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// SbBTCPool is a free data retrieval call binding the contract method 0x0085aea1.
+//
+// Solidity: function sbBTCPool() view returns(address)
+func (_SwapContract *SwapContractSession) SbBTCPool() (common.Address, error) {
+	return _SwapContract.Contract.SbBTCPool(&_SwapContract.CallOpts)
+}
+
+// SbBTCPool is a free data retrieval call binding the contract method 0x0085aea1.
+//
+// Solidity: function sbBTCPool() view returns(address)
+func (_SwapContract *SwapContractCallerSession) SbBTCPool() (common.Address, error) {
+	return _SwapContract.Contract.SbBTCPool(&_SwapContract.CallOpts)
+}
+
 // SpGetPendingSwaps is a free data retrieval call binding the contract method 0x20199e99.
 //
 // Solidity: function spGetPendingSwaps() view returns((bytes32,string,address,uint256,uint256)[] data)
@@ -963,6 +839,37 @@ func (_SwapContract *SwapContractCallerSession) SwapCount() (*big.Int, error) {
 	return _SwapContract.Contract.SwapCount(&_SwapContract.CallOpts)
 }
 
+// SwapRewards is a free data retrieval call binding the contract method 0xd0f9a085.
+//
+// Solidity: function swapRewards() view returns(address)
+func (_SwapContract *SwapContractCaller) SwapRewards(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _SwapContract.contract.Call(opts, &out, "swapRewards")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// SwapRewards is a free data retrieval call binding the contract method 0xd0f9a085.
+//
+// Solidity: function swapRewards() view returns(address)
+func (_SwapContract *SwapContractSession) SwapRewards() (common.Address, error) {
+	return _SwapContract.Contract.SwapRewards(&_SwapContract.CallOpts)
+}
+
+// SwapRewards is a free data retrieval call binding the contract method 0xd0f9a085.
+//
+// Solidity: function swapRewards() view returns(address)
+func (_SwapContract *SwapContractCallerSession) SwapRewards() (common.Address, error) {
+	return _SwapContract.Contract.SwapRewards(&_SwapContract.CallOpts)
+}
+
 // Tokens is a free data retrieval call binding the contract method 0x508493bc.
 //
 // Solidity: function tokens(address , address ) view returns(uint256)
@@ -992,6 +899,37 @@ func (_SwapContract *SwapContractSession) Tokens(arg0 common.Address, arg1 commo
 // Solidity: function tokens(address , address ) view returns(uint256)
 func (_SwapContract *SwapContractCallerSession) Tokens(arg0 common.Address, arg1 common.Address) (*big.Int, error) {
 	return _SwapContract.Contract.Tokens(&_SwapContract.CallOpts, arg0, arg1)
+}
+
+// TotalStakedAmount is a free data retrieval call binding the contract method 0x567e98f9.
+//
+// Solidity: function totalStakedAmount() view returns(uint256)
+func (_SwapContract *SwapContractCaller) TotalStakedAmount(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _SwapContract.contract.Call(opts, &out, "totalStakedAmount")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// TotalStakedAmount is a free data retrieval call binding the contract method 0x567e98f9.
+//
+// Solidity: function totalStakedAmount() view returns(uint256)
+func (_SwapContract *SwapContractSession) TotalStakedAmount() (*big.Int, error) {
+	return _SwapContract.Contract.TotalStakedAmount(&_SwapContract.CallOpts)
+}
+
+// TotalStakedAmount is a free data retrieval call binding the contract method 0x567e98f9.
+//
+// Solidity: function totalStakedAmount() view returns(uint256)
+func (_SwapContract *SwapContractCallerSession) TotalStakedAmount() (*big.Int, error) {
+	return _SwapContract.Contract.TotalStakedAmount(&_SwapContract.CallOpts)
 }
 
 // TssThreshold is a free data retrieval call binding the contract method 0x12d1441e.
@@ -1118,67 +1056,67 @@ func (_SwapContract *SwapContractCallerSession) WithdrawalFeeBPS() (uint8, error
 	return _SwapContract.Contract.WithdrawalFeeBPS(&_SwapContract.CallOpts)
 }
 
-// Churn is a paid mutator transaction binding the contract method 0x08493505.
+// Churn is a paid mutator transaction binding the contract method 0x045f888a.
 //
-// Solidity: function churn(address _newOwner, bytes32[] _rewardAddressAndAmounts, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold, uint8 _nodeRewardsRatio, uint8 _withdrawalFeeBPS, uint256 _minimumSwapAmountForWBTC, uint256 _expirationTime) returns(bool)
-func (_SwapContract *SwapContractTransactor) Churn(opts *bind.TransactOpts, _newOwner common.Address, _rewardAddressAndAmounts [][32]byte, _isRemoved []bool, _churnedInCount uint8, _tssThreshold uint8, _nodeRewardsRatio uint8, _withdrawalFeeBPS uint8, _minimumSwapAmountForWBTC *big.Int, _expirationTime *big.Int) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "churn", _newOwner, _rewardAddressAndAmounts, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS, _minimumSwapAmountForWBTC, _expirationTime)
+// Solidity: function churn(address _newOwner, address[] _nodes, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold, uint8 _nodeRewardsRatio, uint8 _withdrawalFeeBPS, uint256 _totalStakedAmount, uint256 _minimumSwapAmountForWBTC, uint256 _expirationTime) returns(bool)
+func (_SwapContract *SwapContractTransactor) Churn(opts *bind.TransactOpts, _newOwner common.Address, _nodes []common.Address, _isRemoved []bool, _churnedInCount uint8, _tssThreshold uint8, _nodeRewardsRatio uint8, _withdrawalFeeBPS uint8, _totalStakedAmount *big.Int, _minimumSwapAmountForWBTC *big.Int, _expirationTime *big.Int) (*types.Transaction, error) {
+	return _SwapContract.contract.Transact(opts, "churn", _newOwner, _nodes, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS, _totalStakedAmount, _minimumSwapAmountForWBTC, _expirationTime)
 }
 
-// Churn is a paid mutator transaction binding the contract method 0x08493505.
+// Churn is a paid mutator transaction binding the contract method 0x045f888a.
 //
-// Solidity: function churn(address _newOwner, bytes32[] _rewardAddressAndAmounts, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold, uint8 _nodeRewardsRatio, uint8 _withdrawalFeeBPS, uint256 _minimumSwapAmountForWBTC, uint256 _expirationTime) returns(bool)
-func (_SwapContract *SwapContractSession) Churn(_newOwner common.Address, _rewardAddressAndAmounts [][32]byte, _isRemoved []bool, _churnedInCount uint8, _tssThreshold uint8, _nodeRewardsRatio uint8, _withdrawalFeeBPS uint8, _minimumSwapAmountForWBTC *big.Int, _expirationTime *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.Churn(&_SwapContract.TransactOpts, _newOwner, _rewardAddressAndAmounts, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS, _minimumSwapAmountForWBTC, _expirationTime)
+// Solidity: function churn(address _newOwner, address[] _nodes, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold, uint8 _nodeRewardsRatio, uint8 _withdrawalFeeBPS, uint256 _totalStakedAmount, uint256 _minimumSwapAmountForWBTC, uint256 _expirationTime) returns(bool)
+func (_SwapContract *SwapContractSession) Churn(_newOwner common.Address, _nodes []common.Address, _isRemoved []bool, _churnedInCount uint8, _tssThreshold uint8, _nodeRewardsRatio uint8, _withdrawalFeeBPS uint8, _totalStakedAmount *big.Int, _minimumSwapAmountForWBTC *big.Int, _expirationTime *big.Int) (*types.Transaction, error) {
+	return _SwapContract.Contract.Churn(&_SwapContract.TransactOpts, _newOwner, _nodes, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS, _totalStakedAmount, _minimumSwapAmountForWBTC, _expirationTime)
 }
 
-// Churn is a paid mutator transaction binding the contract method 0x08493505.
+// Churn is a paid mutator transaction binding the contract method 0x045f888a.
 //
-// Solidity: function churn(address _newOwner, bytes32[] _rewardAddressAndAmounts, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold, uint8 _nodeRewardsRatio, uint8 _withdrawalFeeBPS, uint256 _minimumSwapAmountForWBTC, uint256 _expirationTime) returns(bool)
-func (_SwapContract *SwapContractTransactorSession) Churn(_newOwner common.Address, _rewardAddressAndAmounts [][32]byte, _isRemoved []bool, _churnedInCount uint8, _tssThreshold uint8, _nodeRewardsRatio uint8, _withdrawalFeeBPS uint8, _minimumSwapAmountForWBTC *big.Int, _expirationTime *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.Churn(&_SwapContract.TransactOpts, _newOwner, _rewardAddressAndAmounts, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS, _minimumSwapAmountForWBTC, _expirationTime)
+// Solidity: function churn(address _newOwner, address[] _nodes, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold, uint8 _nodeRewardsRatio, uint8 _withdrawalFeeBPS, uint256 _totalStakedAmount, uint256 _minimumSwapAmountForWBTC, uint256 _expirationTime) returns(bool)
+func (_SwapContract *SwapContractTransactorSession) Churn(_newOwner common.Address, _nodes []common.Address, _isRemoved []bool, _churnedInCount uint8, _tssThreshold uint8, _nodeRewardsRatio uint8, _withdrawalFeeBPS uint8, _totalStakedAmount *big.Int, _minimumSwapAmountForWBTC *big.Int, _expirationTime *big.Int) (*types.Transaction, error) {
+	return _SwapContract.Contract.Churn(&_SwapContract.TransactOpts, _newOwner, _nodes, _isRemoved, _churnedInCount, _tssThreshold, _nodeRewardsRatio, _withdrawalFeeBPS, _totalStakedAmount, _minimumSwapAmountForWBTC, _expirationTime)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0xb81102de.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x49b9083e.
 //
-// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
-func (_SwapContract *SwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _destToken, _incomingAmount, _minerFee, _rewardsAmount, _isUpdatelimitBTCForSPFlow2)
+// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _amounts, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
+func (_SwapContract *SwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _amounts []*big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
+	return _SwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _destToken, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _amounts, _isUpdatelimitBTCForSPFlow2)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0xb81102de.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x49b9083e.
 //
-// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
-func (_SwapContract *SwapContractSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
-	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _destToken, _incomingAmount, _minerFee, _rewardsAmount, _isUpdatelimitBTCForSPFlow2)
+// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _amounts, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
+func (_SwapContract *SwapContractSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _amounts []*big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
+	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _destToken, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _amounts, _isUpdatelimitBTCForSPFlow2)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0xb81102de.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x49b9083e.
 //
-// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
-func (_SwapContract *SwapContractTransactorSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
-	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _destToken, _incomingAmount, _minerFee, _rewardsAmount, _isUpdatelimitBTCForSPFlow2)
+// Solidity: function collectSwapFeesForBTC(address _destToken, uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _amounts, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
+func (_SwapContract *SwapContractTransactorSession) CollectSwapFeesForBTC(_destToken common.Address, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _amounts []*big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
+	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _destToken, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _amounts, _isUpdatelimitBTCForSPFlow2)
 }
 
-// DistributeNodeRewards is a paid mutator transaction binding the contract method 0xe9e9bf6a.
+// MultiRecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xbf62dcc8.
 //
-// Solidity: function distributeNodeRewards() returns(bool)
-func (_SwapContract *SwapContractTransactor) DistributeNodeRewards(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "distributeNodeRewards")
+// Solidity: function multiRecordSkyPoolsTX(bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
+func (_SwapContract *SwapContractTransactor) MultiRecordSkyPoolsTX(opts *bind.TransactOpts, _addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
+	return _SwapContract.contract.Transact(opts, "multiRecordSkyPoolsTX", _addressesAndAmounts, _totalSwapped, _rewardsAmount, _usedTxIds)
 }
 
-// DistributeNodeRewards is a paid mutator transaction binding the contract method 0xe9e9bf6a.
+// MultiRecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xbf62dcc8.
 //
-// Solidity: function distributeNodeRewards() returns(bool)
-func (_SwapContract *SwapContractSession) DistributeNodeRewards() (*types.Transaction, error) {
-	return _SwapContract.Contract.DistributeNodeRewards(&_SwapContract.TransactOpts)
+// Solidity: function multiRecordSkyPoolsTX(bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
+func (_SwapContract *SwapContractSession) MultiRecordSkyPoolsTX(_addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
+	return _SwapContract.Contract.MultiRecordSkyPoolsTX(&_SwapContract.TransactOpts, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _usedTxIds)
 }
 
-// DistributeNodeRewards is a paid mutator transaction binding the contract method 0xe9e9bf6a.
+// MultiRecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xbf62dcc8.
 //
-// Solidity: function distributeNodeRewards() returns(bool)
-func (_SwapContract *SwapContractTransactorSession) DistributeNodeRewards() (*types.Transaction, error) {
-	return _SwapContract.Contract.DistributeNodeRewards(&_SwapContract.TransactOpts)
+// Solidity: function multiRecordSkyPoolsTX(bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
+func (_SwapContract *SwapContractTransactorSession) MultiRecordSkyPoolsTX(_addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
+	return _SwapContract.Contract.MultiRecordSkyPoolsTX(&_SwapContract.TransactOpts, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _usedTxIds)
 }
 
 // MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xad289e76.

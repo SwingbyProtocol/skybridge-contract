@@ -1,5 +1,18 @@
 export default [
   {
+    "inputs": [],
+    "name": "BTCT_ADDR",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -86,6 +99,16 @@ export default [
         "type": "uint256"
       },
       {
+        "internalType": "address[]",
+        "name": "_spenders",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      },
+      {
         "internalType": "bool",
         "name": "_isUpdatelimitBTCForSPFlow2",
         "type": "bool"
@@ -104,44 +127,7 @@ export default [
   },
   {
     "inputs": [],
-    "name": "distributeNodeRewards",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getCurrentPriceLP",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountOfFloat",
-        "type": "uint256"
-      }
-    ],
-    "name": "getDepositFeeRate",
     "outputs": [
       {
         "internalType": "uint256",
