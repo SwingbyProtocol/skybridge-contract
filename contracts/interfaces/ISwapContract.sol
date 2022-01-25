@@ -5,6 +5,8 @@ pragma experimental ABIEncoderV2;
 import "./lib/Utils.sol";
 
 interface ISwapContract {
+    
+    function BTCT_ADDR() external returns (address);
 
     function singleTransferERC20(
         address _destToken,
@@ -28,6 +30,8 @@ interface ISwapContract {
         uint256 _incomingAmount,
         uint256 _minerFee,
         uint256 _rewardsAmount,
+        address[] memory _spenders,
+        uint256[] memory _amounts,
         bool    _isUpdatelimitBTCForSPFlow2
     ) external returns (bool);
 
@@ -44,8 +48,6 @@ interface ISwapContract {
         uint256 _minerFee,
         bytes32 _txid
     ) external returns (bool);
-
-    function distributeNodeRewards() external returns (bool);
 
     function recordSkyPoolsTX(
         address _to,
@@ -94,12 +96,13 @@ interface ISwapContract {
 
     function churn(
         address _newOwner,
-        bytes32[] memory _rewardAddressAndAmounts,
+        address[] memory _nodes,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
         uint8 _nodeRewardsRatio,
         uint8 _withdrawalFeeBPS,
+        uint256 _totalStakedAmount,
         uint256 _minimumSwapAmountForWBTC,
         uint256 _expirationTime
     ) external returns (bool);
@@ -108,16 +111,9 @@ interface ISwapContract {
 
     function getCurrentPriceLP() external view returns (uint256);
 
-    function getDepositFeeRate(address _token, uint256 _amountOfFloat)
-        external
-        view
-        returns (uint256);
-
     function getFloatReserve(address _tokenA, address _tokenB)
         external
         returns (uint256 reserveA, uint256 reserveB);
 
-    function getNodeStake(address _user) external returns (uint256 staked);
-
-    function getActiveNodes() external returns (bytes32[] memory);
+    function isNodeStake(address _user) external returns (bool);
 }

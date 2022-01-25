@@ -1,5 +1,18 @@
 export default [
   {
+    "inputs": [],
+    "name": "BTCT_ADDR",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -7,9 +20,9 @@ export default [
         "type": "address"
       },
       {
-        "internalType": "bytes32[]",
-        "name": "_rewardAddressAndAmounts",
-        "type": "bytes32[]"
+        "internalType": "address[]",
+        "name": "_nodes",
+        "type": "address[]"
       },
       {
         "internalType": "bool[]",
@@ -35,6 +48,11 @@ export default [
         "internalType": "uint8",
         "name": "_withdrawalFeeBPS",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalStakedAmount",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -81,6 +99,16 @@ export default [
         "type": "uint256"
       },
       {
+        "internalType": "address[]",
+        "name": "_spenders",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      },
+      {
         "internalType": "bool",
         "name": "_isUpdatelimitBTCForSPFlow2",
         "type": "bool"
@@ -99,57 +127,7 @@ export default [
   },
   {
     "inputs": [],
-    "name": "distributeNodeRewards",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getActiveNodes",
-    "outputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "",
-        "type": "bytes32[]"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getCurrentPriceLP",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountOfFloat",
-        "type": "uint256"
-      }
-    ],
-    "name": "getDepositFeeRate",
     "outputs": [
       {
         "internalType": "uint256",
@@ -197,12 +175,12 @@ export default [
         "type": "address"
       }
     ],
-    "name": "getNodeStake",
+    "name": "isNodeStake",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "staked",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "nonpayable",

@@ -40,6 +40,11 @@ export default [
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "_sbBTCPool",
+        "type": "address"
+      },
+      {
         "internalType": "uint8",
         "name": "_decimals",
         "type": "uint8"

@@ -23,6 +23,7 @@ describe("SkyPools", () => {
 
     let convertScale, lptDecimals, btctTest, btctDecimals, mint500ERC20tokens, balance, zeroFees, minerFees, floatAmount, sampleTxs, redeemedFloatTxIds
 
+    const sbBTCPool = "0xbA99c822bb4dd80f046a75EE564f8295D44Da743"
     const wETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" //https://etherscan.io/token/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
     const BLOCKNUM = 13578738 //pinned block number for all testing data - paraswap TXs are with respect to this block
 
@@ -192,7 +193,7 @@ describe("SkyPools", () => {
 
         mint500ERC20tokens = new BigNumber.from(500).mul(new BigNumber.from(10).pow(btctDecimals))
 
-        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, wETH, 0)
+        swap = await SwapContractFactory.deploy(lpToken.address, btctTest.address, wETH, sbBTCPool, 0)
 
         zeroFees = false
 
@@ -418,7 +419,7 @@ describe("SkyPools", () => {
 
                 //re-deploy with real world wBTC address
                 lpToken = await LPTokenFactory.deploy(8)
-                swap = await SwapContractFactory.deploy(lpToken.address, wBTC, wETH, 0)
+                swap = await SwapContractFactory.deploy(lpToken.address, wBTC, wETH, sbBTCPool, 0)
 
                 await lpToken.transferOwnership(swap.address)
                 expect(await lpToken.getOwner()).to.equal(swap.address)
@@ -1234,28 +1235,32 @@ describe("SkyPools", () => {
                     let currentExpirationTime = await swap.expirationTime()
                     assert.equal(currentExpirationTime, 172800, "Expiration time is 2 days")
 
-                    let rewardAddressAndAmounts = []
-                    let isRemoved = []
+                    let nodes = ["0x8bAf8b6Ed0E0ddB6557Af1A7391a86949FAFa3a8"]
+                    let isRemoved = [false]
                     let churnedInCount = 25
                     let tssThreshold = 16
                     let nodeRewardsRatio = 66
                     let withdrawalFeeBPS = new BigNumber.from(20);
                     let newExpirationTime = new BigNumber.from(86400) //1 day seconds
+                    /*
                     for (i = 0; i < 1; i++) {
                         let staked = new BigNumber.from(3000000).mul(new BigNumber.from(10).pow(new BigNumber.from(18)))
                         let addressesAndAmountStaked = web3.utils.padLeft(staked._hex + owner.address.slice(2), 64)
-                        rewardAddressAndAmounts.push(addressesAndAmountStaked)
+                        nodes.push(addressesAndAmountStaked)
                         isRemoved.push(false)
                     }
-
+                    */
+                    
+                    
                     await swap.churn(
                         owner.address,
-                        rewardAddressAndAmounts,
+                        nodes,
                         isRemoved,
                         churnedInCount,
                         tssThreshold,
                         nodeRewardsRatio,
                         withdrawalFeeBPS,
+                        new BigNumber.from(50),
                         new BigNumber.from(0),
                         newExpirationTime
                     )

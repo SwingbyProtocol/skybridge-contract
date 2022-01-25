@@ -17,6 +17,16 @@ export default [
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "_sbBTCPool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_swapRewards",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_existingBTCFloat",
         "type": "uint256"
@@ -378,9 +388,9 @@ export default [
         "type": "address"
       },
       {
-        "internalType": "bytes32[]",
-        "name": "_rewardAddressAndAmounts",
-        "type": "bytes32[]"
+        "internalType": "address[]",
+        "name": "_nodes",
+        "type": "address[]"
       },
       {
         "internalType": "bool[]",
@@ -406,6 +416,11 @@ export default [
         "internalType": "uint8",
         "name": "_withdrawalFeeBPS",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalStakedAmount",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -465,38 +480,22 @@ export default [
         "type": "uint256"
       },
       {
+        "internalType": "address[]",
+        "name": "_spenders",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      },
+      {
         "internalType": "bool",
         "name": "_isUpdatelimitBTCForSPFlow2",
         "type": "bool"
       }
     ],
     "name": "collectSwapFeesForBTC",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "depositFeesBPS",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "distributeNodeRewards",
     "outputs": [
       {
         "internalType": "bool",
@@ -522,61 +521,11 @@ export default [
   },
   {
     "inputs": [],
-    "name": "feesLPTokensForNode",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getActiveNodes",
-    "outputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "",
-        "type": "bytes32[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getCurrentPriceLP",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "nowPrice",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountOfFloat",
-        "type": "uint256"
-      }
-    ],
-    "name": "getDepositFeeRate",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "depositFeeRate",
         "type": "uint256"
       }
     ],
@@ -613,25 +562,6 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      }
-    ],
-    "name": "getNodeStake",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "staked",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "initialExchangeRate",
     "outputs": [
@@ -639,6 +569,25 @@ export default [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "isNodeStake",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -666,19 +615,6 @@ export default [
   {
     "inputs": [],
     "name": "limitBTCForSPFlow2",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lockedLPTokensForNode",
     "outputs": [
       {
         "internalType": "uint256",
@@ -989,6 +925,19 @@ export default [
     "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sbBTCPool",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1443,6 +1392,19 @@ export default [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "swapRewards",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -1456,6 +1418,19 @@ export default [
       }
     ],
     "name": "tokens",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalStakedAmount",
     "outputs": [
       {
         "internalType": "uint256",
