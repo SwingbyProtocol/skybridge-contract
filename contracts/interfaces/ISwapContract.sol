@@ -18,12 +18,11 @@ interface ISwapContract {
     ) external returns (bool);
 
     function collectSwapFeesForBTC(
-        address _destToken,
         uint256 _incomingAmount,
         uint256 _minerFee,
         uint256 _rewardsAmount,
         address[] memory _spenders,
-        uint256[] memory _amounts,
+        uint256[] memory _swapAmounts,
         bool    _isUpdatelimitBTCForSPFlow2
     ) external returns (bool);
 

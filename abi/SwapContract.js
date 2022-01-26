@@ -473,11 +473,6 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_destToken",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "_incomingAmount",
         "type": "uint256"
@@ -499,7 +494,7 @@ export default [
       },
       {
         "internalType": "uint256[]",
-        "name": "_amounts",
+        "name": "_swapAmounts",
         "type": "uint256[]"
       },
       {

@@ -53,6 +53,12 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rebate",
+        "type": "uint256"
       }
     ],
     "name": "Paid",

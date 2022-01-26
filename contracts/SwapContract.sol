@@ -219,29 +219,23 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev collectSwapFeesForBTC collects fees in the case of swap BTCT to BTC.
-    /// @param _destToken The address of target token.
     /// @param _incomingAmount The spent amount. (BTCT)
     /// @param _minerFee The miner fees of BTC transaction.
     /// @param _rewardsAmount The fees that should be paid.
     function collectSwapFeesForBTC(
-        address _destToken,
         uint256 _incomingAmount,
         uint256 _minerFee,
         uint256 _rewardsAmount,
         address[] memory _spenders,
-        uint256[] memory _amounts,
+        uint256[] memory _swapAmounts,
         bool _isUpdatelimitBTCForSPFlow2
     ) external override onlyOwner returns (bool) {
-        require(
-            _destToken == address(0),
-            "15" //_destToken should not be address(0)
-        );
         address _feesToken = BTCT_ADDR;
         if (_incomingAmount > 0) {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
                 _minerFee
             );
-            ISwapRewards(swapRewards).pullRewardsMulti(_destToken, _spenders, _amounts);
+            ISwapRewards(swapRewards).pullRewardsMulti(address(0), _spenders, _swapAmounts);
             _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
