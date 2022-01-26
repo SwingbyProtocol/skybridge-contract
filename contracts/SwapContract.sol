@@ -56,8 +56,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used; //used TX
 
-    // Node lists
-    mapping(address => bool) private nodes;
+    // Node lists state { 0 => not exist, 1 => exist, 2 => removed }
+    mapping(address => uint8) private nodes;
+    address[] private nodeAddrs;
+    uint8   public activeNodeCount;
     uint256 public totalStakedAmount;
 
     //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
@@ -216,45 +218,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return true;
     }
 
-    /// @dev multiTransferERC20TightlyPacked sends tokens from contract.
-    /// @param _destToken The address of target token.
-    /// @param _addressesAndAmounts The address of recipient and amount.
-    /// @param _totalSwapped The amount of swap.
-    /// @param _rewardsAmount The fees that should be paid.
-    /// @param _redeemedFloatTxIds The txids which is for recording.
-    function multiTransferERC20TightlyPacked(
-        address _destToken,
-        bytes32[] memory _addressesAndAmounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external override onlyOwner returns (bool) {
-        require(whitelist[_destToken], "14"); //_destToken is not whitelisted
-        require(
-            _destToken != address(0),
-            "15" //_destToken should not be address(0)
-        );
-        address _feesToken;
-        if (_totalSwapped > 0) {
-            _swap(address(0), BTCT_ADDR, _totalSwapped);
-        } else if (_totalSwapped == 0) {
-            _feesToken = BTCT_ADDR;
-        }
-        if (_destToken == lpToken) {
-            _feesToken = lpToken;
-        }
-        _rewardsCollection(_feesToken, _rewardsAmount);
-        _addUsedTxs(_redeemedFloatTxIds);
-        for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
-            _safeTransfer(
-                _destToken,
-                address(uint160(uint256(_addressesAndAmounts[i]))),
-                uint256(uint96(bytes12(_addressesAndAmounts[i])))
-            );
-        }
-        return true;
-    }
-
     /// @dev collectSwapFeesForBTC collects fees in the case of swap BTCT to BTC.
     /// @param _destToken The address of target token.
     /// @param _incomingAmount The spent amount. (BTCT)
@@ -296,12 +259,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev recordIncomingFloat mints LP token.
     /// @param _token The address of target token.
     /// @param _addressesAndAmountOfFloat The address of recipient and amount.
-    /// @param _zerofee The flag to accept zero fees.
     /// @param _txid The txids which is for recording.
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
-        bool _zerofee,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
         require(whitelist[_token], "16");//_token is invalid
@@ -309,7 +270,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _issueLPTokensForFloat(
                 _token,
                 _addressesAndAmountOfFloat,
-                _zerofee,
                 _txid
             )
         );
@@ -397,17 +357,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
 
         return true;
-    }
-
-    /// @dev balanceOf - return user balance for given token and user for skypools
-    /// @param _token The address of target token.
-    /// @param _user The address of target user.
-    function balanceOf(address _token, address _user)
-        public
-        view
-        returns (uint256)
-    {
-        return tokens[_token][_user];
     }
 
     /// @dev spFlow1SimpleSwap - FLOW 1 - execute paraswap TX using simpleSwap, ending tokens sent DIRECTLY to user's wallet
@@ -722,26 +671,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         emit SetExpirationTime(_expirationTime, block.timestamp);
     }
 
-    /// @dev spGetPendingSwaps - returns array of pending swaps
-    /// @return data - returns array of pending swap struct objects
-    function spGetPendingSwaps()
-        external
-        view
-        returns (spPendingTx[] memory data)
-    {
-        //require(swapCount != 0);
-
-        uint256 index = 0;
-        data = new spPendingTx[](swapCount.sub(oldestActiveIndex));
-
-        for (uint256 i = oldestActiveIndex.add(1); i <= swapCount; i++) {
-            data[index] = spPendingTXs[index.add(oldestActiveIndex)];
-            index = index.add(1);
-        }
-
-        return data;
-    }
-
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     function _spCleanUpOldTXs() internal {
         uint256 max = oldestActiveIndex.add(10);
@@ -944,17 +873,57 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _nodes.length; i++) {
-            if (_isRemoved[i]) 
-                delete nodes[_nodes[i]];
-            else
-                nodes[_nodes[i]] = true;
+            if (!_isRemoved[i]) {
+                if (nodes[_nodes[i]] == uint8(0)) {
+                    nodeAddrs.push(_nodes[i]);
+                }
+                if (nodes[_nodes[i]] != uint8(1)) {
+                    activeNodeCount++;
+                }
+                nodes[_nodes[i]] = uint8(1);
+            } else {
+                activeNodeCount--;
+                nodes[_nodes[i]] = uint8(2);
+            }
         }
+        require(activeNodeCount <= 100, "Stored node size should be <= 100");
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
         nodeRewardsRatio = _nodeRewardsRatio;
         withdrawalFeeBPS = _withdrawalFeeBPS;
         totalStakedAmount = _totalStakedAmount;
         return true;
+    }
+
+    /// @dev balanceOf - return user balance for given token and user for skypools
+    /// @param _token The address of target token.
+    /// @param _user The address of target user.
+    function balanceOf(address _token, address _user)
+        public
+        view
+        returns (uint256)
+    {
+        return tokens[_token][_user];
+    }
+
+    /// @dev spGetPendingSwaps - returns array of pending swaps
+    /// @return data - returns array of pending swap struct objects
+    function spGetPendingSwaps()
+        external
+        view
+        returns (spPendingTx[] memory data)
+    {
+        //require(swapCount != 0);
+
+        uint256 index = 0;
+        data = new spPendingTx[](swapCount.sub(oldestActiveIndex));
+
+        for (uint256 i = oldestActiveIndex.add(1); i <= swapCount; i++) {
+            data[index] = spPendingTXs[index.add(oldestActiveIndex)];
+            index = index.add(1);
+        }
+
+        return data;
     }
 
     /// @dev isTxUsed sends rewards for Nodes.
@@ -994,6 +963,19 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         (reserveA, reserveB) = (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
     }
 
+    /// @dev getActiveNodes returns active nodes list
+    function getActiveNodes() public view override returns (address[] memory) {
+        uint256 count = 0;
+        address[] memory _nodes = new address[](activeNodeCount);
+        for (uint256 i = 0; i < nodeAddrs.length; i++) {
+            if (nodes[nodeAddrs[i]] == uint8(1)) {
+                _nodes[count] = nodeAddrs[i];
+                count++;
+            }
+        }
+        return _nodes;
+    }
+
     /// @dev isNodeSake returns true if the node is churned in
     function isNodeStake(address _user)
         public
@@ -1001,18 +983,19 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         override
         returns (bool)
     {
-        return nodes[_user];
+        if (nodes[_user] == uint8(1)) {
+            return true;
+        }
+        return false;
     }
 
     /// @dev _issueLPTokensForFloat
     /// @param _token The address of target token.
     /// @param _transaction The recevier address and amount.
-    /// @param _zerofee The flag to accept zero fees.
     /// @param _txid The txid which is for recording.
     function _issueLPTokensForFloat(
         address _token,
         bytes32 _transaction,
-        bool _zerofee,
         bytes32 _txid
     ) internal returns (bool) {
         require(!isTxUsed(_txid), "06"); //"The txid is already used");
@@ -1025,7 +1008,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 amountOfLP = amountOfFloat.mul(lpDecimals).div(nowPrice);
         // Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP);
-
         // Add float amount
         _addFloat(_token, amountOfFloat);
         _addUsedTx(_txid);
