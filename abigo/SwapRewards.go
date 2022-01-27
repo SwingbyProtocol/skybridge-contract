@@ -30,7 +30,7 @@ var (
 
 // SwapRewardsMetaData contains all meta data concerning the SwapRewards contract.
 var SwapRewardsMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swingby\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Paid\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_swapped\",\"type\":\"uint256\"}],\"name\":\"pullRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_receiver\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapped\",\"type\":\"uint256[]\"}],\"name\":\"pullRewardsMulti\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rebateRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardToken\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_newRebateRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_thresholdRatio\",\"type\":\"uint256\"}],\"name\":\"setSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapContract\",\"outputs\":[{\"internalType\":\"contractISwapContract\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"thresholdRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swingby\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rebate\",\"type\":\"uint256\"}],\"name\":\"Paid\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_swapped\",\"type\":\"uint256\"}],\"name\":\"pullRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_receiver\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapped\",\"type\":\"uint256[]\"}],\"name\":\"pullRewardsMulti\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rebateRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardToken\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_newRebateRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_thresholdRatio\",\"type\":\"uint256\"}],\"name\":\"setSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapContract\",\"outputs\":[{\"internalType\":\"contractISwapContract\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"thresholdRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // SwapRewardsABI is the input ABI used to generate the binding from.
@@ -663,12 +663,13 @@ func (it *SwapRewardsPaidIterator) Close() error {
 type SwapRewardsPaid struct {
 	To     common.Address
 	Amount *big.Int
+	Rebate *big.Int
 	Raw    types.Log // Blockchain specific contextual infos
 }
 
-// FilterPaid is a free log retrieval operation binding the contract event 0x737c69225d647e5994eab1a6c301bf6d9232beb2759ae1e27a8966b4732bc489.
+// FilterPaid is a free log retrieval operation binding the contract event 0xdf9a51129930649214df58f542322c245372c6f2fa6fc3c9b40d927c597cd230.
 //
-// Solidity: event Paid(address to, uint256 amount)
+// Solidity: event Paid(address to, uint256 amount, uint256 rebate)
 func (_SwapRewards *SwapRewardsFilterer) FilterPaid(opts *bind.FilterOpts) (*SwapRewardsPaidIterator, error) {
 
 	logs, sub, err := _SwapRewards.contract.FilterLogs(opts, "Paid")
@@ -678,9 +679,9 @@ func (_SwapRewards *SwapRewardsFilterer) FilterPaid(opts *bind.FilterOpts) (*Swa
 	return &SwapRewardsPaidIterator{contract: _SwapRewards.contract, event: "Paid", logs: logs, sub: sub}, nil
 }
 
-// WatchPaid is a free log subscription operation binding the contract event 0x737c69225d647e5994eab1a6c301bf6d9232beb2759ae1e27a8966b4732bc489.
+// WatchPaid is a free log subscription operation binding the contract event 0xdf9a51129930649214df58f542322c245372c6f2fa6fc3c9b40d927c597cd230.
 //
-// Solidity: event Paid(address to, uint256 amount)
+// Solidity: event Paid(address to, uint256 amount, uint256 rebate)
 func (_SwapRewards *SwapRewardsFilterer) WatchPaid(opts *bind.WatchOpts, sink chan<- *SwapRewardsPaid) (event.Subscription, error) {
 
 	logs, sub, err := _SwapRewards.contract.WatchLogs(opts, "Paid")
@@ -715,9 +716,9 @@ func (_SwapRewards *SwapRewardsFilterer) WatchPaid(opts *bind.WatchOpts, sink ch
 	}), nil
 }
 
-// ParsePaid is a log parse operation binding the contract event 0x737c69225d647e5994eab1a6c301bf6d9232beb2759ae1e27a8966b4732bc489.
+// ParsePaid is a log parse operation binding the contract event 0xdf9a51129930649214df58f542322c245372c6f2fa6fc3c9b40d927c597cd230.
 //
-// Solidity: event Paid(address to, uint256 amount)
+// Solidity: event Paid(address to, uint256 amount, uint256 rebate)
 func (_SwapRewards *SwapRewardsFilterer) ParsePaid(log types.Log) (*SwapRewardsPaid, error) {
 	event := new(SwapRewardsPaid)
 	if err := _SwapRewards.contract.UnpackLog(event, "Paid", log); err != nil {

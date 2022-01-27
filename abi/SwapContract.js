@@ -357,6 +357,19 @@ export default [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "activeNodeCount",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -460,11 +473,6 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_destToken",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "_incomingAmount",
         "type": "uint256"
@@ -486,7 +494,7 @@ export default [
       },
       {
         "internalType": "uint256[]",
-        "name": "_amounts",
+        "name": "_swapAmounts",
         "type": "uint256[]"
       },
       {
@@ -514,6 +522,19 @@ export default [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getActiveNodes",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -686,45 +707,6 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_destToken",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "_addressesAndAmounts",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalSwapped",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_rewardsAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "_redeemedFloatTxIds",
-        "type": "bytes32[]"
-      }
-    ],
-    "name": "multiTransferERC20TightlyPacked",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "nodeRewardsRatio",
     "outputs": [
@@ -774,11 +756,6 @@ export default [
         "internalType": "bytes32",
         "name": "_addressesAndAmountOfFloat",
         "type": "bytes32"
-      },
-      {
-        "internalType": "bool",
-        "name": "_zerofee",
-        "type": "bool"
       },
       {
         "internalType": "bytes32",

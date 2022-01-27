@@ -17,28 +17,18 @@ interface ISwapContract {
         bytes32[] memory _redeemedFloatTxIds
     ) external returns (bool);
 
-    function multiTransferERC20TightlyPacked(
-        address _destToken,
-        bytes32[] memory _addressesAndAmounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external returns (bool);
-
     function collectSwapFeesForBTC(
-        address _destToken,
         uint256 _incomingAmount,
         uint256 _minerFee,
         uint256 _rewardsAmount,
         address[] memory _spenders,
-        uint256[] memory _amounts,
+        uint256[] memory _swapAmounts,
         bool    _isUpdatelimitBTCForSPFlow2
     ) external returns (bool);
 
     function recordIncomingFloat(
         address _token,
         bytes32 _addressesAndAmountOfFloat,
-        bool _zerofee,
         bytes32 _txid
     ) external returns (bool);
 
@@ -114,6 +104,8 @@ interface ISwapContract {
     function getFloatReserve(address _tokenA, address _tokenB)
         external
         returns (uint256 reserveA, uint256 reserveB);
+
+    function getActiveNodes() external view returns (address[] memory);
 
     function isNodeStake(address _user) external returns (bool);
 }

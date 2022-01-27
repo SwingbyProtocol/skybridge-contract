@@ -13,9 +13,9 @@ contract SwapRewards is Ownable {
     IERC20 public immutable rewardToken;
     ISwapContract public swapContract;
     uint256 public rebateRate = 30;
-    uint256 public thresholdRatio = 60;
+    uint256 public thresholdRatio = 55; // diff is over 10%
 
-    event Paid(address to, uint256 amount);
+    event Paid(address to, uint256 amount, uint256 rebate);
 
     constructor(
         address _owner,
@@ -66,14 +66,18 @@ contract SwapRewards is Ownable {
         );
         uint256 threshold = balA.add(balB).mul(thresholdRatio).div(100);
         if (
-            (_dest == tokenB && balA <= threshold) ||
-            (_dest == address(0) && balB <= threshold)
+            (_dest == tokenB && balB >= threshold) ||
+            (_dest == address(0) && balA >= threshold)
         ) {
             rewardToken.transfer(
                 _receiver,
                 _swapped.mul(rebateRate).div(100).mul(1e10)
             ); // decimals == 18 for payout
-            emit Paid(_receiver, _swapped.mul(rebateRate).div(100).mul(1e10));
+            emit Paid(
+                _receiver,
+                _swapped,
+                _swapped.mul(rebateRate).div(100).mul(1e10)
+            );
         }
     }
 
@@ -95,8 +99,8 @@ contract SwapRewards is Ownable {
         );
         uint256 threshold = balA.add(balB).mul(thresholdRatio).div(100);
         if (
-            (_dest == tokenB && balA <= threshold) ||
-            (_dest == address(0) && balB <= threshold)
+            (_dest == tokenB && balB >= threshold) ||
+            (_dest == address(0) && balA >= threshold)
         ) {
             for (uint256 i = 0; i < _receiver.length; i++) {
                 rewardToken.transfer(
@@ -105,6 +109,7 @@ contract SwapRewards is Ownable {
                 ); // decimals == 18 for payout
                 emit Paid(
                     _receiver[i],
+                    _swapped[i],
                     _swapped[i].mul(rebateRate).div(100).mul(1e10)
                 );
             }
