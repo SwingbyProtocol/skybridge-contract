@@ -252,46 +252,9 @@
         "LPToken"
       ]
     },
-    "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContractFactory.sol": {
-      "lastModificationDate": 1642806733535,
-      "contentHash": "1cb433e350577ae80e2bf168db3e1005",
-      "sourceName": "contracts/SwapContractFactory.sol",
-      "solcConfig": {
-        "version": "0.8.9",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./SwapContract.sol",
-        "./LPToken.sol"
-      ],
-      "versionPragmas": [
-        ">=0.6.0 <=0.8.9"
-      ],
-      "artifacts": [
-        "SwapContractFactory"
-      ]
-    },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1642806611477,
-      "contentHash": "5db02ece55908de43dc558f854d8a3b3",
+      "lastModificationDate": 1643317814714,
+      "contentHash": "e43054a3c8cc966c1f655100640a62ff",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -320,6 +283,7 @@
         "./interfaces/IBurnableToken.sol",
         "./interfaces/IERC20.sol",
         "./interfaces/ISwapContract.sol",
+        "./interfaces/ISwapRewards.sol",
         "./interfaces/IAugustusSwapper.sol",
         "./interfaces/ITokenTransferProxy.sol",
         "./interfaces/IParaswap.sol",
@@ -338,8 +302,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ISwapContract.sol": {
-      "lastModificationDate": 1642806611489,
-      "contentHash": "2dbe61f8cad3751fa79e3f08aa486e79",
+      "lastModificationDate": 1643317814732,
+      "contentHash": "7011a783bfdd0d1900ad8bed6d9c4b35",
       "sourceName": "contracts/interfaces/ISwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -824,6 +788,113 @@
       ],
       "artifacts": [
         "Address"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ISwapRewards.sol": {
+      "lastModificationDate": 1643151557181,
+      "contentHash": "c6868f72d6fcca3ad7d60ff76bb4cdb4",
+      "sourceName": "contracts/interfaces/ISwapRewards.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <=0.8.9"
+      ],
+      "artifacts": [
+        "ISwapRewards"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapRewards.sol": {
+      "lastModificationDate": 1643317814725,
+      "contentHash": "79286a332cefe87348a7d7bfb089b917",
+      "sourceName": "contracts/SwapRewards.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./interfaces/ISwapContract.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.0 <=0.8.9"
+      ],
+      "artifacts": [
+        "SwapRewards"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1633381640486,
+      "contentHash": "0eac3e1a83ee62326ca007811285b274",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
       ]
     }
   }

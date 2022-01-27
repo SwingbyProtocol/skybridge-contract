@@ -4,6 +4,19 @@
   "sourceName": "contracts/interfaces/ISwapContract.sol",
   "abi": [
     {
+      "inputs": [],
+      "name": "BTCT_ADDR",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -70,11 +83,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "_destToken",
-          "type": "address"
-        },
-        {
           "internalType": "uint256",
           "name": "_incomingAmount",
           "type": "uint256"
@@ -88,6 +96,16 @@
           "internalType": "uint256",
           "name": "_rewardsAmount",
           "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_spenders",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_swapAmounts",
+          "type": "uint256[]"
         },
         {
           "internalType": "bool",
@@ -108,44 +126,20 @@
     },
     {
       "inputs": [],
-      "name": "distributeNodeRewards",
+      "name": "getActiveNodes",
       "outputs": [
         {
-          "internalType": "bool",
+          "internalType": "address[]",
           "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getCurrentPriceLP",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "type": "address[]"
         }
       ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_token",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_amountOfFloat",
-          "type": "uint256"
-        }
-      ],
-      "name": "getDepositFeeRate",
+      "inputs": [],
+      "name": "getCurrentPriceLP",
       "outputs": [
         {
           "internalType": "uint256",
@@ -227,45 +221,6 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_destToken",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_addressesAndAmounts",
-          "type": "bytes32[]"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_totalSwapped",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_rewardsAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_redeemedFloatTxIds",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "multiTransferERC20TightlyPacked",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
           "name": "_token",
           "type": "address"
         },
@@ -273,11 +228,6 @@
           "internalType": "bytes32",
           "name": "_addressesAndAmountOfFloat",
           "type": "bytes32"
-        },
-        {
-          "internalType": "bool",
-          "name": "_zerofee",
-          "type": "bool"
         },
         {
           "internalType": "bytes32",
