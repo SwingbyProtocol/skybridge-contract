@@ -86,7 +86,7 @@ contract SwapRewards is Ownable {
         address _dest,
         address[] memory _receiver,
         uint256[] memory _swapped
-    ) public {
+    ) public returns (bool){
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
@@ -114,5 +114,6 @@ contract SwapRewards is Ownable {
                 );
             }
         }
+        return true;
     }
 }

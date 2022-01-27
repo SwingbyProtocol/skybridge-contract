@@ -200,7 +200,7 @@ describe("SkyPools", () => {
         swapRewards = await SwapRewardsFactory.deploy(
             owner.address,
             lpToken.address,
-            tempSwapAddr 
+            tempSwapAddr
         )
 
         swap = await SwapContractFactory.deploy(
@@ -445,12 +445,12 @@ describe("SkyPools", () => {
                 swapRewards = await SwapRewardsFactory.deploy(
                     owner.address,
                     lpToken.address,
-                    tempSwapAddr 
+                    tempSwapAddr
                 )
-        
+
                 swap = await SwapContractFactory.deploy(lpToken.address, wBTC, wETH, sbBTCPool, swapRewards.address, 0)
 
-        
+
                 await swapRewards.connect(owner).setSwap(
                     swap.address,
                     new BigNumber.from(30),
@@ -845,7 +845,7 @@ describe("SkyPools", () => {
                     event.amount.toString().should.equal(amount.mul(5).toString(), 'amount is correct')
                     event.balance.toString().should.equal(amount.mul(5).toString(), 'balance is correct')
                     event.Timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
-                    
+
 
 
 
@@ -878,8 +878,8 @@ describe("SkyPools", () => {
 
                     balance = await wETH_Contract.balanceOf(swap.address)
                     assert.equal(balance.toString(), amount.mul(5).toString(), "Balance of wETH on swap contract before swap is correct")
-                    
-                    
+
+
                     //ensure beneficiary is current swap contract address
                     simpleDataFlow2[9] = swap.address
 
@@ -931,17 +931,17 @@ describe("SkyPools", () => {
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
 
 
-                   /**
-                     //prep to collectSwapFeesForBTC
-                    let swapFeesBPS = new BigNumber.from(20);
-                    let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
-                    let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
-                    let incomingAmount = swapAmount.add(swapFees) //100200000 sats = 1.002 BTC                
-
-                    //allocate floats to wBTC ~1wBTC decimal 8
-                    await swap.collectSwapFeesForBTC(ZERO_ADDRESS, incomingAmount, minerFees, swapFees, true)
-                    
-                    */
+                    /**
+                      //prep to collectSwapFeesForBTC
+                     let swapFeesBPS = new BigNumber.from(20);
+                     let swapAmount = new BigNumber.from(1).mul(new BigNumber.from(10).pow(decimals))
+                     let swapFees = swapAmount.mul(swapFeesBPS).div(new BigNumber.from(10000))
+                     let incomingAmount = swapAmount.add(swapFees) //100200000 sats = 1.002 BTC                
+ 
+                     //allocate floats to wBTC ~1wBTC decimal 8
+                     await swap.collectSwapFeesForBTC(ZERO_ADDRESS, incomingAmount, minerFees, swapFees, true)
+                     
+                     */
 
 
                     //prep to collectSwapFeesForBTC
@@ -953,26 +953,19 @@ describe("SkyPools", () => {
                     let rewardsAmount = swapFees.sub(minerFees)
                     let incomingAmount = swapAmount.add(swapFees) //100200000 sats = 1.002 BTC                
                     let spenders = [rewardsAddr]
-                    let accounts = [new BigNumber.from(5)]
+                    let swapAmounts = [new BigNumber.from(5)]
                     //allocate floats to wBTC ~1wBTC decimal 8
 
                     let test = await swap.swapRewards()
 
-
-                    /**
-                     await swap.collectSwapFeesForBTC(
-                        ZERO_ADDRESS,
+                    await swap.collectSwapFeesForBTC(
                         incomingAmount,
                         minerFees,
                         swapFees,
                         spenders,
-                        accounts,
+                        swapAmounts,
                         true
                     )
-                     
-
-
-                    
                     balance = await swap.getFloatReserve(ZERO_ADDRESS, wBTC)
 
                     //init refund flow for skypools TX
@@ -1002,14 +995,14 @@ describe("SkyPools", () => {
 
                     balance = await wBTC_Contract.balanceOf(user1.address)
                     assert.equal(balance.toString(), expectedSats, "User has received the full refund")
-                */
+
 
                 })//flow 2a: ETH -> wETH -> wBTC -> BTC
 
                 it('simpleSwap Flow 2b => ERC20 -> wBTC -> BTC', async () => {
 
-                     //ensure beneficiary is current swap contract address
-                     simpleDataFlow2B[9] = swap.address
+                    //ensure beneficiary is current swap contract address
+                    simpleDataFlow2B[9] = swap.address
 
                     const swapAndRecordResult = await swap.connect(user1).spFlow2SimpleSwap(
                         receivingBTC_Addr,
