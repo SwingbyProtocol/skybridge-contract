@@ -786,7 +786,7 @@ describe("SkyPools", () => {
                     value: amount.mul(5)
                 }
 
-                const expectedFloats = new BigNumber.from(100030000)//101032000)
+                const expectedFloats = new BigNumber.from(101032000)
 
                 beforeEach(async () => {
                     //set float reserve
@@ -814,9 +814,8 @@ describe("SkyPools", () => {
 
                     let test = await swap.swapRewards()
 
-                    /**
+                    
                      await swap.connect(owner).collectSwapFeesForBTC(
-                        ZERO_ADDRESS,
                         incomingAmount,
                         minerFees,
                         swapFees,
@@ -824,7 +823,7 @@ describe("SkyPools", () => {
                         amounts,
                         true
                     )
-                     */
+                     
 
                     /////////////////////////////// DEPOSIT UNI TOKENS //////////////////////////////////////////////
                     await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(5))//amount refers to number of UNI tokens here
