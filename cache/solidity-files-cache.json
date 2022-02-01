@@ -253,8 +253,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1643317943416,
-      "contentHash": "e43054a3c8cc966c1f655100640a62ff",
+      "lastModificationDate": 1643749047920,
+      "contentHash": "5bfdbe8b2ef11d8e10e746b3f086c53d",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -284,6 +284,7 @@
         "./interfaces/IERC20.sol",
         "./interfaces/ISwapContract.sol",
         "./interfaces/ISwapRewards.sol",
+        "./interfaces/IParams.sol",
         "./interfaces/IAugustusSwapper.sol",
         "./interfaces/ITokenTransferProxy.sol",
         "./interfaces/IParaswap.sol",
@@ -895,6 +896,77 @@
       ],
       "artifacts": [
         "IERC20"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/Params.sol": {
+      "lastModificationDate": 1643749102521,
+      "contentHash": "cf456ddf63500d9c06d8051750587946",
+      "sourceName": "contracts/Params.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IParams.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.0 <=0.8.9"
+      ],
+      "artifacts": [
+        "Params"
+      ]
+    },
+    "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IParams.sol": {
+      "lastModificationDate": 1643748648745,
+      "contentHash": "e70e999482a7529073e0288ac383639b",
+      "sourceName": "contracts/interfaces/IParams.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <=0.8.9"
+      ],
+      "artifacts": [
+        "IParams"
       ]
     }
   }

@@ -18,15 +18,18 @@ contract Params is Ownable, IParams{
         depositFeesBPS = 0;
     }
 
-    function setNodeRewardsRatio(uint8 _new) external onlyOwner {
-        nodeRewardsRatio = _new;
+    function setNodeRewardsRatio(uint8 _nodeRewardsRatio) external onlyOwner {
+        nodeRewardsRatio = _nodeRewardsRatio;
     }
+    
 
-    function setWithdrawalFeeBPS(uint8 _new) external onlyOwner {
-        withdrawalFeeBPS = _new;
+    function setWithdrawalFeeBPS(uint8 _withdrawalFeeBPS) external onlyOwner {
+        withdrawalFeeBPS = _withdrawalFeeBPS;
     }
+    
 
-    function setDepositFeesBPS(uint8 _new) external onlyOwner {
-        depositFeesBPS = _new;
+    function setDepositFeesBPS(uint8 _depositFeesBPS) external onlyOwner {
+        depositFeesBPS = _depositFeesBPS;
     }
+    
 }

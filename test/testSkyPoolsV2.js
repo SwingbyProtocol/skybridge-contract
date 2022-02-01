@@ -21,7 +21,7 @@ require('chai')
     .should()
 
 describe("SkyPools", () => {
-    let LPTokenFactory, SwapContractFactory, SwapRewardsFactory, swapRewards, lptoken, swap, owner, receiver, accounts
+    let LPTokenFactory, SwapContractFactory, SwapRewardsFactory, ParamsFactory, params, swapRewards, lptoken, swap, owner, receiver, accounts
 
     let convertScale, lptDecimals, btctTest, btctDecimals, mint500ERC20tokens, balance, zeroFees, minerFees, floatAmount, sampleTxs, redeemedFloatTxIds
 
@@ -181,6 +181,9 @@ describe("SkyPools", () => {
         LPTokenFactory = await ethers.getContractFactory("LPToken")
         SwapContractFactory = await ethers.getContractFactory("SwapContract")
         SwapRewardsFactory = await ethers.getContractFactory("SwapRewards")
+        ParamsFactory = await ethers.getContractFactory("Params")
+
+        params = await ParamsFactory.deploy()
 
 
         lpToken = await LPTokenFactory.deploy(8)
@@ -208,6 +211,7 @@ describe("SkyPools", () => {
             btctTest.address,
             wETH,
             sbBTCPool,
+            params.address,
             swapRewards.address,
             0
         )
@@ -447,8 +451,10 @@ describe("SkyPools", () => {
                     lpToken.address,
                     tempSwapAddr
                 )
+                ParamsFactory = await ethers.getContractFactory("Params")
 
-                swap = await SwapContractFactory.deploy(lpToken.address, wBTC, wETH, sbBTCPool, swapRewards.address, 0)
+                params = await ParamsFactory.deploy()
+                swap = await SwapContractFactory.deploy(lpToken.address, wBTC, wETH, sbBTCPool, params.address, swapRewards.address, 0)
 
 
                 await swapRewards.connect(owner).setSwap(

@@ -6,6 +6,7 @@ import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
 import "./interfaces/ISwapRewards.sol";
+import "./interfaces/IParams.sol";
 import "./interfaces/IAugustusSwapper.sol";
 import "./interfaces/ITokenTransferProxy.sol";
 import "./interfaces/IParaswap.sol";
@@ -47,6 +48,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     uint8 public tssThreshold;
     uint8 public nodeRewardsRatio;
     uint8 public withdrawalFeeBPS;
+    uint8 public depositFeesBPS;
     uint256 public initialExchangeRate;
     uint256 public limitBTCForSPFlow2;
 
@@ -74,6 +76,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     address public immutable sbBTCPool;
 
     address public immutable swapRewards;
+    address public immutable params;
 
     /**
      * Events
@@ -141,6 +144,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address _btct,
         address _wETH,
         address _sbBTCPool,
+        address _params,
         address _swapRewards,
         uint256 _existingBTCFloat
     ) {
@@ -155,6 +159,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         wETH = _wETH;
         //set address for sbBTCpool
         sbBTCPool = _sbBTCPool;
+        //set address for params
+        params = _params;
         //set address for swapRewards
         swapRewards = _swapRewards;
         // Set lpToken address
@@ -163,10 +169,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         lpDecimals = 10**IERC20(_lpToken).decimals();
         // Set BTCT address
         BTCT_ADDR = _btct;
-        // Set nodeRewardsRatio
-        nodeRewardsRatio = 66;
-        // Set withdrawalFeeBPS
-        withdrawalFeeBPS = 20;
+        // Set nodeRewardsRatio from Params contract
+        nodeRewardsRatio = IParams(params).nodeRewardsRatio();
+        //Set depositFeesBPS from Params contract
+        depositFeesBPS = IParams(params).depositFeesBPS();
+        // Set withdrawalFeeBPS from Params contract
+        withdrawalFeeBPS = IParams(params).withdrawalFeeBPS();
         // Set convertScale
         convertScale = 10**(IERC20(_btct).decimals() - 8);
         // Set initialExchangeRate
@@ -1005,12 +1013,14 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // Add float amount
         _addFloat(_token, amountOfFloat);
         _addUsedTx(_txid);
+        
+        
         emit IssueLPTokensForFloat(
             to,
             amountOfFloat,
             amountOfLP,
             nowPrice,
-            0,
+            depositFeesBPS,//0,
             _txid
         );
         return true;

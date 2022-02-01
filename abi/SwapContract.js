@@ -23,6 +23,11 @@ export default [
       },
       {
         "internalType": "address",
+        "name": "_params",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_swapRewards",
         "type": "address"
       },
@@ -516,6 +521,19 @@ export default [
   },
   {
     "inputs": [],
+    "name": "depositFeesBPS",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "expirationTime",
     "outputs": [
       {
@@ -735,6 +753,19 @@ export default [
   {
     "inputs": [],
     "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "params",
     "outputs": [
       {
         "internalType": "address",
