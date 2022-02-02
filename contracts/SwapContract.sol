@@ -124,8 +124,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 Timestamp
     );
 
-    event SetExpirationTime(uint256 ExpirationTime, uint256 Timestamp);
-
     event DistributeNodeRewards(uint256 rewardLPTsForNodes);
 
     modifier priceCheck() {
