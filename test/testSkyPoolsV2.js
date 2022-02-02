@@ -1351,8 +1351,6 @@ describe("SkyPools", () => {
                         isRemoved,
                         churnedInCount,
                         tssThreshold,
-                        nodeRewardsRatio,
-                        withdrawalFeeBPS,
                         new BigNumber.from(50),
                         new BigNumber.from(0),
                         newExpirationTime

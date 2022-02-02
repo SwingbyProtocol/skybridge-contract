@@ -40,16 +40,6 @@ export default [
         "type": "uint8"
       },
       {
-        "internalType": "uint8",
-        "name": "_nodeRewardsRatio",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_withdrawalFeeBPS",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint256",
         "name": "_totalStakedAmount",
         "type": "uint256"

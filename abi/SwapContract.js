@@ -426,16 +426,6 @@ export default [
         "type": "uint8"
       },
       {
-        "internalType": "uint8",
-        "name": "_nodeRewardsRatio",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_withdrawalFeeBPS",
-        "type": "uint8"
-      },
-      {
         "internalType": "uint256",
         "name": "_totalStakedAmount",
         "type": "uint256"
@@ -517,19 +507,6 @@ export default [
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "depositFeesBPS",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -722,19 +699,6 @@ export default [
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "nodeRewardsRatio",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1502,19 +1466,6 @@ export default [
         "internalType": "bool",
         "name": "",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "withdrawalFeeBPS",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
       }
     ],
     "stateMutability": "view",

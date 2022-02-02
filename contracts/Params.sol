@@ -4,12 +4,12 @@ pragma experimental ABIEncoderV2;
 import "./interfaces/IParams.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Params is Ownable, IParams{
+contract Params is Ownable, IParams {
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
 
-    constructor(){
+    constructor() {
         // Initialize nodeRewardsRatio
         nodeRewardsRatio = 66;
         // Initialize withdrawalFeeBPS
@@ -19,17 +19,26 @@ contract Params is Ownable, IParams{
     }
 
     function setNodeRewardsRatio(uint8 _nodeRewardsRatio) external onlyOwner {
+        require(
+            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
+            "_nodeRewardsRatio is not valid"
+        );
         nodeRewardsRatio = _nodeRewardsRatio;
     }
-    
 
     function setWithdrawalFeeBPS(uint8 _withdrawalFeeBPS) external onlyOwner {
+        require(
+            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
+            "_withdrawalFeeBPS is invalid"
+        );
         withdrawalFeeBPS = _withdrawalFeeBPS;
     }
-    
 
     function setDepositFeesBPS(uint8 _depositFeesBPS) external onlyOwner {
+        require(
+            _depositFeesBPS >= 0 && _depositFeesBPS <= 100,
+            "_depositFeesBPS is invalid"
+        );
         depositFeesBPS = _depositFeesBPS;
     }
-    
 }

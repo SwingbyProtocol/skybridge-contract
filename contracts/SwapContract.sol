@@ -46,9 +46,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     uint8 public churnedInCount;
     uint8 public tssThreshold;
-    uint8 public nodeRewardsRatio;
-    uint8 public withdrawalFeeBPS;
-    uint8 public depositFeesBPS;
     uint256 public initialExchangeRate;
     uint256 public limitBTCForSPFlow2;
 
@@ -169,12 +166,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         lpDecimals = 10**IERC20(_lpToken).decimals();
         // Set BTCT address
         BTCT_ADDR = _btct;
-        // Set nodeRewardsRatio from Params contract
-        nodeRewardsRatio = IParams(params).nodeRewardsRatio();
-        //Set depositFeesBPS from Params contract
-        depositFeesBPS = IParams(params).depositFeesBPS();
-        // Set withdrawalFeeBPS from Params contract
-        withdrawalFeeBPS = IParams(params).withdrawalFeeBPS();
         // Set convertScale
         convertScale = 10**(IERC20(_btct).decimals() - 8);
         // Set initialExchangeRate
@@ -831,8 +822,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _isRemoved The flags to remove node.
     /// @param _churnedInCount The number of next party size of TSS group.
     /// @param _tssThreshold The number of next threshold.
-    /// @param _nodeRewardsRatio The number of rewards ratio for node owners
-    /// @param _withdrawalFeeBPS The amount of wthdrawal fees.
     /// @param _totalStakedAmount The amount of total staked amount on the network.
     function churn(
         address _newOwner,
@@ -840,8 +829,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
-        uint8 _nodeRewardsRatio,
-        uint8 _withdrawalFeeBPS,
         uint256 _totalStakedAmount,
         uint256 _minimumSwapAmountForWBTC, //set to 0 to keep existing min swap amount
         uint256 _expirationTime //set to 0 to keep existing expiration time
@@ -853,14 +840,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(
             _churnedInCount >= _tssThreshold + uint8(1),
             "02" //"n should be >= t+1"
-        );
-        require(
-            _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
-            "03" //"_nodeRewardsRatio is not valid"
-        );
-        require(
-            _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
-            "04" //"_withdrawalFeeBPS is invalid"
         );
         require(
             _nodes.length == _isRemoved.length,
@@ -891,8 +870,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(activeNodeCount <= 100, "Stored node size should be <= 100");
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
-        nodeRewardsRatio = _nodeRewardsRatio;
-        withdrawalFeeBPS = _withdrawalFeeBPS;
         totalStakedAmount = _totalStakedAmount;
         return true;
     }
@@ -1020,7 +997,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             amountOfFloat,
             amountOfLP,
             nowPrice,
-            depositFeesBPS,//0,
+            IParams(params).depositFeesBPS(),
             _txid
         );
         return true;
@@ -1046,7 +1023,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 nowPrice = getCurrentPriceLP();
         // Calculate the amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(lpDecimals);
-        uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
+        uint256 withdrawalFees = amountOfFloat.mul(IParams(params).withdrawalFeeBPS()).div(10000);
         require(
             amountOfFloat.sub(withdrawalFees) >= _minerFee,
             "09" //"Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
@@ -1161,7 +1138,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         floatAmountOf[_feesToken] = floatAmountOf[_feesToken].add(
             _rewardsAmount
         );
-        uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
+        uint256 amountForNodes = _rewardsAmount.mul(IParams(params).nodeRewardsRatio()).div(100);
         // Alloc LP tokens for nodes as fees
         uint256 amountLPTokensForNode = amountForNodes.mul(lpDecimals).div(
             nowPrice

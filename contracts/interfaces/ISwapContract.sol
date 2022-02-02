@@ -90,8 +90,6 @@ interface ISwapContract {
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
-        uint8 _nodeRewardsRatio,
-        uint8 _withdrawalFeeBPS,
         uint256 _totalStakedAmount,
         uint256 _minimumSwapAmountForWBTC,
         uint256 _expirationTime
