@@ -43,16 +43,6 @@ export default [
         "internalType": "uint256",
         "name": "_totalStakedAmount",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_minimumSwapAmountForWBTC",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_expirationTime",
-        "type": "uint256"
       }
     ],
     "name": "churn",

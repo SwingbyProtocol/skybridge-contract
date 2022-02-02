@@ -429,16 +429,6 @@ export default [
         "internalType": "uint256",
         "name": "_totalStakedAmount",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_minimumSwapAmountForWBTC",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_expirationTime",
-        "type": "uint256"
       }
     ],
     "name": "churn",
@@ -507,19 +497,6 @@ export default [
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "expirationTime",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -649,19 +626,6 @@ export default [
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "minimumSwapAmountForWBTC",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",

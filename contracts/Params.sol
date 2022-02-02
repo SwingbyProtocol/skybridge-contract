@@ -5,11 +5,18 @@ import "./interfaces/IParams.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Params is Ownable, IParams {
+    uint256 public minimumSwapAmountForWBTC; 
+    uint256 public expirationTime; 
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
 
+
     constructor() {
+        //Initialize minimumSwapAmountForWBTC
+        minimumSwapAmountForWBTC = 24000;
+        // Initialize expirationTime
+        expirationTime = 172800; //2 days
         // Initialize nodeRewardsRatio
         nodeRewardsRatio = 66;
         // Initialize withdrawalFeeBPS
@@ -18,7 +25,23 @@ contract Params is Ownable, IParams {
         depositFeesBPS = 0;
     }
 
-    function setNodeRewardsRatio(uint8 _nodeRewardsRatio) external onlyOwner {
+    function setMinimumSwapAmountForWBTC(uint256 _minimumSwapAmountForWBTC) public onlyOwner {
+        require(
+            _minimumSwapAmountForWBTC > 0, 
+            "_minimumSwapAmountForWBTC can not be 0" 
+        );
+        minimumSwapAmountForWBTC = _minimumSwapAmountForWBTC;
+    }
+
+    function setExpirationTime(uint256 _expirationTime) public onlyOwner {
+        require(
+            _expirationTime >= 0, 
+            "_expirationTime can not be 0" 
+        );
+        expirationTime = _expirationTime;
+    }
+
+    function setNodeRewardsRatio(uint8 _nodeRewardsRatio) public onlyOwner {
         require(
             _nodeRewardsRatio >= 0 && _nodeRewardsRatio <= 100,
             "_nodeRewardsRatio is not valid"
@@ -26,7 +49,7 @@ contract Params is Ownable, IParams {
         nodeRewardsRatio = _nodeRewardsRatio;
     }
 
-    function setWithdrawalFeeBPS(uint8 _withdrawalFeeBPS) external onlyOwner {
+    function setWithdrawalFeeBPS(uint8 _withdrawalFeeBPS) public onlyOwner {
         require(
             _withdrawalFeeBPS >= 0 && _withdrawalFeeBPS <= 100,
             "_withdrawalFeeBPS is invalid"
@@ -34,7 +57,7 @@ contract Params is Ownable, IParams {
         withdrawalFeeBPS = _withdrawalFeeBPS;
     }
 
-    function setDepositFeesBPS(uint8 _depositFeesBPS) external onlyOwner {
+    function setDepositFeesBPS(uint8 _depositFeesBPS) public onlyOwner {
         require(
             _depositFeesBPS >= 0 && _depositFeesBPS <= 100,
             "_depositFeesBPS is invalid"

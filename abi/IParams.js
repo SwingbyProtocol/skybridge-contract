@@ -14,6 +14,32 @@ export default [
   },
   {
     "inputs": [],
+    "name": "expirationTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minimumSwapAmountForWBTC",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "nodeRewardsRatio",
     "outputs": [
       {
@@ -22,14 +48,14 @@ export default [
         "type": "uint8"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint8",
-        "name": "_new",
+        "name": "_depositFeesBPS",
         "type": "uint8"
       }
     ],
@@ -41,8 +67,34 @@ export default [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_expirationTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "setExpirationTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minimumSwapAmountForWBTC",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMinimumSwapAmountForWBTC",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint8",
-        "name": "_new",
+        "name": "_nodeRewardsRatio",
         "type": "uint8"
       }
     ],
@@ -55,7 +107,7 @@ export default [
     "inputs": [
       {
         "internalType": "uint8",
-        "name": "_new",
+        "name": "_withdrawalFeeBPS",
         "type": "uint8"
       }
     ],

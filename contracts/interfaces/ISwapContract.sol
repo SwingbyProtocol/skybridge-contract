@@ -90,9 +90,7 @@ interface ISwapContract {
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
-        uint256 _totalStakedAmount,
-        uint256 _minimumSwapAmountForWBTC,
-        uint256 _expirationTime
+        uint256 _totalStakedAmount
     ) external returns (bool);
 
     function isTxUsed(bytes32 _txid) external view returns (bool);

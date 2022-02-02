@@ -31,8 +31,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 AmountWBTC; //outbound amount for this swap.
         uint256 Timestamp; // block timestamp that is set by EVM
     }
-    uint256 public expirationTime;
-    uint256 public minimumSwapAmountForWBTC;
 
     mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
     //spPendingTx[] spPendingTXs;
@@ -145,10 +143,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address _swapRewards,
         uint256 _existingBTCFloat
     ) {
-        //set default expiration time for pending TX
-        expirationTime = 172800; //2 days
-        //min amount to swap for FLOW 2
-        minimumSwapAmountForWBTC = 24000;
         //init latest removed index and swapCount
         oldestActiveIndex = 0;
         swapCount = 0;
@@ -496,7 +490,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "Received amount insufficient"
         );
         require(
-            receivedAmount >= minimumSwapAmountForWBTC,
+            receivedAmount >= IParams(params).minimumSwapAmountForWBTC(),
             "Received amount has not met the min for FLOW 2 swaps"
         );
 
@@ -543,7 +537,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "Received amount insufficient"
         );
         require(
-            receivedAmount >= minimumSwapAmountForWBTC,
+            receivedAmount >= IParams(params).minimumSwapAmountForWBTC(),
             "Received amount has not met the min for FLOW 2 swaps"
         );
 
@@ -657,12 +651,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
     }
 
-    /// @dev setExpirationTime - allow node to adjust expiration time
-    /// @param _expirationTime new expiration time
-    function _setExpirationTime(uint256 _expirationTime) internal {
-        expirationTime = _expirationTime;
-        emit SetExpirationTime(_expirationTime, block.timestamp);
-    }
+    
 
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     function _spCleanUpOldTXs() internal {
@@ -674,7 +663,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < max; i++) {
-            if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
+            if (spPendingTXs[i].Timestamp.add(IParams(params).expirationTime()) < current) {
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1);
             }
@@ -692,7 +681,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < max; i++) {
-            if (spPendingTXs[i].Timestamp.add(expirationTime) < current) {
+            if (spPendingTXs[i].Timestamp.add(IParams(params).expirationTime()) < current) {
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1);
             }
@@ -829,9 +818,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
         uint8 _tssThreshold,
-        uint256 _totalStakedAmount,
-        uint256 _minimumSwapAmountForWBTC, //set to 0 to keep existing min swap amount
-        uint256 _expirationTime //set to 0 to keep existing expiration time
+        uint256 _totalStakedAmount
     ) external override onlyOwner returns (bool) {
         require(
             _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
@@ -844,13 +831,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(
             _nodes.length == _isRemoved.length,
             "05" //"_nodes and _isRemoved length is not match"
-        );
-        if (_minimumSwapAmountForWBTC != 0) {
-            minimumSwapAmountForWBTC = _minimumSwapAmountForWBTC;
-        }
-        if (_expirationTime != 0) {
-            _setExpirationTime(_expirationTime);
-        }
+        );       
+        
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _nodes.length; i++) {
