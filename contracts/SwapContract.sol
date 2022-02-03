@@ -210,6 +210,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return true;
     }
 
+    
+
     /// @dev collectSwapFeesForBTC collects fees in the case of swap BTCT to BTC.
     /// @param _incomingAmount The spent amount. (BTCT)
     /// @param _minerFee The miner fees of BTC transaction.
@@ -350,11 +352,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         require(
             tokens[_data.fromToken][_data.beneficiary] >= _data.fromAmount,
-            "Balance is not sufficient"
+            "Balance insufficient"
         );
         require(
             _data.fromToken == BTCT_ADDR,
-            "fromToken must be the required BTCt token"
+            "fromToken != BTCT_ADDR"
         );
         _doSimpleSwap(_data); //no received amount, tokens to go user's wallet
 
@@ -383,10 +385,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         require(
             tokens[fromToken][msg.sender] >= _amountIn,
-            "Balance is not sufficient"
+            "Balance insufficient"
         );
-        require(fromToken == BTCT_ADDR, "Must swap from BTC token");
-        require(endToken != BTCT_ADDR, "Ending token must be wBTC");
+        require(fromToken == BTCT_ADDR, "fromToken != BTCT_ADDR");
         require(endToken != ETHER, "Use path wBTC -> wETH");
 
         uint256 preSwapBalance = IERC20(endToken).balanceOf(address(this));
@@ -414,9 +415,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         require(
             receivedAmount >= _amountOutMin,
-            "Received amount insufficient"
+            "Received < minimum"
         );
-        require(receivedAmount != 0);
 
         tokens[endToken][msg.sender] = tokens[endToken][msg.sender].add(
             receivedAmount
@@ -446,11 +446,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         require(
             tokens[fromToken][msg.sender] >= _amountIn,
-            "Balance is not sufficient"
+            "Balance insufficient"
         );
-        require(fromToken != BTCT_ADDR, "Must swap from BTC token");
         require(fromToken != ETHER, "Use path wETH -> wBTC");
-        require(endToken == BTCT_ADDR, "Must swap to BTC token");
+        require(endToken == BTCT_ADDR, "swap => BTCT");
 
         uint256 preSwapBalance = IERC20(endToken).balanceOf(address(this));
 
@@ -477,11 +476,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         require(
             receivedAmount >= _amountOutMin,
-            "Received amount insufficient"
+            "Received < minimum"
         );
         require(
             receivedAmount >= ip.minimumSwapAmountForWBTC(),
-            "Received amount has not met the min for FLOW 2 swaps"
+            "receivedAmount < minimumSwapAmountForWBTC"
         );
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
@@ -507,7 +506,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         require(
             tokens[_data.fromToken][msg.sender] >= _data.fromAmount,
-            "Balance is not sufficient"
+            "Balance insufficient"
         );
 
         uint256 preSwapBalance = IERC20(_data.toToken).balanceOf(address(this));
@@ -528,7 +527,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         require(
             receivedAmount >= ip.minimumSwapAmountForWBTC(),
-            "Received amount has not met the min for FLOW 2 swaps"
+            "receivedAmount < minimumSwapAmountForWBTC"
         );
 
         _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
@@ -700,9 +699,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
             IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
-            uint256 endingBalance = IERC20(_token).balanceOf(address(this));
-
-            uint256 received = endingBalance.sub(initBalance);
+            uint256 received = IERC20(_token).balanceOf(address(this)).sub(initBalance);
 
             tokens[_token][msg.sender] = tokens[_token][msg.sender].add(
                 received
