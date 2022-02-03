@@ -31,6 +31,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 Timestamp; // block timestamp that is set by EVM
     }
 
+    //Data and indexes for pending swap objects
     mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
     uint256 public swapCount;
     uint256 public oldestActiveIndex;
@@ -68,6 +69,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     address public immutable swapRewards;
     address public immutable params;
     IParams public immutable ip;
+    ISwapRewards public immutable sw;
 
     /**
      * Events
@@ -150,6 +152,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         ip = IParams(params);
         //set address for swapRewards
         swapRewards = _swapRewards;
+        //set ISwapRewards
+        sw = ISwapRewards(swapRewards);
         // Set lpToken address
         lpToken = _lpToken;
         // Set initial lpDecimals of LP token
@@ -192,7 +196,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         address _feesToken;
         if (_totalSwapped > 0) {
-            ISwapRewards(swapRewards).pullRewards(
+            sw.pullRewards(
                 _destToken,
                 _to,
                 _totalSwapped
@@ -227,7 +231,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
                 _minerFee
             );
-            ISwapRewards(swapRewards).pullRewardsMulti(
+            sw.pullRewardsMulti(
                 address(0),
                 _spenders,
                 _swapAmounts
@@ -352,7 +356,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     {
         require(
             _data.beneficiary == msg.sender,
-            "You can only execute swaps to your own address"
+            "beneficiary != msg.sender"
         );
 
         require(
@@ -510,7 +514,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(_data.toToken == BTCT_ADDR, "Must swap to BTC token");
         require(
             _data.beneficiary == address(this),
-            "Beneficiary must be this contract"
+            "beneficiary != swap contract"
         );
         require(
             tokens[_data.fromToken][msg.sender] >= _data.fromAmount,

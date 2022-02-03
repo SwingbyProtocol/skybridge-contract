@@ -1310,6 +1310,19 @@ export default [
   },
   {
     "inputs": [],
+    "name": "sw",
+    "outputs": [
+      {
+        "internalType": "contract ISwapRewards",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "swapCount",
     "outputs": [
       {
