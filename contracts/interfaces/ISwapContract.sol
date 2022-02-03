@@ -17,6 +17,14 @@ interface ISwapContract {
         bytes32[] memory _redeemedFloatTxIds
     ) external returns (bool);
 
+    function multiTransferERC20TightlyPacked(
+        address _destToken,
+        bytes32[] memory _addressesAndAmounts,
+        uint256 _totalSwapped,
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
+    ) external returns (bool);
+
     function collectSwapFeesForBTC(
         uint256 _incomingAmount,
         uint256 _minerFee,

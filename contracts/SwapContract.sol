@@ -210,6 +210,45 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return true;
     }
 
+    /// @dev multiTransferERC20TightlyPacked sends tokens from contract.
+    /// @param _destToken The address of target token.
+    /// @param _addressesAndAmounts The address of recipient and amount.
+    /// @param _totalSwapped The amount of swap.
+    /// @param _rewardsAmount The fees that should be paid.
+    /// @param _redeemedFloatTxIds The txids which is for recording.
+    function multiTransferERC20TightlyPacked(
+        address _destToken,
+        bytes32[] memory _addressesAndAmounts,
+        uint256 _totalSwapped,
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
+    ) external override onlyOwner returns (bool) {
+        require(whitelist[_destToken], "_destToken is not whitelisted");
+        require(
+            _destToken != address(0),
+            "_destToken should not be address(0)"
+        );
+        address _feesToken = address(0);
+        if (_totalSwapped > 0) {
+            _swap(address(0), BTCT_ADDR, _totalSwapped);
+        } else if (_totalSwapped == 0) {
+            _feesToken = BTCT_ADDR;
+        }
+        if (_destToken == lpToken) {
+            _feesToken = lpToken;
+        }
+        _rewardsCollection(_feesToken, _rewardsAmount);
+        _addUsedTxs(_redeemedFloatTxIds);
+        for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
+            _safeTransfer(
+                _destToken,
+                address(uint160(uint256(_addressesAndAmounts[i]))),
+                uint256(uint96(bytes12(_addressesAndAmounts[i])))
+            );
+        }
+        return true;
+    }
+
     
 
     /// @dev collectSwapFeesForBTC collects fees in the case of swap BTCT to BTC.
