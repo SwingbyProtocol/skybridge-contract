@@ -915,13 +915,7 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_loopCount",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "spCleanUpOldTXs",
     "outputs": [],
     "stateMutability": "nonpayable",

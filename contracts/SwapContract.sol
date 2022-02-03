@@ -196,11 +196,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         address _feesToken;
         if (_totalSwapped > 0) {
-            sw.pullRewards(
-                _destToken,
-                _to,
-                _totalSwapped
-            );
+            sw.pullRewards(_destToken, _to, _totalSwapped);
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = BTCT_ADDR;
@@ -231,11 +227,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
                 _minerFee
             );
-            sw.pullRewardsMulti(
-                address(0),
-                _spenders,
-                _swapAmounts
-            );
+            sw.pullRewardsMulti(address(0), _spenders, _swapAmounts);
             _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
@@ -354,10 +346,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         external
         nonReentrant
     {
-        require(
-            _data.beneficiary == msg.sender,
-            "beneficiary != msg.sender"
-        );
+        require(_data.beneficiary == msg.sender, "beneficiary != msg.sender");
 
         require(
             tokens[_data.fromToken][_data.beneficiary] >= _data.fromAmount,
@@ -560,12 +549,14 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _amountOutMin,
         address[] calldata _path
     ) internal {
-        address fromToken = _path[0];
+        //address fromToken = _path[0];
 
-        address proxy = IAugustusSwapper(paraswapAddress)
-            .getTokenTransferProxy();
+        //address proxy = IAugustusSwapper(paraswapAddress).getTokenTransferProxy();
 
-        IERC20(fromToken).safeIncreaseAllowance(proxy, _amountIn);
+        IERC20(_path[0]).safeIncreaseAllowance(
+            IAugustusSwapper(paraswapAddress).getTokenTransferProxy(),
+            _amountIn
+        );
 
         IParaswap(paraswapAddress).swapOnUniswapFork(
             _factory,
@@ -585,12 +576,14 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _amountOutMin,
         address[] calldata _path
     ) internal {
-        address fromToken = _path[0];
+        //address fromToken = _path[0];
 
-        address proxy = IAugustusSwapper(paraswapAddress)
-            .getTokenTransferProxy();
+        //address proxy = IAugustusSwapper(paraswapAddress).getTokenTransferProxy();
 
-        IERC20(fromToken).safeIncreaseAllowance(proxy, _amountIn);
+        IERC20(_path[0]).safeIncreaseAllowance(
+            IAugustusSwapper(paraswapAddress).getTokenTransferProxy(), 
+            _amountIn
+        );
 
         IParaswap(paraswapAddress).swapOnUniswap(
             _amountIn,
@@ -602,10 +595,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev _doSimpleSwap - performs paraswap transaction - BALANCE & TOKEN CHECKS MUST OCCUR BEFORE CALLING THIS
     /// @param _data data from API call that is ready to be sent to paraswap interface
     function _doSimpleSwap(Utils.SimpleData calldata _data) internal {
-        address proxy = IAugustusSwapper(paraswapAddress)
-            .getTokenTransferProxy();
+        //address proxy = IAugustusSwapper(paraswapAddress).getTokenTransferProxy();
 
-        IERC20(_data.fromToken).safeIncreaseAllowance(proxy, _data.fromAmount);
+        IERC20(_data.fromToken).safeIncreaseAllowance(
+            IAugustusSwapper(paraswapAddress).getTokenTransferProxy(), 
+            _data.fromAmount
+        );
 
         IParaswap(paraswapAddress).simpleSwap(_data);
     }
@@ -637,7 +632,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
 
         //clean up expired TXs
-        _spCleanUpOldTXs();
+        spCleanUpOldTXs();
 
         swapCount = swapCount.add(1); //increment TX count after cleaning up pending TXs to not loop over next empty index
 
@@ -653,8 +648,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
-    function _spCleanUpOldTXs() internal {
-        uint256 max = oldestActiveIndex.add(10);
+    function spCleanUpOldTXs() public {
+        uint256 max = oldestActiveIndex.add(ip.loopCount());
 
         if (max >= swapCount) {
             max = swapCount;
@@ -669,6 +664,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
     }
 
+    /**
     /// @dev spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     /// @param _loopCount - max times the loop will run
     function spCleanUpOldTXs(uint256 _loopCount) external {
@@ -686,6 +682,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             }
         }
     }
+     */
 
     /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
     /// @param _token The address of the ERC-20 token contract.
