@@ -774,6 +774,18 @@ describe("SkyPools", () => {
                             badData
                         ).should.be.rejectedWith("beneficiary != msg.sender")
                     })
+                    it('checks updated ownership modifier', async () => {
+                        await swapRewards.connect(user2).setSwap(
+                            swap.address,
+                            new BigNumber.from(30),
+                            new BigNumber.from(60)
+                        ).should.be.rejectedWith("!owner")
+                        await swapRewards.connect(owner).setSwap(
+                            swap.address,
+                            new BigNumber.from(30),
+                            new BigNumber.from(60)
+                        )
+                    })
                 })
             })//END FLOW 1
 
@@ -809,15 +821,15 @@ describe("SkyPools", () => {
                     //allocate floats to wBTC ~1wBTC decimal 8
 
                     let test = await swap.swapRewards()
-                    
-                     await swap.connect(owner).collectSwapFeesForBTC(
+
+                    await swap.connect(owner).collectSwapFeesForBTC(
                         incomingAmount,
                         minerFees,
                         swapFees,
                         spenders,
                         amounts,
                         true
-                    )                     
+                    )
 
                     /////////////////////////////// DEPOSIT UNI TOKENS //////////////////////////////////////////////
                     await populateBalance(user1.address, UNI, UNI_SLOT, amount.mul(5))//amount refers to number of UNI tokens here
@@ -1323,7 +1335,7 @@ describe("SkyPools", () => {
 
                     /////////////////////////////// MANUAL CLEANUP OF OLD TXS WITH HIGH LOOP COUNT //////////////////////////////////////////////
 
-                    
+
                     await swap.spCleanUpOldTXs()
 
                     data = await swap.spGetPendingSwaps()
@@ -1335,7 +1347,7 @@ describe("SkyPools", () => {
                     await ethers.provider.send("evm_mine") //next block
                     currentBlock = await ethers.provider.getBlockNumber()
                     blockObj = await ethers.provider.getBlock(currentBlock) //https://docs.ethers.io/v5/api/providers/types/#providers-Block
-                                        
+
                     await swap.spCleanUpOldTXs()
 
                     data = await swap.spGetPendingSwaps()

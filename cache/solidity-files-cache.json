@@ -77,8 +77,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
-      "lastModificationDate": 1633381640708,
-      "contentHash": "4fe56b59ced59d87df6b796758f62895",
+      "lastModificationDate": 1643931755971,
+      "contentHash": "c00f2ca1715f43f40d149654ed4c6f04",
       "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -106,7 +106,7 @@
         "../utils/Context.sol"
       ],
       "versionPragmas": [
-        "^0.8.0"
+        ">=0.6.0 <=0.8.9"
       ],
       "artifacts": [
         "Ownable"
@@ -826,7 +826,7 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapRewards.sol": {
-      "lastModificationDate": 1643922948702,
+      "lastModificationDate": 1643931762305,
       "contentHash": "72843b6004935e5e87775641879641a4",
       "sourceName": "contracts/SwapRewards.sol",
       "solcConfig": {
