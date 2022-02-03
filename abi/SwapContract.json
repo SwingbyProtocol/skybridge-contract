@@ -231,25 +231,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "ExpirationTime",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "Timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "SetExpirationTime",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "from",
         "type": "address"
@@ -562,6 +543,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ip",
+    "outputs": [
+      {
+        "internalType": "contract IParams",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

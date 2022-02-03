@@ -12,7 +12,6 @@ import "./interfaces/ITokenTransferProxy.sol";
 import "./interfaces/IParaswap.sol";
 import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-//import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/lib/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -33,7 +32,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
-    //spPendingTx[] spPendingTXs;
     uint256 public swapCount;
     uint256 public oldestActiveIndex;
 
@@ -56,22 +54,20 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     // Node lists state { 0 => not exist, 1 => exist, 2 => removed }
     mapping(address => uint8) private nodes;
     address[] private nodeAddrs;
-    uint8   public activeNodeCount;
+    uint8 public activeNodeCount;
     uint256 public totalStakedAmount;
 
     //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
     mapping(address => mapping(address => uint256)) public tokens;
     //keep track of ether in tokens[][]
-    address constant ETHER =
-        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    address constant ETHER = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address constant paraswapAddress =
         0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
     address public immutable wETH;
-
     address public immutable sbBTCPool;
-
     address public immutable swapRewards;
     address public immutable params;
+    IParams public immutable ip;
 
     /**
      * Events
@@ -150,6 +146,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         sbBTCPool = _sbBTCPool;
         //set address for params
         params = _params;
+        //set IParams
+        ip = IParams(params);
         //set address for swapRewards
         swapRewards = _swapRewards;
         // Set lpToken address
@@ -172,7 +170,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /**
      * Transfer part
      */
-
     /// @dev singleTransferERC20 sends tokens from contract.
     /// @param _destToken The address of target token.
     /// @param _to The address of recipient.
@@ -195,7 +192,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
         address _feesToken;
         if (_totalSwapped > 0) {
-            ISwapRewards(swapRewards).pullRewards(_destToken, _to, _totalSwapped);
+            ISwapRewards(swapRewards).pullRewards(
+                _destToken,
+                _to,
+                _totalSwapped
+            );
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = BTCT_ADDR;
@@ -226,7 +227,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
                 _minerFee
             );
-            ISwapRewards(swapRewards).pullRewardsMulti(address(0), _spenders, _swapAmounts);
+            ISwapRewards(swapRewards).pullRewardsMulti(
+                address(0),
+                _spenders,
+                _swapAmounts
+            );
             _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
@@ -250,13 +255,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bytes32 _addressesAndAmountOfFloat,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
-        require(whitelist[_token], "16");//_token is invalid
+        require(whitelist[_token], "16"); //_token is invalid
         require(
-            _issueLPTokensForFloat(
-                _token,
-                _addressesAndAmountOfFloat,
-                _txid
-            )
+            _issueLPTokensForFloat(_token, _addressesAndAmountOfFloat, _txid)
         );
         return true;
     }
@@ -272,7 +273,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 _minerFee,
         bytes32 _txid
     ) external override onlyOwner priceCheck returns (bool) {
-        require(whitelist[_token], "16");//_token is invalid
+        require(whitelist[_token], "16"); //_token is invalid
         require(
             _burnLPTokensForFloat(
                 _token,
@@ -287,7 +288,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /**
      * Skypools part
      */
-
     /// @dev Record SkyPools TX - allocate tokens from float to user in tokens[][]
     /// @param _to The address of recipient.
     /// @param _totalSwapped The amount of swap amount.
@@ -345,7 +345,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev spFlow1SimpleSwap - FLOW 1 - execute paraswap TX using simpleSwap, ending tokens sent DIRECTLY to user's wallet
-    /// @param _data A struct containing the data for simpleSwap, from the paraswap lib.
+    /// @param _data A struct containing the data for simpleSwap, from the paraswap Utils lib.
     function spFlow1SimpleSwap(Utils.SimpleData calldata _data)
         external
         nonReentrant
@@ -392,7 +392,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             tokens[fromToken][msg.sender] >= _amountIn,
             "Balance is not sufficient"
         );
-
         require(fromToken == BTCT_ADDR, "Must swap from BTC token");
         require(endToken != BTCT_ADDR, "Ending token must be wBTC");
         require(endToken != ETHER, "Use path wBTC -> wETH");
@@ -488,7 +487,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "Received amount insufficient"
         );
         require(
-            receivedAmount >= IParams(params).minimumSwapAmountForWBTC(),
+            receivedAmount >= ip.minimumSwapAmountForWBTC(),
             "Received amount has not met the min for FLOW 2 swaps"
         );
 
@@ -535,7 +534,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             "Received amount insufficient"
         );
         require(
-            receivedAmount >= IParams(params).minimumSwapAmountForWBTC(),
+            receivedAmount >= ip.minimumSwapAmountForWBTC(),
             "Received amount has not met the min for FLOW 2 swaps"
         );
 
@@ -649,8 +648,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         );
     }
 
-    
-
     /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
     function _spCleanUpOldTXs() internal {
         uint256 max = oldestActiveIndex.add(10);
@@ -661,7 +658,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < max; i++) {
-            if (spPendingTXs[i].Timestamp.add(IParams(params).expirationTime()) < current) {
+            if (spPendingTXs[i].Timestamp.add(ip.expirationTime()) < current) {
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1);
             }
@@ -679,7 +676,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
         uint256 current = block.timestamp;
         for (uint256 i = oldestActiveIndex; i < max; i++) {
-            if (spPendingTXs[i].Timestamp.add(IParams(params).expirationTime()) < current) {
+            if (spPendingTXs[i].Timestamp.add(ip.expirationTime()) < current) {
                 delete spPendingTXs[i];
                 oldestActiveIndex = i.add(1);
             }
@@ -785,7 +782,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
      * Life cycle part
      */
 
-     /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
+    /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
     /// @param _minerFee The miner fees of BTC transaction.
     /// @param _txid The txid which is for recording.
     function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
@@ -797,7 +794,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(!isTxUsed(_txid), "The txid is already used");
         floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
             _minerFee,
-            "12"//"BTC float amount insufficient"
+            "12" //"BTC float amount insufficient"
         );
         _addUsedTx(_txid);
         return true;
@@ -829,8 +826,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(
             _nodes.length == _isRemoved.length,
             "05" //"_nodes and _isRemoved length is not match"
-        );       
-        
+        );
+
         transferOwnership(_newOwner);
         // Update active node list
         for (uint256 i = 0; i < _nodes.length; i++) {
@@ -936,12 +933,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     }
 
     /// @dev isNodeSake returns true if the node is churned in
-    function isNodeStake(address _user)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isNodeStake(address _user) public view override returns (bool) {
         if (nodes[_user] == uint8(1)) {
             return true;
         }
@@ -970,14 +962,13 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // Add float amount
         _addFloat(_token, amountOfFloat);
         _addUsedTx(_txid);
-        
-        
+
         emit IssueLPTokensForFloat(
             to,
             amountOfFloat,
             amountOfLP,
             nowPrice,
-            IParams(params).depositFeesBPS(),
+            ip.depositFeesBPS(),
             _txid
         );
         return true;
@@ -1003,7 +994,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 nowPrice = getCurrentPriceLP();
         // Calculate the amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(lpDecimals);
-        uint256 withdrawalFees = amountOfFloat.mul(IParams(params).withdrawalFeeBPS()).div(10000);
+        uint256 withdrawalFees = amountOfFloat.mul(ip.withdrawalFeeBPS()).div(
+            10000
+        );
         require(
             amountOfFloat.sub(withdrawalFees) >= _minerFee,
             "09" //"Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
@@ -1118,7 +1111,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         floatAmountOf[_feesToken] = floatAmountOf[_feesToken].add(
             _rewardsAmount
         );
-        uint256 amountForNodes = _rewardsAmount.mul(IParams(params).nodeRewardsRatio()).div(100);
+        uint256 amountForNodes = _rewardsAmount.mul(ip.nodeRewardsRatio()).div(
+            100
+        );
         // Alloc LP tokens for nodes as fees
         uint256 amountLPTokensForNode = amountForNodes.mul(lpDecimals).div(
             nowPrice

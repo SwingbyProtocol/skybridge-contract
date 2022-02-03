@@ -34,7 +34,7 @@ contract SwapRewards is Ownable {
         address _swap,
         uint256 _newRebateRate,
         uint256 _thresholdRatio
-    ) public {
+    ) external {
         require(msg.sender == owner(), "!owner");
         require(
             _newRebateRate >= 0 && _newRebateRate <= 100,
@@ -54,7 +54,7 @@ contract SwapRewards is Ownable {
         address _dest,
         address _receiver,
         uint256 _swapped
-    ) public {
+    ) external {
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
@@ -86,7 +86,7 @@ contract SwapRewards is Ownable {
         address _dest,
         address[] memory _receiver,
         uint256[] memory _swapped
-    ) public returns (bool){
+    ) external returns (bool){
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
