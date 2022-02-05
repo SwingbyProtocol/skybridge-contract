@@ -6,6 +6,7 @@ interface IParams {
 
     function minimumSwapAmountForWBTC() external view returns (uint256);
     function expirationTime() external view returns (uint256);
+    function paraswapAddress() external view returns (address);
     function nodeRewardsRatio() external view returns (uint8);
     function depositFeesBPS() external view returns (uint8);
     function withdrawalFeeBPS() external view returns (uint8);
@@ -14,6 +15,8 @@ interface IParams {
     function setMinimumSwapAmountForWBTC(uint256 _minimumSwapAmountForWBTC) external;
 
     function setExpirationTime(uint256 _expirationTime) external;
+
+    function setParaswapAddress(address _paraswapAddress) external;
 
     function setNodeRewardsRatio(uint8 _nodeRewardsRatio) external;
 

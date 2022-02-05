@@ -15,7 +15,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/lib/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./LPToken.sol";
 
 //import "hardhat/console.sol"; //console.log()
 
@@ -43,11 +42,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     uint8 public churnedInCount;
     uint8 public tssThreshold;
-    uint256 public initialExchangeRate;
     uint256 public limitBTCForSPFlow2;
 
     uint256 private immutable convertScale;
-    uint256 private immutable lpDecimals;
+    uint256 private immutable lpDivisor;
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used; //used TX
@@ -62,12 +60,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     mapping(address => mapping(address => uint256)) public tokens;
     //keep track of ether in tokens[][]
     address constant ETHER = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address constant paraswapAddress =
-        0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
+    address public paraswapAddress; 
     address public immutable wETH;
     address public immutable sbBTCPool;
-    address public immutable swapRewards;
-    address public immutable params;
+    
     IParams public immutable ip;
     ISwapRewards public immutable sw;
 
@@ -122,10 +118,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 Timestamp
     );
 
-    event DistributeNodeRewards(uint256 rewardLPTsForNodes);
+    event DistributeNodeRewards(uint256 rewardLPTsForNodes);     
 
     modifier priceCheck() {
-        uint256 beforePrice = getCurrentPriceLP();
+        uint256 beforePrice = getCurrentPriceLP();        
         _;
         require(getCurrentPriceLP() >= beforePrice, "Invalid LPT price");
     }
@@ -146,24 +142,20 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         wETH = _wETH;
         //set address for sbBTCpool
         sbBTCPool = _sbBTCPool;
-        //set address for params
-        params = _params;
         //set IParams
-        ip = IParams(params);
-        //set address for swapRewards
-        swapRewards = _swapRewards;
+        ip = IParams(_params);
+        //set paraswap address
+        paraswapAddress = ip.paraswapAddress();
         //set ISwapRewards
-        sw = ISwapRewards(swapRewards);
+        sw = ISwapRewards(_swapRewards);
         // Set lpToken address
         lpToken = _lpToken;
-        // Set initial lpDecimals of LP token
-        lpDecimals = 10**IERC20(_lpToken).decimals();
+        // Set initial lpDivisor of LP token
+        lpDivisor = 10**IERC20(_lpToken).decimals();
         // Set BTCT address
         BTCT_ADDR = _btct;
         // Set convertScale
         convertScale = 10**(IERC20(_btct).decimals() - 8);
-        // Set initialExchangeRate
-        initialExchangeRate = 10**IERC20(_lpToken).decimals();
         // Set whitelist addresses
         whitelist[_btct] = true;
         whitelist[_lpToken] = true;
@@ -937,10 +929,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             BTCT_ADDR
         );
         uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
-        // decimals of totalReserved == 8, lpDecimals == 8, decimals of rate == 8
+        // decimals of totalReserved == 8, lpDivisor == 8, decimals of rate == 8
         nowPrice = totalLPs == 0
-            ? initialExchangeRate
-            : (reserveA.add(reserveB)).mul(lpDecimals).div(totalLPs);
+            ? lpDivisor
+            : (reserveA.add(reserveB)).mul(lpDivisor).div(totalLPs);
         return nowPrice;
     }
 
@@ -993,7 +985,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         (address to, uint256 amountOfFloat) = _splitToValues(_transaction);
         // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
-        uint256 amountOfLP = amountOfFloat.mul(lpDecimals).div(nowPrice);
+        uint256 amountOfLP = amountOfFloat.mul(lpDivisor).div(nowPrice);
         // Send LP tokens to LP
         IBurnableToken(lpToken).mint(to, amountOfLP);
         // Add float amount
@@ -1030,7 +1022,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         // Calculate the amount of LP token
         uint256 nowPrice = getCurrentPriceLP();
         // Calculate the amountOfFloat
-        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(lpDecimals);
+        uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(lpDivisor);
         uint256 withdrawalFees = amountOfFloat.mul(ip.withdrawalFeeBPS()).div(
             10000
         );
@@ -1152,7 +1144,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             100
         );
         // Alloc LP tokens for nodes as fees
-        uint256 amountLPTokensForNode = amountForNodes.mul(lpDecimals).div(
+        uint256 amountLPTokensForNode = amountForNodes.mul(lpDivisor).div(
             nowPrice
         );
         // Mints LP tokens for Nodes

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Params is Ownable, IParams {
     uint256 public minimumSwapAmountForWBTC;
     uint256 public expirationTime;
+    address public paraswapAddress;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
@@ -17,6 +18,8 @@ contract Params is Ownable, IParams {
         minimumSwapAmountForWBTC = 24000;
         // Initialize expirationTime
         expirationTime = 172800; //2 days
+        // Initialize paraswap address to current address
+        paraswapAddress = 0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57;
         // Initialize nodeRewardsRatio
         nodeRewardsRatio = 66;
         // Initialize withdrawalFeeBPS
@@ -41,6 +44,10 @@ contract Params is Ownable, IParams {
     function setExpirationTime(uint256 _expirationTime) external onlyOwner {
         require(_expirationTime >= 0, "_expirationTime can not be 0");
         expirationTime = _expirationTime;
+    }
+
+    function setParaswapAddress(address _paraswapAddress) external onlyOwner {
+        paraswapAddress = _paraswapAddress;
     }
 
     function setNodeRewardsRatio(uint8 _nodeRewardsRatio) external onlyOwner {

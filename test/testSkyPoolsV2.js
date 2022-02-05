@@ -820,8 +820,6 @@ describe("SkyPools", () => {
                     let amounts = [incomingAmount]
                     //allocate floats to wBTC ~1wBTC decimal 8
 
-                    let test = await swap.swapRewards()
-
                     await swap.connect(owner).collectSwapFeesForBTC(
                         incomingAmount,
                         minerFees,
@@ -954,8 +952,6 @@ describe("SkyPools", () => {
                     let spenders = [rewardsAddr]
                     let swapAmounts = [new BigNumber.from(5)]
                     //allocate floats to wBTC ~1wBTC decimal 8
-
-                    let test = await swap.swapRewards()
 
                     await swap.collectSwapFeesForBTC(
                         incomingAmount,

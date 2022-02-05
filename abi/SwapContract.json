@@ -537,19 +537,6 @@
   },
   {
     "inputs": [],
-    "name": "initialExchangeRate",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "ip",
     "outputs": [
       {
@@ -726,7 +713,7 @@
   },
   {
     "inputs": [],
-    "name": "params",
+    "name": "paraswapAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -1362,19 +1349,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "swapRewards",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

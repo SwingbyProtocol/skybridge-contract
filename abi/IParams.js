@@ -65,6 +65,19 @@ export default [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "paraswapAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint8",
@@ -125,6 +138,19 @@ export default [
       }
     ],
     "name": "setNodeRewardsRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_paraswapAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setParaswapAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

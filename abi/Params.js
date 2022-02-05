@@ -103,6 +103,19 @@ export default [
   },
   {
     "inputs": [],
+    "name": "paraswapAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -169,6 +182,19 @@ export default [
       }
     ],
     "name": "setNodeRewardsRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_paraswapAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setParaswapAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
