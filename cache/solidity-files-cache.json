@@ -77,8 +77,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
-      "lastModificationDate": 1633381640708,
-      "contentHash": "4fe56b59ced59d87df6b796758f62895",
+      "lastModificationDate": 1643931755971,
+      "contentHash": "c00f2ca1715f43f40d149654ed4c6f04",
       "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -106,7 +106,7 @@
         "../utils/Context.sol"
       ],
       "versionPragmas": [
-        "^0.8.0"
+        ">=0.6.0 <=0.8.9"
       ],
       "artifacts": [
         "Ownable"
@@ -253,8 +253,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapContract.sol": {
-      "lastModificationDate": 1643923916982,
-      "contentHash": "d790288e53695b305e6d5bf526f5e03b",
+      "lastModificationDate": 1643931917053,
+      "contentHash": "1e0f4c25380aec13937bcac9f05d5231",
       "sourceName": "contracts/SwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -303,8 +303,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/ISwapContract.sol": {
-      "lastModificationDate": 1643921051507,
-      "contentHash": "efc8d5b7e9c800340d7c9160c0c4ed4e",
+      "lastModificationDate": 1643931953433,
+      "contentHash": "c7e3cf490b78d1da155c50fadbf7ecd0",
       "sourceName": "contracts/interfaces/ISwapContract.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -826,7 +826,7 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/SwapRewards.sol": {
-      "lastModificationDate": 1643922948702,
+      "lastModificationDate": 1643931762305,
       "contentHash": "72843b6004935e5e87775641879641a4",
       "sourceName": "contracts/SwapRewards.sol",
       "solcConfig": {
@@ -899,8 +899,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/Params.sol": {
-      "lastModificationDate": 1643921134730,
-      "contentHash": "571d7c09145df2f2fb54a1cab9391ba7",
+      "lastModificationDate": 1643925314941,
+      "contentHash": "14f94b69676eb773f7b9d3d71b02baea",
       "sourceName": "contracts/Params.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -936,8 +936,8 @@
       ]
     },
     "/mnt/c/pr0/SWINGBY/DEV/contracts/interfaces/IParams.sol": {
-      "lastModificationDate": 1643921051495,
-      "contentHash": "9939e77fe8087ff4e22eebed14b55127",
+      "lastModificationDate": 1643924677790,
+      "contentHash": "070f845917269f23a8189485606de34e",
       "sourceName": "contracts/interfaces/IParams.sol",
       "solcConfig": {
         "version": "0.8.9",

@@ -5,12 +5,12 @@ import "./interfaces/IParams.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Params is Ownable, IParams {
-    uint256 public minimumSwapAmountForWBTC; 
-    uint256 public expirationTime; 
+    uint256 public minimumSwapAmountForWBTC;
+    uint256 public expirationTime;
     uint8 public nodeRewardsRatio;
     uint8 public depositFeesBPS;
     uint8 public withdrawalFeeBPS;
-
+    uint8 public loopCount; //max loops when cleaning up expired SkyPools TXs
 
     constructor() {
         //Initialize minimumSwapAmountForWBTC
@@ -23,21 +23,23 @@ contract Params is Ownable, IParams {
         withdrawalFeeBPS = 20;
         // Initialize depositFeesBPS
         depositFeesBPS = 0;
+        // Initialize loopCount
+        loopCount = 10;
     }
 
-    function setMinimumSwapAmountForWBTC(uint256 _minimumSwapAmountForWBTC) external onlyOwner {
+    function setMinimumSwapAmountForWBTC(uint256 _minimumSwapAmountForWBTC)
+        external
+        onlyOwner
+    {
         require(
-            _minimumSwapAmountForWBTC > 0, 
-            "_minimumSwapAmountForWBTC can not be 0" 
+            _minimumSwapAmountForWBTC > 0,
+            "_minimumSwapAmountForWBTC can not be 0"
         );
         minimumSwapAmountForWBTC = _minimumSwapAmountForWBTC;
     }
 
     function setExpirationTime(uint256 _expirationTime) external onlyOwner {
-        require(
-            _expirationTime >= 0, 
-            "_expirationTime can not be 0" 
-        );
+        require(_expirationTime >= 0, "_expirationTime can not be 0");
         expirationTime = _expirationTime;
     }
 
@@ -63,5 +65,10 @@ contract Params is Ownable, IParams {
             "_depositFeesBPS is invalid"
         );
         depositFeesBPS = _depositFeesBPS;
+    }
+
+    function setLoopCount(uint8 _loopCount) external onlyOwner {
+        require(_loopCount != 0, "_loopCount can not equal 0");
+        loopCount = _loopCount;
     }
 }

@@ -51,6 +51,19 @@
   },
   {
     "inputs": [],
+    "name": "loopCount",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "minimumSwapAmountForWBTC",
     "outputs": [
       {
@@ -117,6 +130,19 @@
       }
     ],
     "name": "setExpirationTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_loopCount",
+        "type": "uint8"
+      }
+    ],
+    "name": "setLoopCount",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

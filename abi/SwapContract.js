@@ -660,6 +660,45 @@ export default [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_destToken",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "_addressesAndAmounts",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalSwapped",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rewardsAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "_redeemedFloatTxIds",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "multiTransferERC20TightlyPacked",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "oldestActiveIndex",
     "outputs": [
@@ -915,13 +954,7 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_loopCount",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "spCleanUpOldTXs",
     "outputs": [],
     "stateMutability": "nonpayable",

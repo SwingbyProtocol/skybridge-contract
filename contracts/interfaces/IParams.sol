@@ -9,6 +9,7 @@ interface IParams {
     function nodeRewardsRatio() external view returns (uint8);
     function depositFeesBPS() external view returns (uint8);
     function withdrawalFeeBPS() external view returns (uint8);
+    function loopCount() external view returns (uint8);
 
     function setMinimumSwapAmountForWBTC(uint256 _minimumSwapAmountForWBTC) external;
 
@@ -19,4 +20,7 @@ interface IParams {
     function setWithdrawalFeeBPS(uint8 _withdrawalFeeBPS) external;
 
     function setDepositFeesBPS(uint8 _depositFeesBPS) external;
-}
+
+    function setLoopCount(uint8 _loopCount) external;
+}   
+

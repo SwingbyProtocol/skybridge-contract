@@ -17,6 +17,14 @@ interface ISwapContract {
         bytes32[] memory _redeemedFloatTxIds
     ) external returns (bool);
 
+    function multiTransferERC20TightlyPacked(
+        address _destToken,
+        bytes32[] memory _addressesAndAmounts,
+        uint256 _totalSwapped,
+        uint256 _rewardsAmount,
+        bytes32[] memory _redeemedFloatTxIds
+    ) external returns (bool);
+
     function collectSwapFeesForBTC(
         uint256 _incomingAmount,
         uint256 _minerFee,
@@ -72,7 +80,7 @@ interface ISwapContract {
         Utils.SimpleData calldata _data
     ) external returns (uint256 receivedAmount);
 
-    function spCleanUpOldTXs(uint256 _loopCount) external;
+    function spCleanUpOldTXs() external;
 
     function spDeposit(address _token, uint256 _amount) external payable;
 
