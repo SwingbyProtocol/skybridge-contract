@@ -30,42 +30,41 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 Timestamp; // block timestamp that is set by EVM
     }
 
-    //Data and indexes for pending swap objects
-    mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
-    uint256 public swapCount;
-    uint256 public oldestActiveIndex;
+    IBurnableToken public immutable lpToken;
+    IParams public immutable ip;
+    ISwapRewards public immutable sw;
 
+    /** Skybridge */
     mapping(address => bool) public whitelist;
-
     address public immutable BTCT_ADDR;
-    address public immutable lpToken;
-
-    uint8 public churnedInCount;
-    uint8 public tssThreshold;
-    uint256 public limitBTCForSPFlow2;
-
+    address public immutable sbBTCPool;
     uint256 private immutable convertScale;
     uint256 private immutable lpDivisor;
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used; //used TX
 
+    /** TSS */
     // Node lists state { 0 => not exist, 1 => exist, 2 => removed }
     mapping(address => uint8) private nodes;
     address[] private nodeAddrs;
     uint8 public activeNodeCount;
     uint256 public totalStakedAmount;
+    uint8 public churnedInCount;
+    uint8 public tssThreshold;
 
+    /** Skypool */
     //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
     mapping(address => mapping(address => uint256)) public tokens;
     //keep track of ether in tokens[][]
     address constant ETHER = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public paraswapAddress; 
     address public immutable wETH;
-    address public immutable sbBTCPool;
-    
-    IParams public immutable ip;
-    ISwapRewards public immutable sw;
+    //Data and indexes for pending swap objects
+    mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
+    uint256 public swapCount;
+    uint256 public oldestActiveIndex;
+    uint256 public limitBTCForSPFlow2;
 
     /**
      * Events
@@ -149,7 +148,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         //set ISwapRewards
         sw = ISwapRewards(_swapRewards);
         // Set lpToken address
-        lpToken = _lpToken;
+        lpToken = IBurnableToken(_lpToken);
         // Set initial lpDivisor of LP token
         lpDivisor = 10**IERC20(_lpToken).decimals();
         // Set BTCT address
@@ -186,15 +185,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _destToken != address(0),
             "15" //_destToken should not be address(0)
         );
-        address _feesToken;
+        address _feesToken = address(0);
         if (_totalSwapped > 0) {
             sw.pullRewards(_destToken, _to, _totalSwapped);
             _swap(address(0), BTCT_ADDR, _totalSwapped);
-        } else if (_totalSwapped == 0) {
-            _feesToken = BTCT_ADDR;
-        }
-        if (_destToken == lpToken) {
-            _feesToken = lpToken;
+        } else {
+            _feesToken = (_destToken == address(lpToken)) ? address(lpToken) : BTCT_ADDR;
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
@@ -223,11 +219,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         address _feesToken = address(0);
         if (_totalSwapped > 0) {
             _swap(address(0), BTCT_ADDR, _totalSwapped);
-        } else if (_totalSwapped == 0) {
-            _feesToken = BTCT_ADDR;
-        }
-        if (_destToken == lpToken) {
-            _feesToken = lpToken;
+        } else {
+            _feesToken = (_destToken == address(lpToken)) ? address(lpToken) : BTCT_ADDR;
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
@@ -928,7 +921,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             address(0),
             BTCT_ADDR
         );
-        uint256 totalLPs = IBurnableToken(lpToken).totalSupply();
+        uint256 totalLPs = lpToken.totalSupply();
         // decimals of totalReserved == 8, lpDivisor == 8, decimals of rate == 8
         nowPrice = totalLPs == 0
             ? lpDivisor
@@ -987,7 +980,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 nowPrice = getCurrentPriceLP();
         uint256 amountOfLP = amountOfFloat.mul(lpDivisor).div(nowPrice);
         // Send LP tokens to LP
-        IBurnableToken(lpToken).mint(to, amountOfLP);
+        lpToken.mint(to, amountOfLP);
         // Add float amount
         _addFloat(_token, amountOfFloat);
         _addUsedTx(_txid);
@@ -1058,7 +1051,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _safeTransfer(_token, to, withdrawal);
         }
         // Burn LP tokens
-        require(IBurnableToken(lpToken).burn(amountOfLP));
+        require(lpToken.burn(amountOfLP));
         emit BurnLPTokensForFloat(
             to,
             amountOfLP,
@@ -1129,11 +1122,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         internal
     {
         if (_rewardsAmount == 0) return;
-        if (_feesToken == lpToken) {
-            IBurnableToken(lpToken).transfer(sbBTCPool, _rewardsAmount);
-            emit RewardsCollection(_feesToken, 0, _rewardsAmount, 0);
-            return;
-        }
+        // if (_feesToken == lpToken) {
+        //     IBurnableToken(lpToken).transfer(sbBTCPool, _rewardsAmount);
+        //     emit RewardsCollection(_feesToken, 0, _rewardsAmount, 0);
+        //     return;
+        // }
+
         // Get current LP token price.
         uint256 nowPrice = getCurrentPriceLP();
         // Add all fees into pool
@@ -1148,7 +1142,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             nowPrice
         );
         // Mints LP tokens for Nodes
-        IBurnableToken(lpToken).mint(sbBTCPool, amountLPTokensForNode);
+        lpToken.mint(sbBTCPool, amountLPTokensForNode);
 
         emit RewardsCollection(
             _feesToken,
