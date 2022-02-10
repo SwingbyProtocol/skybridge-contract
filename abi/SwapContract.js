@@ -604,7 +604,7 @@ export default [
     "name": "lpToken",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IBurnableToken",
         "name": "",
         "type": "address"
       }
