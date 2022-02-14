@@ -174,7 +174,7 @@ describe("SkyPools", () => {
 
     before(async () => {
         [owner, receiver, user1, user2, ...addrs] = await ethers.getSigners()
-        accounts = [owner, receiver, user1, user2, ...addrs]
+        accounts = [owner, receiver, user1, user2, ...addrs] // X
         LPTokenFactory = await ethers.getContractFactory("LPToken")
         SwapContractFactory = await ethers.getContractFactory("SwapContract")
         SwapRewardsFactory = await ethers.getContractFactory("SwapRewards")
@@ -1323,7 +1323,7 @@ describe("SkyPools", () => {
                         isRemoved,
                         churnedInCount,
                         tssThreshold,
-                        new BigNumber.from(50),
+                        new BigNumber.from(50), //_totalStakedAmount
                     )
 
                     currentExpirationTime = await params.expirationTime()
