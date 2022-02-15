@@ -14,6 +14,7 @@ contract SwapRewards is Ownable {
     ISwapContract public swapContract;
     uint256 public rebateRate = 30;
     uint256 public thresholdRatio = 55; // diff is over 10%
+    uint256 public pricePerBTC;
 
     event Paid(address to, uint256 amount, uint256 rebate);
 
@@ -28,6 +29,12 @@ contract SwapRewards is Ownable {
         transferOwnership(_owner);
         rewardToken = IERC20(_swingby);
         swapContract = ISwapContract(_swap);
+    }
+
+    // expected DAO executes this
+    function setSWINGBYPrice(uint256 _price) external {
+        require(msg.sender == owner(), "!owner");
+        pricePerBTC = _price;
     }
 
     function setSwap(
@@ -71,12 +78,12 @@ contract SwapRewards is Ownable {
         ) {
             rewardToken.transfer(
                 _receiver,
-                _swapped.mul(rebateRate).div(100).mul(1e10)
+                _swapped.mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
             ); // decimals == 18 for payout
             emit Paid(
                 _receiver,
                 _swapped,
-                _swapped.mul(rebateRate).div(100).mul(1e10)
+                _swapped.mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
             );
         }
     }
@@ -105,12 +112,12 @@ contract SwapRewards is Ownable {
             for (uint256 i = 0; i < _receiver.length; i++) {
                 rewardToken.transfer(
                     _receiver[i],
-                    _swapped[i].mul(rebateRate).div(100).mul(1e10)
+                    _swapped[i].mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
                 ); // decimals == 18 for payout
                 emit Paid(
                     _receiver[i],
                     _swapped[i],
-                    _swapped[i].mul(rebateRate).div(100).mul(1e10)
+                    _swapped[i].mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
                 );
             }
         }
