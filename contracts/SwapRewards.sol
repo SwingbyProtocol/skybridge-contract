@@ -12,7 +12,7 @@ contract SwapRewards is Ownable {
 
     IERC20 public immutable rewardToken;
     ISwapContract public swapContract;
-    uint256 public rebateRate = 30;
+    uint256 public rebateRate = 30;  // BPS base
     uint256 public thresholdRatio = 55; // diff is over 10%
     uint256 public pricePerBTC;
 
@@ -80,12 +80,12 @@ contract SwapRewards is Ownable {
         ) {
             rewardToken.transfer(
                 _receiver,
-                _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e8)
+                _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e6)
             ); // decimals == 18 for payout
             emit Paid(
                 _receiver,
                 _swapped,
-                _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e8)
+                _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e6)
             );
         }
     }
@@ -114,12 +114,12 @@ contract SwapRewards is Ownable {
             for (uint256 i = 0; i < _receiver.length; i++) {
                 rewardToken.transfer(
                     _receiver[i],
-                    _swapped[i].mul(rebateRate).mul(pricePerBTC).mul(1e8)
+                    _swapped[i].mul(rebateRate).mul(pricePerBTC).mul(1e6)
                 ); // decimals == 18 for payout
                 emit Paid(
                     _receiver[i],
                     _swapped[i],
-                    _swapped[i].mul(rebateRate).mul(pricePerBTC).mul(1e8)
+                    _swapped[i].mul(rebateRate).mul(pricePerBTC).mul(1e6)
                 );
             }
         }
