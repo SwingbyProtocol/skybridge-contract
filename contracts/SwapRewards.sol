@@ -21,7 +21,8 @@ contract SwapRewards is Ownable {
     constructor(
         address _owner,
         address _swingby,
-        address _swap
+        address _swap,
+        uint256 _pricePerBTC
     ) {
         require(_owner != address(0), "owner address is not be 0x0");
         require(_swingby != address(0), "swingby address must not be 0x0");
@@ -29,12 +30,13 @@ contract SwapRewards is Ownable {
         transferOwnership(_owner);
         rewardToken = IERC20(_swingby);
         swapContract = ISwapContract(_swap);
+        pricePerBTC = _pricePerBTC;
     }
 
     // expected DAO executes this
-    function setSWINGBYPrice(uint256 _price) external {
+    function setSWINGBYPrice(uint256 _pricePerBTC) external {
         require(msg.sender == owner(), "!owner");
-        pricePerBTC = _price;
+        pricePerBTC = _pricePerBTC;
     }
 
     function setSwap(
@@ -78,12 +80,12 @@ contract SwapRewards is Ownable {
         ) {
             rewardToken.transfer(
                 _receiver,
-                _swapped.mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
+                _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e8)
             ); // decimals == 18 for payout
             emit Paid(
                 _receiver,
                 _swapped,
-                _swapped.mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
+                _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e8)
             );
         }
     }
@@ -112,12 +114,12 @@ contract SwapRewards is Ownable {
             for (uint256 i = 0; i < _receiver.length; i++) {
                 rewardToken.transfer(
                     _receiver[i],
-                    _swapped[i].mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
+                    _swapped[i].mul(rebateRate).mul(pricePerBTC).mul(1e8)
                 ); // decimals == 18 for payout
                 emit Paid(
                     _receiver[i],
                     _swapped[i],
-                    _swapped[i].mul(rebateRate).div(100).mul(pricePerBTC).mul(1e10)
+                    _swapped[i].mul(rebateRate).mul(pricePerBTC).mul(1e8)
                 );
             }
         }
