@@ -29,9 +29,9 @@ module.exports = {
       tasks: ["compile"],
     },
     test: {//npx hardhat watch test -- run test when a file is saved
-      tasks: [{ command: 'test', params: { testFiles: ['./test/testAddNode.js'] }}], //test this file
+      tasks: [{ command: 'test', params: { testFiles: ['./test/testSwapContract.js'] }}], //test this file
       //files: ['./test/testSkyPoolsV2.js'] //test when this file is saved
-      files: ['./test/testAddNode.js'] //test when this file is saved
+      files: ['./test/testSwapContract.js'] //test when this file is saved
     }
   },
   solidity: {

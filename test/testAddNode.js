@@ -56,7 +56,13 @@ describe("Testing Node Functions...", () => {
             swapRewards.address,
             0
         )
-        //console.log(swap)
+
+        await swapRewards.connect(owner).setSwap(
+            swap.address,
+            new BigNumber.from(30),
+            new BigNumber.from(60)
+        )
+
 
         redeemedFloatTxIds = [
             "0x13e8785fe862e60f2caa4f838146ff9d4f4bd4a02dd6fb1f513b0a9be3452b62",
