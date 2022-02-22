@@ -10,7 +10,7 @@ import "./interfaces/ISwapContract.sol";
 contract SwapRewards is Ownable {
     using SafeMath for uint256;
 
-    IERC20 public immutable rewardToken;
+    IERC20 public immutable rewardToken; //swingby
     ISwapContract public swapContract;
     uint256 public rebateRate = 30;  // BPS base
     uint256 public thresholdRatio = 55; // diff is over 10%
@@ -21,7 +21,6 @@ contract SwapRewards is Ownable {
     constructor(
         address _owner,
         address _swingby,
-        address _swap,
         uint256 _pricePerBTC
     ) {
         require(_owner != address(0), "owner address is not be 0x0");
@@ -29,7 +28,6 @@ contract SwapRewards is Ownable {
 
         transferOwnership(_owner);
         rewardToken = IERC20(_swingby);
-        swapContract = ISwapContract(_swap);
         pricePerBTC = _pricePerBTC;
     }
 
@@ -63,7 +61,7 @@ contract SwapRewards is Ownable {
         address _dest,
         address _receiver,
         uint256 _swapped
-    ) external {
+    ) external returns (bool) {
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
@@ -88,6 +86,7 @@ contract SwapRewards is Ownable {
                 _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e6)
             );
         }
+        return true;
     }
 
     // pullRewardsMulti transfers the funds to the user
