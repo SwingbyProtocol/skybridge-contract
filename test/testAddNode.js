@@ -57,7 +57,7 @@ describe("Testing Node Functions...", () => {
             0
         )
 
-        await swapRewards.connect(owner).setSwap(
+        await swapRewards.connect(sender).setSwap(
             swap.address,
             new BigNumber.from(30),
             new BigNumber.from(60)
