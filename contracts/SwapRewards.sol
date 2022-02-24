@@ -10,24 +10,31 @@ import "./interfaces/ISwapContract.sol";
 contract SwapRewards is Ownable {
     using SafeMath for uint256;
 
-    IERC20 public immutable rewardToken;
+    IERC20 public immutable rewardToken; //swingby
     ISwapContract public swapContract;
-    uint256 public rebateRate = 30;
+    uint256 public rebateRate = 30; // BPS base
     uint256 public thresholdRatio = 55; // diff is over 10%
+    uint256 public pricePerBTC;
 
     event Paid(address to, uint256 amount, uint256 rebate);
 
     constructor(
         address _owner,
         address _swingby,
-        address _swap
+        uint256 _pricePerBTC
     ) {
         require(_owner != address(0), "owner address is not be 0x0");
         require(_swingby != address(0), "swingby address must not be 0x0");
 
         transferOwnership(_owner);
         rewardToken = IERC20(_swingby);
-        swapContract = ISwapContract(_swap);
+        pricePerBTC = _pricePerBTC;
+    }
+
+    // expected DAO executes this
+    function setSWINGBYPrice(uint256 _pricePerBTC) external {
+        require(msg.sender == owner(), "!owner");
+        pricePerBTC = _pricePerBTC;
     }
 
     function setSwap(
@@ -54,7 +61,7 @@ contract SwapRewards is Ownable {
         address _dest,
         address _receiver,
         uint256 _swapped
-    ) external {
+    ) external returns (bool) {
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
@@ -69,16 +76,11 @@ contract SwapRewards is Ownable {
             (_dest == tokenB && balB >= threshold) ||
             (_dest == address(0) && balA >= threshold)
         ) {
-            rewardToken.transfer(
-                _receiver,
-                _swapped.mul(rebateRate).div(100).mul(1e10)
-            ); // decimals == 18 for payout
-            emit Paid(
-                _receiver,
-                _swapped,
-                _swapped.mul(rebateRate).div(100).mul(1e10)
-            );
+            uint256 amount = _swapped.mul(rebateRate).mul(pricePerBTC).mul(1e6);
+            rewardToken.transfer(_receiver, amount); // decimals == 18 for payout
+            emit Paid(_receiver, _swapped, amount);
         }
+        return true;
     }
 
     // pullRewardsMulti transfers the funds to the user
@@ -86,7 +88,7 @@ contract SwapRewards is Ownable {
         address _dest,
         address[] memory _receiver,
         uint256[] memory _swapped
-    ) external returns (bool){
+    ) external returns (bool) {
         require(
             msg.sender == address(swapContract),
             "caller is not swap contact"
@@ -103,15 +105,12 @@ contract SwapRewards is Ownable {
             (_dest == address(0) && balA >= threshold)
         ) {
             for (uint256 i = 0; i < _receiver.length; i++) {
-                rewardToken.transfer(
-                    _receiver[i],
-                    _swapped[i].mul(rebateRate).div(100).mul(1e10)
-                ); // decimals == 18 for payout
-                emit Paid(
-                    _receiver[i],
-                    _swapped[i],
-                    _swapped[i].mul(rebateRate).div(100).mul(1e10)
-                );
+                uint256 amount = _swapped[i]
+                    .mul(rebateRate)
+                    .mul(pricePerBTC)
+                    .mul(1e6);
+                rewardToken.transfer(_receiver[i], amount); // decimals == 18 for payout
+                emit Paid(_receiver[i], _swapped[i], amount);
             }
         }
         return true;
