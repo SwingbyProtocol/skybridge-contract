@@ -250,11 +250,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     ) external override onlyOwner returns (bool) {
         address _feesToken = BTCT_ADDR;
         if (_incomingAmount > 0) {
-            uint256 swapAmount = _incomingAmount.sub(_rewardsAmount).sub(
-                _minerFee
-            );
+            uint256 swapAmount = _incomingAmount.sub(_rewardsAmount);
             sw.pullRewardsMulti(address(0), _spenders, _swapAmounts);
-            _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
+            _swap(BTCT_ADDR, address(0), swapAmount);
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
         }
@@ -382,11 +380,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _data.fromToken == BTCT_ADDR,
             "fromToken != BTCT_ADDR"
         );
-        _doSimpleSwap(_data); //no received amount, tokens to go user's wallet
 
         tokens[_data.fromToken][_data.beneficiary] = tokens[_data.fromToken][
             _data.beneficiary
         ].sub(_data.fromAmount);
+        
+        _doSimpleSwap(_data); //no received amount, tokens to go user's wallet
     }
 
     /// @dev spFlow1Uniswap - FLOW 1 - execute paraswap TX using uniswap, ending tokens sent to users allocation in tokens[][] mapping
@@ -1112,7 +1111,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         if (_token == BTCT_ADDR) {
             _amount = _amount.mul(convertScale);
         }
-        require(IERC20(_token).transfer(_to, _amount));
+        IERC20(_token).safeTransfer(_to, _amount);
     }
 
     /// @dev _rewardsCollection collects tx rewards.
@@ -1196,10 +1195,5 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             address(uint160(uint256(_data))),
             uint256(uint96(bytes12(_data)))
         );
-    }
-
-    /// @dev The contract doesn't allow receiving Ether.
-    fallback() external {
-        revert();
     }
 }
