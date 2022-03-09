@@ -30,7 +30,7 @@ var (
 
 // ISwapRewardsMetaData contains all meta data concerning the ISwapRewards contract.
 var ISwapRewardsMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_swapped\",\"type\":\"uint256\"}],\"name\":\"pullRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_receiver\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapped\",\"type\":\"uint256[]\"}],\"name\":\"pullRewardsMulti\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_swapped\",\"type\":\"uint256\"}],\"name\":\"pullRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_receiver\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapped\",\"type\":\"uint256[]\"}],\"name\":\"pullRewardsMulti\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_pricePerBTC\",\"type\":\"uint256\"}],\"name\":\"setSWINGBYPrice\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // ISwapRewardsABI is the input ABI used to generate the binding from.
@@ -219,4 +219,25 @@ func (_ISwapRewards *ISwapRewardsSession) PullRewardsMulti(_dest common.Address,
 // Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns(bool)
 func (_ISwapRewards *ISwapRewardsTransactorSession) PullRewardsMulti(_dest common.Address, _receiver []common.Address, _swapped []*big.Int) (*types.Transaction, error) {
 	return _ISwapRewards.Contract.PullRewardsMulti(&_ISwapRewards.TransactOpts, _dest, _receiver, _swapped)
+}
+
+// SetSWINGBYPrice is a paid mutator transaction binding the contract method 0xfabe44a8.
+//
+// Solidity: function setSWINGBYPrice(uint256 _pricePerBTC) returns()
+func (_ISwapRewards *ISwapRewardsTransactor) SetSWINGBYPrice(opts *bind.TransactOpts, _pricePerBTC *big.Int) (*types.Transaction, error) {
+	return _ISwapRewards.contract.Transact(opts, "setSWINGBYPrice", _pricePerBTC)
+}
+
+// SetSWINGBYPrice is a paid mutator transaction binding the contract method 0xfabe44a8.
+//
+// Solidity: function setSWINGBYPrice(uint256 _pricePerBTC) returns()
+func (_ISwapRewards *ISwapRewardsSession) SetSWINGBYPrice(_pricePerBTC *big.Int) (*types.Transaction, error) {
+	return _ISwapRewards.Contract.SetSWINGBYPrice(&_ISwapRewards.TransactOpts, _pricePerBTC)
+}
+
+// SetSWINGBYPrice is a paid mutator transaction binding the contract method 0xfabe44a8.
+//
+// Solidity: function setSWINGBYPrice(uint256 _pricePerBTC) returns()
+func (_ISwapRewards *ISwapRewardsTransactorSession) SetSWINGBYPrice(_pricePerBTC *big.Int) (*types.Transaction, error) {
+	return _ISwapRewards.Contract.SetSWINGBYPrice(&_ISwapRewards.TransactOpts, _pricePerBTC)
 }

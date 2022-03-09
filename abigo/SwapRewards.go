@@ -30,7 +30,7 @@ var (
 
 // SwapRewardsMetaData contains all meta data concerning the SwapRewards contract.
 var SwapRewardsMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swingby\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rebate\",\"type\":\"uint256\"}],\"name\":\"Paid\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_swapped\",\"type\":\"uint256\"}],\"name\":\"pullRewards\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_receiver\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapped\",\"type\":\"uint256[]\"}],\"name\":\"pullRewardsMulti\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rebateRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardToken\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_newRebateRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_thresholdRatio\",\"type\":\"uint256\"}],\"name\":\"setSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapContract\",\"outputs\":[{\"internalType\":\"contractISwapContract\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"thresholdRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swingby\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_pricePerBTC\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rebate\",\"type\":\"uint256\"}],\"name\":\"Paid\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pricePerBTC\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_swapped\",\"type\":\"uint256\"}],\"name\":\"pullRewards\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dest\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_receiver\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapped\",\"type\":\"uint256[]\"}],\"name\":\"pullRewardsMulti\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rebateRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardToken\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_pricePerBTC\",\"type\":\"uint256\"}],\"name\":\"setSWINGBYPrice\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_newRebateRate\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_thresholdRatio\",\"type\":\"uint256\"}],\"name\":\"setSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapContract\",\"outputs\":[{\"internalType\":\"contractISwapContract\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"thresholdRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // SwapRewardsABI is the input ABI used to generate the binding from.
@@ -210,6 +210,37 @@ func (_SwapRewards *SwapRewardsCallerSession) Owner() (common.Address, error) {
 	return _SwapRewards.Contract.Owner(&_SwapRewards.CallOpts)
 }
 
+// PricePerBTC is a free data retrieval call binding the contract method 0x4017fe77.
+//
+// Solidity: function pricePerBTC() view returns(uint256)
+func (_SwapRewards *SwapRewardsCaller) PricePerBTC(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _SwapRewards.contract.Call(opts, &out, "pricePerBTC")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// PricePerBTC is a free data retrieval call binding the contract method 0x4017fe77.
+//
+// Solidity: function pricePerBTC() view returns(uint256)
+func (_SwapRewards *SwapRewardsSession) PricePerBTC() (*big.Int, error) {
+	return _SwapRewards.Contract.PricePerBTC(&_SwapRewards.CallOpts)
+}
+
+// PricePerBTC is a free data retrieval call binding the contract method 0x4017fe77.
+//
+// Solidity: function pricePerBTC() view returns(uint256)
+func (_SwapRewards *SwapRewardsCallerSession) PricePerBTC() (*big.Int, error) {
+	return _SwapRewards.Contract.PricePerBTC(&_SwapRewards.CallOpts)
+}
+
 // RebateRate is a free data retrieval call binding the contract method 0xb681a1e7.
 //
 // Solidity: function rebateRate() view returns(uint256)
@@ -336,42 +367,42 @@ func (_SwapRewards *SwapRewardsCallerSession) ThresholdRatio() (*big.Int, error)
 
 // PullRewards is a paid mutator transaction binding the contract method 0xff320aae.
 //
-// Solidity: function pullRewards(address _dest, address _receiver, uint256 _swapped) returns()
+// Solidity: function pullRewards(address _dest, address _receiver, uint256 _swapped) returns(bool)
 func (_SwapRewards *SwapRewardsTransactor) PullRewards(opts *bind.TransactOpts, _dest common.Address, _receiver common.Address, _swapped *big.Int) (*types.Transaction, error) {
 	return _SwapRewards.contract.Transact(opts, "pullRewards", _dest, _receiver, _swapped)
 }
 
 // PullRewards is a paid mutator transaction binding the contract method 0xff320aae.
 //
-// Solidity: function pullRewards(address _dest, address _receiver, uint256 _swapped) returns()
+// Solidity: function pullRewards(address _dest, address _receiver, uint256 _swapped) returns(bool)
 func (_SwapRewards *SwapRewardsSession) PullRewards(_dest common.Address, _receiver common.Address, _swapped *big.Int) (*types.Transaction, error) {
 	return _SwapRewards.Contract.PullRewards(&_SwapRewards.TransactOpts, _dest, _receiver, _swapped)
 }
 
 // PullRewards is a paid mutator transaction binding the contract method 0xff320aae.
 //
-// Solidity: function pullRewards(address _dest, address _receiver, uint256 _swapped) returns()
+// Solidity: function pullRewards(address _dest, address _receiver, uint256 _swapped) returns(bool)
 func (_SwapRewards *SwapRewardsTransactorSession) PullRewards(_dest common.Address, _receiver common.Address, _swapped *big.Int) (*types.Transaction, error) {
 	return _SwapRewards.Contract.PullRewards(&_SwapRewards.TransactOpts, _dest, _receiver, _swapped)
 }
 
 // PullRewardsMulti is a paid mutator transaction binding the contract method 0x49e031a5.
 //
-// Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns()
+// Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns(bool)
 func (_SwapRewards *SwapRewardsTransactor) PullRewardsMulti(opts *bind.TransactOpts, _dest common.Address, _receiver []common.Address, _swapped []*big.Int) (*types.Transaction, error) {
 	return _SwapRewards.contract.Transact(opts, "pullRewardsMulti", _dest, _receiver, _swapped)
 }
 
 // PullRewardsMulti is a paid mutator transaction binding the contract method 0x49e031a5.
 //
-// Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns()
+// Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns(bool)
 func (_SwapRewards *SwapRewardsSession) PullRewardsMulti(_dest common.Address, _receiver []common.Address, _swapped []*big.Int) (*types.Transaction, error) {
 	return _SwapRewards.Contract.PullRewardsMulti(&_SwapRewards.TransactOpts, _dest, _receiver, _swapped)
 }
 
 // PullRewardsMulti is a paid mutator transaction binding the contract method 0x49e031a5.
 //
-// Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns()
+// Solidity: function pullRewardsMulti(address _dest, address[] _receiver, uint256[] _swapped) returns(bool)
 func (_SwapRewards *SwapRewardsTransactorSession) PullRewardsMulti(_dest common.Address, _receiver []common.Address, _swapped []*big.Int) (*types.Transaction, error) {
 	return _SwapRewards.Contract.PullRewardsMulti(&_SwapRewards.TransactOpts, _dest, _receiver, _swapped)
 }
@@ -395,6 +426,27 @@ func (_SwapRewards *SwapRewardsSession) RenounceOwnership() (*types.Transaction,
 // Solidity: function renounceOwnership() returns()
 func (_SwapRewards *SwapRewardsTransactorSession) RenounceOwnership() (*types.Transaction, error) {
 	return _SwapRewards.Contract.RenounceOwnership(&_SwapRewards.TransactOpts)
+}
+
+// SetSWINGBYPrice is a paid mutator transaction binding the contract method 0xfabe44a8.
+//
+// Solidity: function setSWINGBYPrice(uint256 _pricePerBTC) returns()
+func (_SwapRewards *SwapRewardsTransactor) SetSWINGBYPrice(opts *bind.TransactOpts, _pricePerBTC *big.Int) (*types.Transaction, error) {
+	return _SwapRewards.contract.Transact(opts, "setSWINGBYPrice", _pricePerBTC)
+}
+
+// SetSWINGBYPrice is a paid mutator transaction binding the contract method 0xfabe44a8.
+//
+// Solidity: function setSWINGBYPrice(uint256 _pricePerBTC) returns()
+func (_SwapRewards *SwapRewardsSession) SetSWINGBYPrice(_pricePerBTC *big.Int) (*types.Transaction, error) {
+	return _SwapRewards.Contract.SetSWINGBYPrice(&_SwapRewards.TransactOpts, _pricePerBTC)
+}
+
+// SetSWINGBYPrice is a paid mutator transaction binding the contract method 0xfabe44a8.
+//
+// Solidity: function setSWINGBYPrice(uint256 _pricePerBTC) returns()
+func (_SwapRewards *SwapRewardsTransactorSession) SetSWINGBYPrice(_pricePerBTC *big.Int) (*types.Transaction, error) {
+	return _SwapRewards.Contract.SetSWINGBYPrice(&_SwapRewards.TransactOpts, _pricePerBTC)
 }
 
 // SetSwap is a paid mutator transaction binding the contract method 0xa9d6e083.
