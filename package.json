@@ -26,6 +26,7 @@
   "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
   "dependencies": {
     "@chainsafe/truffle-plugin-abigen": "0.0.2",
+    "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@openzeppelin/contracts": "^4.3.2",
     "@symblox/hardhat-abi-gen": "^0.2.0",
     "@truffle/hdwallet-provider": "^1.2.3",

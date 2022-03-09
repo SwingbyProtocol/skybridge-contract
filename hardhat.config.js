@@ -5,16 +5,12 @@
 
 
 require("@nomiclabs/hardhat-waffle");
-
-
 //Plugins to let hardhat use web3 and truffle libraries 
 require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-truffle5");
-
-
 require("hardhat-watcher");
-
 require('@symblox/hardhat-abi-gen');
+require('@nomiclabs/hardhat-etherscan');
 
 //const mnemonic = process.env.SEED
 
@@ -29,7 +25,7 @@ module.exports = {
       tasks: ["compile"],
     },
     test: {//npx hardhat watch test -- run test when a file is saved
-      tasks: [{ command: 'test', params: { testFiles: ['./test/testSkyPoolsV2.js'] }}], //test this file
+      tasks: [{ command: 'test', params: { testFiles: ['./test/testSkyPoolsV2.js'] } }], //test this file
       files: ['./test/testSkyPoolsV2.js'] //test when this file is saved
     }
   },
@@ -57,7 +53,7 @@ module.exports = {
     },
     goerli: {
       url: "https://goerli.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts:[mnemonic],
+      accounts: [mnemonic],
       network_id: 5,       // Ropsten's id
       gas: 5500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -67,7 +63,12 @@ module.exports = {
     },
     ropsten: {
       url: "https://eth-ropsten.alchemyapi.io/v2/5EGdI7OUE9ptMFggrLzsM2dDpBYPMujp",
-      accounts:[mnemonic],
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        path: "m/44'/60'/0'/0",
+        initialIndex: 1,
+        count: 10
+      },
       network_id: 3,       // Ropsten's id
       gas: 5500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -77,7 +78,7 @@ module.exports = {
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts:[mnemonic],
+      accounts: [mnemonic],
       network_id: 1,       // Ropsten's id
       gas: 3000000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -87,7 +88,7 @@ module.exports = {
     },
     bsc_testnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts:[mnemonic],
+      accounts: [mnemonic],
       network_id: 97,       // Ropsten's id
       gas: 7500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -97,7 +98,7 @@ module.exports = {
     },
     bsc_mainnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts:[mnemonic],
+      accounts: [mnemonic],
       network_id: 56,       // Ropsten's id
       gas: 3000000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -114,7 +115,7 @@ module.exports = {
   },
   // Set default mocha options here, use special reporters etc.
   mocha: {
-     timeout: 100000
+    timeout: 100000
   },
 
   // Configure your compilers
@@ -132,13 +133,17 @@ module.exports = {
     },
   },
 
-abiExporter: {
+  etherscan: {
+    apiKey: process.env.ETHERSCAN
+  },
+
+  abiExporter: {
     path: './abi',
     clear: false,
     flat: true,
     spacing: 2
   },
-  
+
   plugins: [
     "@chainsafe/truffle-plugin-abigen"
   ]
