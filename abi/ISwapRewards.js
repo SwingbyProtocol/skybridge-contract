@@ -56,5 +56,18 @@ export default [
     ],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_pricePerBTC",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSWINGBYPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ];

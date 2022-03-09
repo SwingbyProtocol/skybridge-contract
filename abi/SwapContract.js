@@ -326,10 +326,6 @@ export default [
     "type": "event"
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "fallback"
-  },
-  {
     "inputs": [],
     "name": "BTCT_ADDR",
     "outputs": [

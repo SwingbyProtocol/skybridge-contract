@@ -12,11 +12,6 @@ export default [
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "_swap",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "_pricePerBTC",
         "type": "uint256"
@@ -114,7 +109,13 @@ export default [
       }
     ],
     "name": "pullRewards",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
