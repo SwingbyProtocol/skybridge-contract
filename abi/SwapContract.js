@@ -401,11 +401,6 @@ export default [
         "internalType": "uint8",
         "name": "_tssThreshold",
         "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalStakedAmount",
-        "type": "uint256"
       }
     ],
     "name": "churn",
@@ -1364,19 +1359,6 @@ export default [
       }
     ],
     "name": "tokens",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalStakedAmount",
     "outputs": [
       {
         "internalType": "uint256",

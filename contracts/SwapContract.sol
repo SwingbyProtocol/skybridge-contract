@@ -49,7 +49,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     mapping(address => uint8) private nodes;
     address[] private nodeAddrs;
     uint8 public activeNodeCount;
-    uint256 public totalStakedAmount;
     uint8 public churnedInCount;
     uint8 public tssThreshold;
 
@@ -827,14 +826,12 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @param _isRemoved The flags to remove node.
     /// @param _churnedInCount The number of next party size of TSS group.
     /// @param _tssThreshold The number of next threshold.
-    /// @param _totalStakedAmount The amount of total staked amount on the network.
     function churn(
         address _newOwner,
         address[] memory _nodes,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
-        uint8 _tssThreshold,
-        uint256 _totalStakedAmount
+        uint8 _tssThreshold
     ) external override onlyOwner returns (bool) {
         require(
             _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
@@ -868,7 +865,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         require(activeNodeCount <= 100, "Stored node size should be <= 100");
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
-        totalStakedAmount = _totalStakedAmount;
         return true;
     }
 

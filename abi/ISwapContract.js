@@ -38,11 +38,6 @@ export default [
         "internalType": "uint8",
         "name": "_tssThreshold",
         "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalStakedAmount",
-        "type": "uint256"
       }
     ],
     "name": "churn",

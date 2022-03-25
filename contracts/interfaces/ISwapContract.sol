@@ -97,8 +97,7 @@ interface ISwapContract {
         address[] memory _nodes,
         bool[] memory _isRemoved,
         uint8 _churnedInCount,
-        uint8 _tssThreshold,
-        uint256 _totalStakedAmount
+        uint8 _tssThreshold
     ) external returns (bool);
 
     function isTxUsed(bytes32 _txid) external view returns (bool);
