@@ -1323,7 +1323,6 @@ describe("SkyPools", () => {
                         isRemoved,
                         churnedInCount,
                         tssThreshold,
-                        new BigNumber.from(50),
                     )
 
                     currentExpirationTime = await params.expirationTime()

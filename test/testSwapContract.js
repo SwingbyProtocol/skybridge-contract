@@ -555,7 +555,7 @@ describe('Contract: SwapContract', async () => {
                 rewardAddressAndAmounts.push(addressesAndAmountStaked)
                 isRemoved.push(false)
             }
-            const tx1 = await swap.churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS, new BigNumber.from(0),{
+            const tx1 = await swap.churn(receiver.address, rewardAddressAndAmounts, isRemoved, churnedInCount, tssThreshold, nodeRewardsRatio, withdrawalFeeBPS,{
                 value: 0,
                 gasPrice: 2 * 10 ** 6
             })
