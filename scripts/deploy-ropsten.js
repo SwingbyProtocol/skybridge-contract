@@ -16,9 +16,9 @@ async function main() {
     //let BTCT_ADDR = "0x449268b65BAf7251f83fd0a4b182DbC4C20985Fd"
     //BTCT_ADDR = "0xbde8bb00a7ef67007a96945b3a3621177b615c44"
     //BTCT_ADDR = "0xaD6D458402F60fD3Bd25163575031ACDce07538D"//address for DAI as there is no liquidity for BTCt on Ropsten
-    const BTCT_ADDR = "0x442be68395613bdcd19778e761f03261ec46c06d"
+    const BTCT_ADDR = "0x7cb2eac36b4bb7c36640f32e806d33e474d1d427"
     const wETH_ADDR = "0xc778417e063141139fce010982780140aa0cd5ab"
-    const sbBTCPool = "0xc5200d80c68aa78f451da7b8adb90fcdb9d63914"
+    const sbBTCPool = "0xf5329508Fdb96A1aada673dB6572109a228edB7e"
     const params = "0xad2CD8327BFE0E8C059EA5f789d064ba4C261BDb"
     const swapRewards = "0x53E79243D27DCd5E1070b4B71FDC42F8944a7848"
 

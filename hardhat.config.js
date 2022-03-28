@@ -134,7 +134,7 @@ module.exports = {
   },
 
   etherscan: {
-    apiKey: process.env.ETHERSCAN
+    apiKey: "A7EAG5WB4FRAHIURRGWD8HSTM8CVYXZGZ4"
   },
 
   abiExporter: {
