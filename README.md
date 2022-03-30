@@ -44,7 +44,7 @@ https://etherscan.io/address/0x44a62c7121a64691b61aef669f21c628258e7d52
 PraswapRouter
 https://etherscan.io/address/0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57
 BTCT
-https://etherscan.io/token/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
+https://etherscan.io/address/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
 ```
 
 ## Testnet contracts (ropsten)
