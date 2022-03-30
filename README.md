@@ -34,3 +34,27 @@ $ npm run test
 or 
 $ truffle test --network development
 ```
+
+## Mainnet contracts
+```
+SkypoolContract
+https://etherscan.io/address/0x4A084C0D1f89793Bb57f49b97c4e3a24cA539aAA
+LPToken
+https://etherscan.io/address/0x44a62c7121a64691b61aef669f21c628258e7d52
+PraswapRouter
+https://etherscan.io/address/0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57
+BTCT
+https://etherscan.io/token/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
+```
+
+## Testnet contracts (ropsten)
+```
+SkypoolContract
+https://ropsten.etherscan.io/address/0x92c95b6227a9f0b4602649bd83f83adc48dae903
+LPToken
+https://ropsten.etherscan.io/address/0x679199877e56b8e68fdb1ddae122e843ecaca268
+PraswapRouter
+https://ropsten.etherscan.io/address/0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57
+BTCT
+https://ropsten.etherscan.io/address/0x7cb2eac36b4bb7c36640f32e806d33e474d1d427
+```
