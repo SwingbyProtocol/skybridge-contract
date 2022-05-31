@@ -4,6 +4,8 @@ pragma solidity >=0.6.0 <0.8.0;
 import "./interfaces/IBurnableToken.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
+import "./SkyBridge.sol";
+import "./SkyPool.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
@@ -37,8 +39,6 @@ contract SwapContract is Ownable, ISwapContract {
     /**
      * Events
      */
-
-    event Swap(address from, address to, uint256 amount);
 
     event RewardsCollection(
         address feesToken,
@@ -131,7 +131,7 @@ contract SwapContract is Ownable, ISwapContract {
         );
         address _feesToken = address(0);
         if (_totalSwapped > 0) {
-            _swap(address(0), BTCT_ADDR, _totalSwapped);
+            (floatAmountOf[address[0], floatAmountOf[BTCT_ADDR]) = SkyPool.swap(floatAmountOf[address[0], floatAmountOf[BTCT_ADDR], _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = BTCT_ADDR;
         }
@@ -140,7 +140,7 @@ contract SwapContract is Ownable, ISwapContract {
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
-        _safeTransfer(_destToken, _to, _amount);
+        SkyBrdige.safeTransfer(_destToken, _to, _amount);
         return true;
     }
 
@@ -164,7 +164,7 @@ contract SwapContract is Ownable, ISwapContract {
         );
         address _feesToken = address(0);
         if (_totalSwapped > 0) {
-            _swap(address(0), BTCT_ADDR, _totalSwapped);
+            (floatAmountOf[address(0)], floatAmountOf[BTCT_ADDR]) = SkyPool.swap(floatAmountOf[address(0)], floatAmountOf[BTCT_ADDR], _totalSwapped);
         } else if (_totalSwapped == 0) {
             _feesToken = BTCT_ADDR;
         }
@@ -174,7 +174,7 @@ contract SwapContract is Ownable, ISwapContract {
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
         for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
-            _safeTransfer(
+            SkyBrdige.safeTransfer(
                 _destToken,
                 address(uint160(uint256(_addressesAndAmounts[i]))),
                 uint256(uint96(bytes12(_addressesAndAmounts[i])))
@@ -199,7 +199,7 @@ contract SwapContract is Ownable, ISwapContract {
         if (_incomingAmount > 0) {
             uint256 swapAmount =
                 _incomingAmount.sub(_rewardsAmount).sub(_minerFee);
-            _swap(BTCT_ADDR, address(0), swapAmount.add(_minerFee));
+            (floatAmountOf[BTCT_ADDR], floatAmountOf[address(0)]) = SkyPool.swap(loatAmountOf[BTCT_ADDR], floatAmountOf[address(0)], swapAmount.add(_minerFee));
         } else if (_incomingAmount == 0) {
             _feesToken = address(0);
         }
@@ -530,7 +530,7 @@ contract SwapContract is Ownable, ISwapContract {
         // BTCT transfer if token address is BTCT_ADDR
         if (_token == BTCT_ADDR) {
             // _minerFee should be zero
-            _safeTransfer(_token, to, withdrawal);
+            SkyBrdige.safeTransfer(_token, to, withdrawal);
         }
         // Burn LP tokens
         require(IBurnableToken(lpToken).burn(amountOfLP));
@@ -581,40 +581,6 @@ contract SwapContract is Ownable, ISwapContract {
             _amount,
             "_removeFloat: float amount insufficient"
         );
-    }
-
-    /// @dev _swap collects swap amount to change float.
-    /// @param _sourceToken The address of source token
-    /// @param _destToken The address of target token.
-    /// @param _swapAmount The amount of swap.
-    function _swap(
-        address _sourceToken,
-        address _destToken,
-        uint256 _swapAmount
-    ) internal {
-        floatAmountOf[_destToken] = floatAmountOf[_destToken].sub(
-            _swapAmount,
-            "_swap: float amount insufficient"
-        );
-        floatAmountOf[_sourceToken] = floatAmountOf[_sourceToken].add(
-            _swapAmount
-        );
-        emit Swap(_sourceToken, _destToken, _swapAmount);
-    }
-
-    /// @dev _safeTransfer executes tranfer erc20 tokens
-    /// @param _token The address of target token
-    /// @param _to The address of receiver.
-    /// @param _amount The amount of transfer.
-    function _safeTransfer(
-        address _token,
-        address _to,
-        uint256 _amount
-    ) internal {
-        if (_token == BTCT_ADDR) {
-            _amount = _amount.mul(convertScale);
-        }
-        require(IERC20(_token).transfer(_to, _amount));
     }
 
     /// @dev _rewardsCollection collects tx rewards.
