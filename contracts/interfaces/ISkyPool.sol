@@ -6,22 +6,34 @@ import "../libraries/Utils.sol";
 interface ISkyPool {
   function BTCT_ADDR() external returns (address);
 
-    function singleTransferERC20(
+    function swap(
+        address _sourceToken,
         address _destToken,
-        address _to,
-        uint256 _amount,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external returns (bool);
+        uint256 _swapAmount
+    ) external;
 
-    function multiTransferERC20TightlyPacked(
-        address _destToken,
-        bytes32[] memory _addressesAndAmounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _redeemedFloatTxIds
-    ) external returns (bool);
+    function addAllFees(
+        address _feesToken,
+        uint256 _rewardsAmount
+    ) external;
+
+    function removeFloat(
+        address _token,
+        uint256 _amount
+    ) external;
+
+    function addFloat(
+        address _token,
+        uint256 _amount
+    ) external;
+
+    function balanceOf(address _token, address _account) external view returns (uint256);
+    function getFloat(address _token) external view returns (uint256);
+    function updateLimitBTCForSPFlow2() external;
+    function getSwapCount() external view returns (uint256);
+    function recordReduceTokenTx(address _token, address _to, uint256 _amount) external;
+    function reduceLimitBTCForSPFlow2(uint256 _amount) external;
+    function increaseSwapCount() external;
 
     function collectSwapFeesForBTC(
         uint256 _incomingAmount,
@@ -45,11 +57,15 @@ interface ISkyPool {
         bytes32 _txid
     ) external returns (bool);
 
-    function recordSkyPoolsTX(
+    function recordTokenTX(
+        address _token,
         address _to,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _usedTxIds
+        uint256 _totalSwapped
+    ) external returns (bool);
+
+    function multiTokenTX(
+        address _token,
+        bytes32[] memory _addressesAndAmounts
     ) external returns (bool);
 
     function spFlow1SimpleSwap(Utils.SimpleData calldata _data) external;
@@ -89,24 +105,8 @@ interface ISkyPool {
     function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
         external
         returns (bool);
-
-    function churn(
-        address _newOwner,
-        address[] memory _nodes,
-        bool[] memory _isRemoved,
-        uint8 _churnedInCount,
-        uint8 _tssThreshold
-    ) external returns (bool);
-
-    function isTxUsed(bytes32 _txid) external view returns (bool);
-
-    function getCurrentPriceLP() external view returns (uint256);
-
     function getFloatReserve(address _tokenA, address _tokenB)
         external
+        view
         returns (uint256 reserveA, uint256 reserveB);
-
-    function getActiveNodes() external view returns (address[] memory);
-
-    function isNodeStake(address _user) external returns (bool);
 }
