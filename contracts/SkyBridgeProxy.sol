@@ -1,6 +1,8 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 library StorageSlot {
     function getAddressAt(bytes32 slot) internal view returns (address a) {
         assembly {
@@ -15,11 +17,11 @@ library StorageSlot {
     }
 }
 
-contract SkyBridgeProxy {
+contract SkyBridgeProxy is Ownable {
     bytes32 private constant _IMPL_SLOT =
         bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
 
-    function setImplementation(address implementation_) public {
+    function setImplementation(address implementation_) public onlyOwner {
         StorageSlot.setAddressAt(_IMPL_SLOT, implementation_);
     }
 
