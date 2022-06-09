@@ -30,16 +30,16 @@ contract SkyBridge is Ownable, ReentrancyGuard{
   }
 
   ISkyPool public skyPool;
-  IBurnableToken public immutable lpToken;
+  IBurnableToken public lpToken;
   IParams public ip;
-  ISwapRewards public immutable sw;
+  ISwapRewards public sw;
 
   mapping(address => bool) public whitelist;
-  address public immutable BTCT_ADDR;
-  address public immutable sbBTCPool;
-  address public immutable wETH;
-  uint256 private immutable convertScale;
-  uint256 private immutable lpDivisor;
+  address public BTCT_ADDR;
+  address public sbBTCPool;
+  address public wETH;
+  uint256 private convertScale;
+  uint256 private lpDivisor;
 
   mapping(bytes32 => bool) private used; //used TX
 
@@ -54,7 +54,8 @@ contract SkyBridge is Ownable, ReentrancyGuard{
   mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
   uint256 public oldestActiveIndex;
   address constant ETHER = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-  address public paraswapAddress;  
+  address public paraswapAddress;
+  bool intialized;  
 
   modifier priceCheck() {
     uint256 beforePrice = getCurrentPriceLP();        
@@ -62,7 +63,7 @@ contract SkyBridge is Ownable, ReentrancyGuard{
     require(getCurrentPriceLP() >= beforePrice, "Invalid LPT price");
   }
 
-  constructor (
+  function initialize (
     address _lpToken,
     address _btct,
     address _skyPool,
@@ -70,7 +71,8 @@ contract SkyBridge is Ownable, ReentrancyGuard{
     address _sbBTCPool,
     address _swapRewards,
     address _params
-  ) {
+  ) public {
+    require(!intialized, "already initialized");
     skyPool = ISkyPool(skyPool);
     // Set lpToken address
     lpToken = IBurnableToken(_lpToken);
