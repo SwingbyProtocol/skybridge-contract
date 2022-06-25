@@ -3,7 +3,7 @@
 pragma solidity >=0.6.0 <=0.8.9;
 pragma experimental ABIEncoderV2;
 
-import "../libraries/Utils.sol";
+import "./lib/Utils.sol";
 import "./IERC20.sol";
 interface IParaswap {
     function multiSwap(

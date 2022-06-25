@@ -1,9 +1,6 @@
 node_modules
+build/*
+abigenBindings/bin
+.DS_Store
 .env
-coverage
-coverage.json
-typechain
-
-#Hardhat files
 cache
-artifacts

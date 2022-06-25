@@ -1,46 +1,60 @@
-# Advanced Sample Hardhat Project
+# skybridge-contract-v2
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+## Environment
+- testrpc (ganache-cli) - v2.4.0
+- truffle - v5.1.54
+- solc - v0.7.5
+- nodejs - v14.8.0
+- web3 - v1.2.9
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+## Deploy contract
+There are 2 steps to setup contracts on the ethereum testnet.
+1. Deploy SwapContract and LP token contract
+```
+$ export SEED=<your mnemonic key>
+$ truffle migrate --network {development/goerli}
+```
+2. Change the owner of SwapContract to TSS address
+```
+$ TSS={The TSS wallet address} truffle exec scripts/moveSCOwner.js --network {development/goerli} 
 ```
 
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/deploy.ts
+## Build contract
+```
+$ npn run build
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+## Test 
+You have to start testrpc with 100 accounts and binding port `8545` before doing test
+```
+$ ganache-cli -a 100 -l 9000000
+```
+```
+$ npm run test
+or 
+$ truffle test --network development
 ```
 
-# Performance optimizations
+## Mainnet contracts
+```
+SkypoolContract
+https://etherscan.io/address/0x4A084C0D1f89793Bb57f49b97c4e3a24cA539aAA
+LPToken
+https://etherscan.io/address/0x44a62c7121a64691b61aef669f21c628258e7d52
+PraswapRouter
+https://etherscan.io/address/0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57
+BTCT
+https://etherscan.io/address/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
+```
 
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+## Testnet contracts (ropsten)
+```
+SkypoolContract
+https://ropsten.etherscan.io/address/0x92c95b6227a9f0b4602649bd83f83adc48dae903
+LPToken
+https://ropsten.etherscan.io/address/0x679199877e56b8e68fdb1ddae122e843ecaca268
+PraswapRouter
+https://ropsten.etherscan.io/address/0xDEF171Fe48CF0115B1d80b88dc8eAB59176FEe57
+BTCT
+https://ropsten.etherscan.io/address/0x7cb2eac36b4bb7c36640f32e806d33e474d1d427
+```

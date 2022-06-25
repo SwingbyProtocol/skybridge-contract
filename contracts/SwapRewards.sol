@@ -5,13 +5,13 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/ISkyPool.sol";
+import "./interfaces/ISwapContract.sol";
 
 contract SwapRewards is Ownable {
     using SafeMath for uint256;
 
     IERC20 public immutable rewardToken; //swingby
-    ISkyPool public swapContract;
+    ISwapContract public swapContract;
     uint256 public rebateRate = 30; // BPS base
     uint256 public thresholdRatio = 55; // diff is over 10%
     uint256 public pricePerBTC;
@@ -51,7 +51,7 @@ contract SwapRewards is Ownable {
             _thresholdRatio >= 20 && _thresholdRatio <= 100,
             "_thresholdRatio is not valid"
         );
-        swapContract = ISkyPool(_swap);
+        swapContract = ISwapContract(_swap);
         rebateRate = _newRebateRate;
         thresholdRatio = _thresholdRatio;
     }

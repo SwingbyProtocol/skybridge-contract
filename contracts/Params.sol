@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./interfaces/IParams.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Params is Ownable {
+contract Params is Ownable, IParams {
     uint256 public minimumSwapAmountForWBTC;
     uint256 public expirationTime;
     address public paraswapAddress;
