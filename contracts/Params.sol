@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity >=0.6.0 <=0.8.9;
 pragma experimental ABIEncoderV2;
-import "./interfaces/IParams.sol";
+// import "./interfaces/IParams.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Params is Ownable, IParams {
+contract Params is Ownable {
     uint256 public minimumSwapAmountForWBTC;
     uint256 public expirationTime;
     address public paraswapAddress;

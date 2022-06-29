@@ -1,61 +1,39 @@
 {
-  "name": "skybridge-contract",
-  "version": "1.0.0",
-  "description": "## Environment - testrpc (ganache) - v2.4.0 - truffle - v5.1.54 - solc - v0.7.5 - web3 - v1.2.9",
-  "main": "truffle-config.js",
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
-  "scripts": {
-    "build": "npm run compile && rm -rf abigenBindings && truffle run abigen && npm run test",
-    "test": "npm run lint && truffle test",
-    "lint": "eslint --fix . --ext .js",
-    "compile": "truffle compile",
-    "gen-go": "node scripts/generateGoBindings.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SwingbyProtocol/skybridge-contract.git"
-  },
-  "author": "",
-  "license": "SEE LICENSE IN LICENSE",
-  "bugs": {
-    "url": "https://github.com/SwingbyProtocol/skybridge-contract/issues"
-  },
-  "homepage": "https://github.com/SwingbyProtocol/skybridge-contract#readme",
-  "dependencies": {
-    "@chainsafe/truffle-plugin-abigen": "0.0.2",
-    "@nomiclabs/hardhat-etherscan": "^3.0.3",
-    "@openzeppelin/contracts": "^4.3.2",
-    "@symblox/hardhat-abi-gen": "^0.2.0",
-    "@truffle/hdwallet-provider": "^1.2.3",
-    "axios": "^0.21.1",
-    "chai-as-promised": "^7.1.1",
-    "dotenv": "^8.2.0",
-    "elliptic": ">=6.5.4",
-    "hardhat-watcher": "^2.1.1",
-    "install": "^0.13.0",
-    "json-parser": "^3.1.2",
-    "node-fetch": ">=2.6.1",
-    "npm": "^7.6.3",
-    "sol2uml": "^1.1.6",
-    "truffle-contract-size": "^2.0.1",
-    "truffle-hdwallet-provider-privkey": "0.3.0",
-    "truffle-plugin-verify": "^0.5.15"
-  },
+  "name": "hardhat-project",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-truffle5": "^2.0.0",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/test-helpers": "^0.5.10",
-    "chai": "^4.3.4",
-    "eslint": "^7.22.0",
-    "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.1",
-    "hardhat": "^2.6.7",
-    "truffle-flattener": "^1.5.0",
-    "web3": "^1.4.0"
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@openzeppelin/hardhat-upgrades": "^1.19.0",
+    "@typechain/ethers-v5": "^7.2.0",
+    "@typechain/hardhat": "^2.3.1",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^12.20.55",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "chai": "^4.3.6",
+    "dotenv": "^16.0.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-promise": "^5.2.0",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.9",
+    "hardhat": "^2.9.9",
+    "hardhat-gas-reporter": "^1.0.8",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.13",
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.7.21",
+    "ts-node": "^10.8.1",
+    "typechain": "^5.2.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.6.0"
   }
 }

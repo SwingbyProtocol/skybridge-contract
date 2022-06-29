@@ -85,6 +85,7 @@ interface IERC20 {
         address recipient,
         uint256 amount
     ) external returns (bool);
+    function increaseAllowance(address spender, uint256 addedValue) external returns (bool);
 
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to

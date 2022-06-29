@@ -172,6 +172,7 @@ contract BurnableToken is Context, Ownable, IBurnableToken {
      */
     function increaseAllowance(address spender, uint256 addedValue)
         public
+        override
         returns (bool)
     {
         _approve(
