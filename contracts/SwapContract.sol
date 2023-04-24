@@ -1,45 +1,29 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity >=0.6.0 <=0.8.9;
+pragma solidity >=0.6.0 <=0.8.19;
 pragma experimental ABIEncoderV2;
-import "./interfaces/IWETH.sol";
-import "./interfaces/IBurnableToken.sol";
-import "./interfaces/IERC20.sol";
 import "./interfaces/ISwapContract.sol";
 import "./interfaces/ISwapRewards.sol";
-import "./interfaces/IParams.sol";
-import "./interfaces/IAugustusSwapper.sol";
-import "./interfaces/ITokenTransferProxy.sol";
-import "./interfaces/IParaswap.sol";
-import "./interfaces/lib/Utils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/lib/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 //import "hardhat/console.sol"; //console.log()
 
-contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
+contract SwapContract is ISwapContract, Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    struct spPendingTx {
-        bytes32 SwapID; //swap hash for identification of this swap.
-        string DestAddr; //destination BTC address for the swap
-        address RefundAddr; //refund address on evm source chain for if the swap fails.
-        uint256 AmountWBTC; //outbound amount for this swap.
-        uint256 Timestamp; // block timestamp that is set by EVM
-    }
-
     IBurnableToken public immutable lpToken;
-    IParams public immutable ip;
     ISwapRewards public immutable sw;
 
     /** Skybridge */
     mapping(address => bool) public whitelist;
     address public immutable BTCT_ADDR;
-    address public immutable sbBTCPool;
     uint256 private immutable convertScale;
     uint256 private immutable lpDivisor;
+    uint256 public withdrawalFeeBPS;
+    uint256 public nodeRewardsRatio;
+    address public sbBTCPool;
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used; //used TX
@@ -52,37 +36,11 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     uint8 public churnedInCount;
     uint8 public tssThreshold;
 
-    /** Skypool */
-    //skypools - token balance - call using tokens[token address][user address] to get uint256 balance - see function balanceOf
-    mapping(address => mapping(address => uint256)) public tokens;
-    //keep track of ether in tokens[][]
-    address constant ETHER = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address public paraswapAddress; 
-    address public immutable wETH;
-    //Data and indexes for pending swap objects
-    mapping(uint256 => spPendingTx) public spPendingTXs; //index => pending TX object
-    uint256 public swapCount;
-    uint256 public oldestActiveIndex;
-    uint256 public limitBTCForSPFlow2;
-
     /**
      * Events
      */
     event Swap(address from, address to, uint256 amount);
-    event Withdraw(
-        address token,
-        address user,
-        uint256 amount,
-        uint256 balance,
-        uint256 Timestamp
-    );
-    event Deposit(
-        address token,
-        address user,
-        uint256 amount,
-        uint256 balance,
-        uint256 Timestamp
-    );
+
     event RewardsCollection(
         address feesToken,
         uint256 rewards,
@@ -108,18 +66,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         bytes32 txid
     );
 
-    event SwapTokensToBTC(
-        bytes32 SwapID,
-        string DestAddr,
-        address RefundAddr,
-        uint256 AmountWBTC,
-        uint256 Timestamp
-    );
-
-    event DistributeNodeRewards(uint256 rewardLPTsForNodes);     
+    event DistributeFees(uint256 rewardLPTsForNodes);
 
     modifier priceCheck() {
-        uint256 beforePrice = getCurrentPriceLP();        
+        uint256 beforePrice = getCurrentPriceLP();
         _;
         require(getCurrentPriceLP() >= beforePrice, "Invalid LPT price");
     }
@@ -127,38 +77,29 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     constructor(
         address _lpToken,
         address _btct,
-        address _wETH,
         address _sbBTCPool,
-        address _params,
         address _swapRewards,
-        uint256 _existingBTCFloat
+        uint256 _initBTCFloat,
+        uint256 _initWBTCFloat
     ) {
-        //init latest removed index and swapCount
-        oldestActiveIndex = 0;
-        swapCount = 0;
-        //set address for wETH
-        wETH = _wETH;
         //set address for sbBTCpool
         sbBTCPool = _sbBTCPool;
-        //set IParams
-        ip = IParams(_params);
-        //set paraswap address
-        paraswapAddress = ip.paraswapAddress();
         //set ISwapRewards
         sw = ISwapRewards(_swapRewards);
         // Set lpToken address
         lpToken = IBurnableToken(_lpToken);
         // Set initial lpDivisor of LP token
-        lpDivisor = 10**IERC20(_lpToken).decimals();
+        lpDivisor = 10 ** IERC20(_lpToken).decimals();
         // Set BTCT address
         BTCT_ADDR = _btct;
         // Set convertScale
-        convertScale = 10**(IERC20(_btct).decimals() - 8);
+        convertScale = 10 ** (IERC20(_btct).decimals() - 8);
         // Set whitelist addresses
         whitelist[_btct] = true;
         whitelist[_lpToken] = true;
         whitelist[address(0)] = true;
-        floatAmountOf[address(0)] = _existingBTCFloat;
+        floatAmountOf[address(0)] = _initBTCFloat;
+        floatAmountOf[BTCT_ADDR] = _initWBTCFloat;
     }
 
     /**
@@ -189,7 +130,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             sw.pullRewards(_destToken, _to, _totalSwapped);
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else {
-            _feesToken = (_destToken == address(lpToken)) ? address(lpToken) : BTCT_ADDR;
+            _feesToken = (_destToken == address(lpToken))
+                ? address(lpToken)
+                : BTCT_ADDR;
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
@@ -219,7 +162,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         if (_totalSwapped > 0) {
             _swap(address(0), BTCT_ADDR, _totalSwapped);
         } else {
-            _feesToken = (_destToken == address(lpToken)) ? address(lpToken) : BTCT_ADDR;
+            _feesToken = (_destToken == address(lpToken))
+                ? address(lpToken)
+                : BTCT_ADDR;
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
         _addUsedTxs(_redeemedFloatTxIds);
@@ -232,8 +177,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         }
         return true;
     }
-
-    
 
     /// @dev collectSwapFeesForBTC collects fees in the case of swap BTCT to BTC.
     /// @param _incomingAmount The spent amount. (BTCT)
@@ -256,9 +199,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             _feesToken = address(0);
         }
         _rewardsCollection(_feesToken, _rewardsAmount);
-        if (_isUpdatelimitBTCForSPFlow2) {
-            _updateLimitBTCForSPFlow2();
-        }
         return true;
     }
 
@@ -304,498 +244,8 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return true;
     }
 
-    /**
-     * Skypools part
-     */
-    /// @dev Record SkyPools TX - allocate tokens from float to user in tokens[][]
-    /// @param _to The address of recipient.
-    /// @param _totalSwapped The amount of swap amount.
-    /// @param _rewardsAmount The fees that should be paid.
-    /// @param _usedTxIds The txids which is for recording.
-    function recordSkyPoolsTX(
-        address _to,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _usedTxIds
-    ) external onlyOwner returns (bool) {
-        require(_totalSwapped != 0);
-        require(_rewardsAmount != 0);
-
-        _swap(address(0), BTCT_ADDR, _totalSwapped);
-
-        tokens[BTCT_ADDR][_to] = tokens[BTCT_ADDR][_to].add(_totalSwapped);
-
-        _rewardsCollection(address(0), _rewardsAmount);
-
-        _addUsedTxs(_usedTxIds);
-
-        return true;
-    }
-
-    /// @dev multiRecordSkyPoolsTX - allocate tokens from float to user in tokens[][] in batches
-    /// @param _addressesAndAmounts The address of recipientand amount.
-    /// @param _totalSwapped The amount of swap amount.
-    /// @param _rewardsAmount The fees that should be paid.
-    /// @param _usedTxIds The txids which is for recording.
-    function multiRecordSkyPoolsTX(
-        bytes32[] memory _addressesAndAmounts,
-        uint256 _totalSwapped,
-        uint256 _rewardsAmount,
-        bytes32[] memory _usedTxIds
-    ) external onlyOwner returns (bool) {
-        require(_totalSwapped != 0);
-        require(_rewardsAmount != 0);
-
-        _swap(address(0), BTCT_ADDR, _totalSwapped);
-
-        _rewardsCollection(address(0), _rewardsAmount);
-
-        _addUsedTxs(_usedTxIds);
-
-        for (uint256 i = 0; i < _addressesAndAmounts.length; i++) {
-            tokens[BTCT_ADDR][
-                address(uint160(uint256(_addressesAndAmounts[i])))
-            ] = tokens[BTCT_ADDR][
-                address(uint160(uint256(_addressesAndAmounts[i])))
-            ].add(uint256(uint96(bytes12(_addressesAndAmounts[i]))));
-        }
-
-        return true;
-    }
-
-    /// @dev spFlow1SimpleSwap - FLOW 1 - execute paraswap TX using simpleSwap, ending tokens sent DIRECTLY to user's wallet
-    /// @param _data A struct containing the data for simpleSwap, from the paraswap Utils lib.
-    function spFlow1SimpleSwap(Utils.SimpleData calldata _data)
-        external
-        nonReentrant
-    {
-        require(_data.beneficiary == msg.sender, "beneficiary != msg.sender");
-
-        require(
-            tokens[_data.fromToken][_data.beneficiary] >= _data.fromAmount,
-            "Balance insufficient"
-        );
-        require(
-            _data.fromToken == BTCT_ADDR,
-            "fromToken != BTCT_ADDR"
-        );
-
-        tokens[_data.fromToken][_data.beneficiary] = tokens[_data.fromToken][
-            _data.beneficiary
-        ].sub(_data.fromAmount);
-        
-        _doSimpleSwap(_data); //no received amount, tokens to go user's wallet
-    }
-
-    /// @dev spFlow1Uniswap - FLOW 1 - execute paraswap TX using uniswap, ending tokens sent to users allocation in tokens[][] mapping
-    /// @param _fork - BOOL to determine if using swapOnUniswap or swapOnUniswapFork paraswap contract methods
-    /// @param _factory - param for swapOnUniswapFork
-    /// @param _initCode - param for swapOnUniswapFork
-    /// @param _amountIn - param for swapOnUniswapFork or swapOnUniswap
-    /// @param _amountOutMin - param for swapOnUniswapFork or swapOnUniswap
-    /// @param _path - param for swapOnUniswapFork or swapOnUniswap
-    function spFlow1Uniswap(
-        bool _fork,
-        address _factory,
-        bytes32 _initCode,
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address[] calldata _path
-    ) external nonReentrant returns (uint256 receivedAmount) {
-        address fromToken = _path[0];
-        address endToken = _path[_path.length - 1];
-
-        require(
-            tokens[fromToken][msg.sender] >= _amountIn,
-            "Balance insufficient"
-        );
-        require(fromToken == BTCT_ADDR, "fromToken != BTCT_ADDR");
-        require(endToken != ETHER, "Use path wBTC -> wETH");
-
-        uint256 preSwapBalance = IERC20(endToken).balanceOf(address(this));
-
-        tokens[fromToken][msg.sender] = tokens[fromToken][msg.sender].sub(
-            _amountIn
-        );
-
-        //do swap
-        if (_fork) {
-            _doUniswapFork(
-                _factory,
-                _initCode,
-                _amountIn,
-                _amountOutMin,
-                _path
-            );
-        } else {
-            _doUniswap(_amountIn, _amountOutMin, _path);
-        }
-
-        receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
-            preSwapBalance
-        );
-
-        require(
-            receivedAmount >= _amountOutMin,
-            "Received < minimum"
-        );
-
-        tokens[endToken][msg.sender] = tokens[endToken][msg.sender].add(
-            receivedAmount
-        );
-
-        return receivedAmount;
-    }
-
-    /// @dev spFlow2Uniswap - FLOW 1 - execute paraswap TX using uniswap, ending tokens sent to users allocation in tokens[][] mapping
-    /// @param _fork - BOOL to determine if using swapOnUniswap or swapOnUniswapFork paraswap contract methods
-    /// @param _factory - param for swapOnUniswapFork
-    /// @param _initCode - param for swapOnUniswapFork
-    /// @param _amountIn - param for swapOnUniswapFork or swapOnUniswap
-    /// @param _amountOutMin - param for swapOnUniswapFork or swapOnUniswap
-    /// @param _path - param for swapOnUniswapFork or swapOnUniswap
-    function spFlow2Uniswap(
-        string calldata _destinationAddressForBTC,
-        bool _fork,
-        address _factory,
-        bytes32 _initCode,
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address[] calldata _path
-    ) external nonReentrant returns (uint256 receivedAmount) {
-        address fromToken = _path[0];
-        address endToken = _path[_path.length - 1];
-
-        require(
-            tokens[fromToken][msg.sender] >= _amountIn,
-            "Balance insufficient"
-        );
-        require(fromToken != ETHER, "Use path wETH -> wBTC");
-        require(endToken == BTCT_ADDR, "swap => BTCT");
-
-        uint256 preSwapBalance = IERC20(endToken).balanceOf(address(this));
-
-        tokens[fromToken][msg.sender] = tokens[fromToken][msg.sender].sub(
-            _amountIn
-        );
-
-        //do swap
-        if (_fork) {
-            _doUniswapFork(
-                _factory,
-                _initCode,
-                _amountIn,
-                _amountOutMin,
-                _path
-            );
-        } else {
-            _doUniswap(_amountIn, _amountOutMin, _path);
-        }
-
-        receivedAmount = IERC20(endToken).balanceOf(address(this)).sub(
-            preSwapBalance
-        );
-
-        require(
-            receivedAmount >= _amountOutMin,
-            "Received < minimum"
-        );
-        require(
-            receivedAmount >= ip.minimumSwapAmountForWBTC(),
-            "receivedAmount < minimumSwapAmountForWBTC"
-        );
-
-        _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
-
-        return receivedAmount;
-    }
-
-    /// @dev spParaSwapToken2BTC - FLOW 2 -> swap ERC20 -> wBTC
-    /// @param _destinationAddressForBTC The BTC address to send BTC to.
-    /// @param _data simpleData from paraswap API call, param for simpleSwap
-    function spFlow2SimpleSwap(
-        string calldata _destinationAddressForBTC,
-        Utils.SimpleData calldata _data
-    ) external nonReentrant returns (uint256 receivedAmount) {
-        //bytes32 destBytes32 = _stringToBytes32(destinationAddressForBTC);
-        //console.log("Converted to bytes32 and back to String:",_bytes32ToString(destBytes32));
-
-        require(_data.fromToken != BTCT_ADDR, "Must not swap from BTC token");
-        require(_data.toToken == BTCT_ADDR, "Must swap to BTC token");
-        require(
-            _data.beneficiary == address(this),
-            "beneficiary != swap contract"
-        );
-        require(
-            tokens[_data.fromToken][msg.sender] >= _data.fromAmount,
-            "Balance insufficient"
-        );
-
-        uint256 preSwapBalance = IERC20(_data.toToken).balanceOf(address(this));
-
-        tokens[_data.fromToken][msg.sender] = tokens[_data.fromToken][
-            msg.sender
-        ].sub(_data.fromAmount);
-
-        _doSimpleSwap(_data);
-
-        receivedAmount = IERC20(_data.toToken).balanceOf(address(this)).sub(
-            preSwapBalance
-        );
-
-        require(
-            receivedAmount >= _data.expectedAmount,
-            "Received amount insufficient"
-        );
-        require(
-            receivedAmount >= ip.minimumSwapAmountForWBTC(),
-            "receivedAmount < minimumSwapAmountForWBTC"
-        );
-
-        _spRecordPendingTx(_destinationAddressForBTC, receivedAmount);
-
-        return receivedAmount;
-    }
-
-    /// @dev _doUniswapFork - performs paraswap transaction - BALANCE & TOKEN CHECKS MUST OCCUR BEFORE CALLING THIS
-    /// @param _factory - param for swapOnUniswapFork
-    /// @param _initCode - param for swapOnUniswapFork
-    /// @param _amountIn - param for swapOnUniswapFork
-    /// @param _amountOutMin - param for swapOnUniswapFork
-    /// @param _path - param for swapOnUniswapFork
-    function _doUniswapFork(
-        address _factory,
-        bytes32 _initCode,
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address[] calldata _path
-    ) internal {
-        //address fromToken = _path[0];
-
-        //address proxy = IAugustusSwapper(paraswapAddress).getTokenTransferProxy();
-
-        IERC20(_path[0]).safeIncreaseAllowance(
-            IAugustusSwapper(paraswapAddress).getTokenTransferProxy(),
-            _amountIn
-        );
-
-        IParaswap(paraswapAddress).swapOnUniswapFork(
-            _factory,
-            _initCode,
-            _amountIn,
-            _amountOutMin,
-            _path
-        );
-    }
-
-    /// @dev _doUniswap - performs paraswap transaction - BALANCE & TOKEN CHECKS MUST OCCUR BEFORE CALLING THIS
-    /// @param _amountIn - param for swapOnUniswap
-    /// @param _amountOutMin - param for swapOnUniswap
-    /// @param _path - param for swapOnUniswap
-    function _doUniswap(
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address[] calldata _path
-    ) internal {
-        //address fromToken = _path[0];
-
-        //address proxy = IAugustusSwapper(paraswapAddress).getTokenTransferProxy();
-
-        IERC20(_path[0]).safeIncreaseAllowance(
-            IAugustusSwapper(paraswapAddress).getTokenTransferProxy(), 
-            _amountIn
-        );
-
-        IParaswap(paraswapAddress).swapOnUniswap(
-            _amountIn,
-            _amountOutMin,
-            _path
-        );
-    }
-
-    /// @dev _doSimpleSwap - performs paraswap transaction - BALANCE & TOKEN CHECKS MUST OCCUR BEFORE CALLING THIS
-    /// @param _data data from API call that is ready to be sent to paraswap interface
-    function _doSimpleSwap(Utils.SimpleData calldata _data) internal {
-        //address proxy = IAugustusSwapper(paraswapAddress).getTokenTransferProxy();
-
-        IERC20(_data.fromToken).safeIncreaseAllowance(
-            IAugustusSwapper(paraswapAddress).getTokenTransferProxy(), 
-            _data.fromAmount
-        );
-
-        IParaswap(paraswapAddress).simpleSwap(_data);
-    }
-
-    /// @dev _spRecordPendingTx - hash a unique swap ID, and add it to the array of pending TXs, and then emit event
-    /// @param _destinationAddressForBTC The BTC address to send BTC to.
-    /// @param _btctAmount amount in BTC decimal 8.
-    function _spRecordPendingTx(
-        string calldata _destinationAddressForBTC,
-        uint256 _btctAmount
-    ) internal {
-        //hash TX data for unique ID
-        bytes32 ID = keccak256(
-            abi.encodePacked(
-                BTCT_ADDR, //specific to current chain
-                swapCount,
-                _destinationAddressForBTC,
-                _btctAmount,
-                block.timestamp
-            )
-        );
-
-        spPendingTXs[swapCount] = spPendingTx(
-            ID,
-            _destinationAddressForBTC,
-            msg.sender,
-            _btctAmount,
-            block.timestamp
-        );
-
-        //clean up expired TXs
-        spCleanUpOldTXs();
-
-        swapCount = swapCount.add(1); //increment TX count after cleaning up pending TXs to not loop over next empty index
-
-        _reduceLimitBTCForSPFlow2(_btctAmount);
-
-        emit SwapTokensToBTC(
-            ID,
-            _destinationAddressForBTC,
-            msg.sender,
-            _btctAmount,
-            block.timestamp
-        );
-    }
-
-    /// @dev _spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
-    function spCleanUpOldTXs() public {
-        uint256 max = oldestActiveIndex.add(ip.loopCount());
-
-        if (max >= swapCount) {
-            max = swapCount;
-        }
-
-        uint256 current = block.timestamp;
-        for (uint256 i = oldestActiveIndex; i < max; i++) {
-            if (spPendingTXs[i].Timestamp.add(ip.expirationTime()) < current) {
-                delete spPendingTXs[i];
-                oldestActiveIndex = i.add(1);
-            }
-        }
-    }
-
-    /**
-    /// @dev spCleanUpOldTXs - call when executing flow 2 swaps, cleans up expired TXs and moves the indices
-    /// @param _loopCount - max times the loop will run
-    function spCleanUpOldTXs(uint256 _loopCount) external {
-        uint256 max = oldestActiveIndex.add(_loopCount);
-
-        if (max >= swapCount) {
-            max = swapCount;
-        }
-
-        uint256 current = block.timestamp;
-        for (uint256 i = oldestActiveIndex; i < max; i++) {
-            if (spPendingTXs[i].Timestamp.add(ip.expirationTime()) < current) {
-                delete spPendingTXs[i];
-                oldestActiveIndex = i.add(1);
-            }
-        }
-    }
-     */
-
-    /// @dev spDeposit - ERC-20 ONLY - users deposit ERC-20 tokens, balances to be stored in tokens[][]
-    /// @param _token The address of the ERC-20 token contract.
-    /// @param _amount amount to be deposited.
-    function spDeposit(address _token, uint256 _amount)
-        external
-        payable
-        nonReentrant
-    {
-        if (msg.value == 0) {
-            require(_token != ETHER);
-            require(_token != BTCT_ADDR);
-
-            uint256 initBalance = IERC20(_token).balanceOf(address(this));
-
-            IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
-
-            uint256 received = IERC20(_token).balanceOf(address(this)).sub(initBalance);
-
-            tokens[_token][msg.sender] = tokens[_token][msg.sender].add(
-                received
-            );
-
-            emit Deposit(
-                _token,
-                msg.sender,
-                received,
-                tokens[_token][msg.sender],
-                block.timestamp
-            );
-        } else {
-            require(msg.value > 0);
-            //swap to wETH tokens - contract now holds wETH instead of ether
-            IWETH(wETH).deposit{value: msg.value}();
-
-            tokens[wETH][msg.sender] = tokens[wETH][msg.sender].add(msg.value);
-
-            emit Deposit(
-                ETHER,
-                msg.sender,
-                msg.value,
-                tokens[wETH][msg.sender],
-                block.timestamp
-            );
-        }
-    }
-
-    /// @dev redeemEther for skypools - swap wETH for ether and send to user's wallet
-    /// @param _amount amount to withdraw
-    function redeemEther(uint256 _amount) external nonReentrant {
-        require(tokens[wETH][msg.sender] >= _amount);
-        IWETH(wETH).withdraw(_amount);
-        tokens[wETH][msg.sender] = tokens[wETH][msg.sender].sub(_amount);
-        address payable sender = payable(msg.sender);
-
-        (
-            bool success, /*bytes memory data*/
-
-        ) = sender.call{value: _amount}("");
-
-        require(success, "receiver rejected ETH transfer");
-        emit Withdraw(
-            ETHER,
-            msg.sender,
-            _amount,
-            tokens[wETH][msg.sender],
-            block.timestamp
-        );
-    }
-
-    receive() external payable {
-        assert(msg.sender == wETH); // only accept ETH via fallback from the WETH contract
-    }
-
-    /// @dev redeemERC20Token for skypools - redeem erc20 token
-    /// @param _token The address of target token.
-    /// @param _amount The amount to withdraw - call with BTC decimals (8) for BTC
-    function redeemERC20Token(address _token, uint256 _amount)
-        external
-        nonReentrant
-    {
-        require(tokens[_token][msg.sender] >= _amount, "Insufficient Balance");
-        tokens[_token][msg.sender] = tokens[_token][msg.sender].sub(_amount);
-        _safeTransfer(_token, msg.sender, _amount);
-
-        emit Withdraw(
-            _token,
-            msg.sender,
-            _amount,
-            tokens[_token][msg.sender],
-            block.timestamp
-        );
+    fallback() external {
+        revert(); // reject all ETH
     }
 
     /**
@@ -805,12 +255,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev recordUTXOSweepMinerFee reduces float amount by collected miner fees.
     /// @param _minerFee The miner fees of BTC transaction.
     /// @param _txid The txid which is for recording.
-    function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid)
-        public
-        override
-        onlyOwner
-        returns (bool)
-    {
+    function recordUTXOSweepMinerFee(
+        uint256 _minerFee,
+        bytes32 _txid
+    ) public override onlyOwner returns (bool) {
         require(!isTxUsed(_txid), "The txid is already used");
         floatAmountOf[address(0)] = floatAmountOf[address(0)].sub(
             _minerFee,
@@ -834,7 +282,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint8 _tssThreshold
     ) external override onlyOwner returns (bool) {
         require(
-            _tssThreshold >= tssThreshold && _tssThreshold <= 2**8 - 1,
+            _tssThreshold >= tssThreshold && _tssThreshold <= 2 ** 8 - 1,
             "01" //"_tssThreshold should be >= tssThreshold"
         );
         require(
@@ -868,37 +316,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         return true;
     }
 
-    /// @dev balanceOf - return user balance for given token and user for skypools
-    /// @param _token The address of target token.
-    /// @param _user The address of target user.
-    function balanceOf(address _token, address _user)
-        public
-        view
-        returns (uint256)
-    {
-        return tokens[_token][_user];
-    }
-
-    /// @dev spGetPendingSwaps - returns array of pending swaps
-    /// @return data - returns array of pending swap struct objects
-    function spGetPendingSwaps()
-        external
-        view
-        returns (spPendingTx[] memory data)
-    {
-        //require(swapCount != 0);
-
-        uint256 index = 0;
-        data = new spPendingTx[](swapCount.sub(oldestActiveIndex));
-
-        for (uint256 i = oldestActiveIndex.add(1); i <= swapCount; i++) {
-            data[index] = spPendingTXs[index.add(oldestActiveIndex)];
-            index = index.add(1);
-        }
-
-        return data;
-    }
-
     /// @dev isTxUsed sends rewards for Nodes.
     /// @param _txid The txid which is for recording.
     function isTxUsed(bytes32 _txid) public view override returns (bool) {
@@ -927,12 +344,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev getFloatReserve returns float reserves
     /// @param _tokenA The address of target tokenA.
     /// @param _tokenB The address of target tokenB.
-    function getFloatReserve(address _tokenA, address _tokenB)
-        public
-        view
-        override
-        returns (uint256 reserveA, uint256 reserveB)
-    {
+    function getFloatReserve(
+        address _tokenA,
+        address _tokenB
+    ) public view override returns (uint256 reserveA, uint256 reserveB) {
         (reserveA, reserveB) = (floatAmountOf[_tokenA], floatAmountOf[_tokenB]);
     }
 
@@ -985,7 +400,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
             amountOfFloat,
             amountOfLP,
             nowPrice,
-            ip.depositFeesBPS(),
+            0,
             _txid
         );
         return true;
@@ -1011,9 +426,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         uint256 nowPrice = getCurrentPriceLP();
         // Calculate the amountOfFloat
         uint256 amountOfFloat = amountOfLP.mul(nowPrice).div(lpDivisor);
-        uint256 withdrawalFees = amountOfFloat.mul(ip.withdrawalFeeBPS()).div(
-            10000
-        );
+        uint256 withdrawalFees = amountOfFloat.mul(withdrawalFeeBPS).div(10000);
         require(
             amountOfFloat.sub(withdrawalFees) >= _minerFee,
             "09" //"Error: amountOfFloat.sub(withdrawalFees) < _minerFee"
@@ -1113,9 +526,10 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
     /// @dev _rewardsCollection collects tx rewards.
     /// @param _feesToken The token address for collection fees.
     /// @param _rewardsAmount The amount of rewards.
-    function _rewardsCollection(address _feesToken, uint256 _rewardsAmount)
-        internal
-    {
+    function _rewardsCollection(
+        address _feesToken,
+        uint256 _rewardsAmount
+    ) internal {
         if (_rewardsAmount == 0) return;
         // if (_feesToken == lpToken) {
         //     IBurnableToken(lpToken).transfer(sbBTCPool, _rewardsAmount);
@@ -1129,9 +543,7 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         floatAmountOf[_feesToken] = floatAmountOf[_feesToken].add(
             _rewardsAmount
         );
-        uint256 amountForNodes = _rewardsAmount.mul(ip.nodeRewardsRatio()).div(
-            100
-        );
+        uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
         uint256 amountLPTokensForNode = amountForNodes.mul(lpDivisor).div(
             nowPrice
@@ -1153,25 +565,6 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
         used[_txid] = true;
     }
 
-    /// @dev _updateLimitBTCForSPFlow2 udpates limitBTCForSPFlow2
-    function _updateLimitBTCForSPFlow2() internal {
-        // Update limitBTCForSPFlow2 by adding BTC floats
-        limitBTCForSPFlow2 = floatAmountOf[address(0)];
-    }
-
-    /// @dev _reduceLimitBTCForSPFlow2 reduces limitBTCForSPFlow2 when new sp flow2 txs are coming.
-    /// @param _amount The amount of BTCT, (use BTCT amount insatead of BTC amount for enough. always BTCT > BTC)
-    function _reduceLimitBTCForSPFlow2(uint256 _amount) internal {
-        if (limitBTCForSPFlow2 == 0) {
-            // initialize when initial Flow2 tx has been called.
-            _updateLimitBTCForSPFlow2();
-        }
-        limitBTCForSPFlow2 = limitBTCForSPFlow2.sub(
-            _amount,
-            "12" //"BTC float amount insufficient"
-        );
-    }
-
     /// @dev _addUsedTxs updates txid list which is spent. (multiple hashes)
     /// @param _txids The array of txid.
     function _addUsedTxs(bytes32[] memory _txids) internal {
@@ -1182,11 +575,9 @@ contract SwapContract is Ownable, ReentrancyGuard, ISwapContract {
 
     /// @dev _splitToValues returns address and amount of staked SWINGBYs
     /// @param _data The info of a staker.
-    function _splitToValues(bytes32 _data)
-        internal
-        pure
-        returns (address, uint256)
-    {
+    function _splitToValues(
+        bytes32 _data
+    ) internal pure returns (address, uint256) {
         return (
             address(uint160(uint256(_data))),
             uint256(uint96(bytes12(_data)))

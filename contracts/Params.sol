@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity >=0.6.0 <=0.8.9;
+pragma solidity >=0.6.0 <=0.8.19;
 pragma experimental ABIEncoderV2;
 import "./interfaces/IParams.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
