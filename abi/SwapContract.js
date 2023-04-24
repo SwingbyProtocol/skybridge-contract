@@ -13,17 +13,7 @@ export default [
       },
       {
         "internalType": "address",
-        "name": "_wETH",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_sbBTCPool",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_params",
         "type": "address"
       },
       {
@@ -33,7 +23,12 @@ export default [
       },
       {
         "internalType": "uint256",
-        "name": "_existingBTCFloat",
+        "name": "_initBTCFloat",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_initWBTCFloat",
         "type": "uint256"
       }
     ],
@@ -88,49 +83,12 @@ export default [
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "balance",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "Timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "Deposit",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "rewardLPTsForNodes",
         "type": "uint256"
       }
     ],
-    "name": "DistributeNodeRewards",
+    "name": "DistributeFees",
     "type": "event"
   },
   {
@@ -252,78 +210,8 @@ export default [
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "SwapID",
-        "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "DestAddr",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "RefundAddr",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "AmountWBTC",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "Timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "SwapTokensToBTC",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "balance",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "Timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "Withdraw",
-    "type": "event"
+    "stateMutability": "nonpayable",
+    "type": "fallback"
   },
   {
     "inputs": [],
@@ -346,30 +234,6 @@ export default [
         "internalType": "uint8",
         "name": "",
         "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -527,19 +391,6 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "ip",
-    "outputs": [
-      {
-        "internalType": "contract IParams",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -579,19 +430,6 @@ export default [
   },
   {
     "inputs": [],
-    "name": "limitBTCForSPFlow2",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "lpToken",
     "outputs": [
       {
@@ -601,40 +439,6 @@ export default [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "_addressesAndAmounts",
-        "type": "bytes32[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalSwapped",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_rewardsAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "_usedTxIds",
-        "type": "bytes32[]"
-      }
-    ],
-    "name": "multiRecordSkyPoolsTX",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -678,7 +482,7 @@ export default [
   },
   {
     "inputs": [],
-    "name": "oldestActiveIndex",
+    "name": "nodeRewardsRatio",
     "outputs": [
       {
         "internalType": "uint256",
@@ -692,19 +496,6 @@ export default [
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "paraswapAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -781,40 +572,6 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalSwapped",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_rewardsAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32[]",
-        "name": "_usedTxIds",
-        "type": "bytes32[]"
-      }
-    ],
-    "name": "recordSkyPoolsTX",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "_minerFee",
         "type": "uint256"
@@ -833,37 +590,6 @@ export default [
         "type": "bool"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "redeemERC20Token",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "redeemEther",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -933,437 +659,12 @@ export default [
   },
   {
     "inputs": [],
-    "name": "spCleanUpOldTXs",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "spDeposit",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "fromToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "toToken",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "fromAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "toAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "expectedAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address[]",
-            "name": "callees",
-            "type": "address[]"
-          },
-          {
-            "internalType": "bytes",
-            "name": "exchangeData",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "startIndexes",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "values",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "address payable",
-            "name": "beneficiary",
-            "type": "address"
-          },
-          {
-            "internalType": "address payable",
-            "name": "partner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "feePercent",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "permit",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "deadline",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes16",
-            "name": "uuid",
-            "type": "bytes16"
-          }
-        ],
-        "internalType": "struct Utils.SimpleData",
-        "name": "_data",
-        "type": "tuple"
-      }
-    ],
-    "name": "spFlow1SimpleSwap",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "_fork",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "_factory",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "_initCode",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountIn",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountOutMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_path",
-        "type": "address[]"
-      }
-    ],
-    "name": "spFlow1Uniswap",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "receivedAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_destinationAddressForBTC",
-        "type": "string"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "fromToken",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "toToken",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "fromAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "toAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "expectedAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address[]",
-            "name": "callees",
-            "type": "address[]"
-          },
-          {
-            "internalType": "bytes",
-            "name": "exchangeData",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "startIndexes",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "values",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "address payable",
-            "name": "beneficiary",
-            "type": "address"
-          },
-          {
-            "internalType": "address payable",
-            "name": "partner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "feePercent",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "permit",
-            "type": "bytes"
-          },
-          {
-            "internalType": "uint256",
-            "name": "deadline",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes16",
-            "name": "uuid",
-            "type": "bytes16"
-          }
-        ],
-        "internalType": "struct Utils.SimpleData",
-        "name": "_data",
-        "type": "tuple"
-      }
-    ],
-    "name": "spFlow2SimpleSwap",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "receivedAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_destinationAddressForBTC",
-        "type": "string"
-      },
-      {
-        "internalType": "bool",
-        "name": "_fork",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "_factory",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "_initCode",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountIn",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amountOutMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_path",
-        "type": "address[]"
-      }
-    ],
-    "name": "spFlow2Uniswap",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "receivedAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "spGetPendingSwaps",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "bytes32",
-            "name": "SwapID",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "string",
-            "name": "DestAddr",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "RefundAddr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "AmountWBTC",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "Timestamp",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct SwapContract.spPendingTx[]",
-        "name": "data",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "spPendingTXs",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "SwapID",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "string",
-        "name": "DestAddr",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "RefundAddr",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "AmountWBTC",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "Timestamp",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "sw",
     "outputs": [
       {
         "internalType": "contract ISwapRewards",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "swapCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "tokens",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1396,19 +697,6 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "wETH",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -1428,7 +716,16 @@ export default [
     "type": "function"
   },
   {
-    "stateMutability": "payable",
-    "type": "receive"
+    "inputs": [],
+    "name": "withdrawalFeeBPS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ];
