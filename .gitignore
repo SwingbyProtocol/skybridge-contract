@@ -1,6 +1,7 @@
 node_modules
+cache
+artifacts
 build/*
 abigenBindings/bin
 .DS_Store
 .env
-cache
