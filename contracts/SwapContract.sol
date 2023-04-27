@@ -23,6 +23,8 @@ contract SwapContract is ISwapContract, Ownable {
     uint256 private immutable lpDivisor;
     uint256 public withdrawalFeeBPS;
     uint256 public nodeRewardsRatio;
+    uint256 public buybackRewardsRatio;
+    address public buybackAddress;
     address public sbBTCPool;
 
     mapping(address => uint256) private floatAmountOf;
@@ -44,7 +46,7 @@ contract SwapContract is ISwapContract, Ownable {
     event RewardsCollection(
         address feesToken,
         uint256 rewards,
-        uint256 amountLPTokensForNode,
+        uint256 rewardsLPTTotal,
         uint256 currentPriceLP
     );
 
@@ -100,6 +102,9 @@ contract SwapContract is ISwapContract, Ownable {
         whitelist[address(0)] = true;
         floatAmountOf[address(0)] = _initBTCFloat;
         floatAmountOf[BTCT_ADDR] = _initWBTCFloat;
+        withdrawalFeeBPS = 30;
+        nodeRewardsRatio = 66;
+        buybackRewardsRatio = 24;
     }
 
     /**
@@ -543,18 +548,19 @@ contract SwapContract is ISwapContract, Ownable {
         floatAmountOf[_feesToken] = floatAmountOf[_feesToken].add(
             _rewardsAmount
         );
-        uint256 amountForNodes = _rewardsAmount.mul(nodeRewardsRatio).div(100);
+        uint256 feesTotal = _rewardsAmount.mul(nodeRewardsRatio).div(100);
         // Alloc LP tokens for nodes as fees
-        uint256 amountLPTokensForNode = amountForNodes.mul(lpDivisor).div(
-            nowPrice
-        );
+        uint256 feesLPTTotal = feesTotal.mul(lpDivisor).div(nowPrice);
+        // Alloc Buyback tokens for nodes as fees
+        uint256 feesBuyback = feesLPTTotal.mul(buybackRewardsRatio).div(100);
         // Mints LP tokens for Nodes
-        lpToken.mint(sbBTCPool, amountLPTokensForNode);
+        lpToken.mint(sbBTCPool, feesLPTTotal.sub(feesBuyback));
+        lpToken.mint(buybackAddress, feesBuyback);
 
         emit RewardsCollection(
             _feesToken,
             _rewardsAmount,
-            amountLPTokensForNode,
+            feesLPTTotal,
             nowPrice
         );
     }

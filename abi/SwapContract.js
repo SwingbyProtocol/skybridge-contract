@@ -171,7 +171,7 @@ export default [
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "amountLPTokensForNode",
+        "name": "rewardsLPTTotal",
         "type": "uint256"
       },
       {
@@ -234,6 +234,32 @@ export default [
         "internalType": "uint8",
         "name": "",
         "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "buybackAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "buybackRewardsRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
