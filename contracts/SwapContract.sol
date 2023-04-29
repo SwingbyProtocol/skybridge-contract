@@ -81,6 +81,7 @@ contract SwapContract is ISwapContract, Ownable {
         address _btct,
         address _sbBTCPool,
         address _swapRewards,
+        address _buybackAddress,
         uint256 _initBTCFloat,
         uint256 _initWBTCFloat
     ) {
@@ -102,6 +103,7 @@ contract SwapContract is ISwapContract, Ownable {
         whitelist[address(0)] = true;
         floatAmountOf[address(0)] = _initBTCFloat;
         floatAmountOf[BTCT_ADDR] = _initWBTCFloat;
+        buybackAddress = _buybackAddress;
         withdrawalFeeBPS = 30;
         nodeRewardsRatio = 66;
         buybackRewardsRatio = 24;
@@ -192,8 +194,7 @@ contract SwapContract is ISwapContract, Ownable {
         uint256 _minerFee,
         uint256 _rewardsAmount,
         address[] memory _spenders,
-        uint256[] memory _swapAmounts,
-        bool _isUpdatelimitBTCForSPFlow2
+        uint256[] memory _swapAmounts
     ) external override onlyOwner returns (bool) {
         address _feesToken = BTCT_ADDR;
         if (_incomingAmount > 0) {
