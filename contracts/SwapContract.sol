@@ -106,7 +106,7 @@ contract SwapContract is ISwapContract, Ownable {
         buybackAddress = _buybackAddress;
         withdrawalFeeBPS = 20;
         nodeRewardsRatio = 66;
-        buybackRewardsRatio = 24;
+        buybackRewardsRatio = 25;
     }
 
     /**
