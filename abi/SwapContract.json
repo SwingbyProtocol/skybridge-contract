@@ -22,6 +22,11 @@
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "_buybackAddress",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_initBTCFloat",
         "type": "uint256"
@@ -343,11 +348,6 @@
         "internalType": "uint256[]",
         "name": "_swapAmounts",
         "type": "uint256[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "_isUpdatelimitBTCForSPFlow2",
-        "type": "bool"
       }
     ],
     "name": "collectSwapFeesForBTC",
@@ -720,6 +720,45 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_sbBTCPool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_buybackAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_withdrawalFeeBPS",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nodeRewardsRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_buybackRewardsRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateParams",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

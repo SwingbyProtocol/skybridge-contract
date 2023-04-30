@@ -77,11 +77,6 @@ export default [
         "internalType": "uint256[]",
         "name": "_swapAmounts",
         "type": "uint256[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "_isUpdatelimitBTCForSPFlow2",
-        "type": "bool"
       }
     ],
     "name": "collectSwapFeesForBTC",
@@ -361,6 +356,45 @@ export default [
       }
     ],
     "name": "singleTransferERC20",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_sbBTCPool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_buybackAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_withdrawalFeeBPS",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nodeRewardsRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_buybackRewardsRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateParams",
     "outputs": [
       {
         "internalType": "bool",
