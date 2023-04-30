@@ -28,37 +28,9 @@ var (
 	_ = event.NewSubscription
 )
 
-// SwapContractspPendingTx is an auto generated low-level Go binding around an user-defined struct.
-type SwapContractspPendingTx struct {
-	SwapID     [32]byte
-	DestAddr   string
-	RefundAddr common.Address
-	AmountWBTC *big.Int
-	Timestamp  *big.Int
-}
-
-// UtilsSimpleData is an auto generated low-level Go binding around an user-defined struct.
-type UtilsSimpleData struct {
-	FromToken      common.Address
-	ToToken        common.Address
-	FromAmount     *big.Int
-	ToAmount       *big.Int
-	ExpectedAmount *big.Int
-	Callees        []common.Address
-	ExchangeData   []byte
-	StartIndexes   []*big.Int
-	Values         []*big.Int
-	Beneficiary    common.Address
-	Partner        common.Address
-	FeePercent     *big.Int
-	Permit         []byte
-	Deadline       *big.Int
-	Uuid           [16]byte
-}
-
 // SwapContractMetaData contains all meta data concerning the SwapContract contract.
 var SwapContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_btct\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_wETH\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sbBTCPool\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_params\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swapRewards\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_existingBTCFloat\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawal\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"BurnLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"Deposit\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardLPTsForNodes\",\"type\":\"uint256\"}],\"name\":\"DistributeNodeRewards\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"depositFees\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"IssueLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feesToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewards\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountLPTokensForNode\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"}],\"name\":\"RewardsCollection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Swap\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"SwapTokensToBTC\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"BTCT_ADDR\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"activeNodeCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_nodes\",\"type\":\"address[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"churnedInCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_spenders\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapAmounts\",\"type\":\"uint256[]\"},{\"internalType\":\"bool\",\"name\":\"_isUpdatelimitBTCForSPFlow2\",\"type\":\"bool\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"nowPrice\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ip\",\"outputs\":[{\"internalType\":\"contractIParams\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"isNodeStake\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"limitBTCForSPFlow2\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lpToken\",\"outputs\":[{\"internalType\":\"contractIBurnableToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_usedTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiRecordSkyPoolsTX\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"oldestActiveIndex\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paraswapAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_usedTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"recordSkyPoolsTX\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"redeemERC20Token\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"redeemEther\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sbBTCPool\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spCleanUpOldTXs\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"spDeposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"fromToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"toToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"fromAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"toAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expectedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"callees\",\"type\":\"address[]\"},{\"internalType\":\"bytes\",\"name\":\"exchangeData\",\"type\":\"bytes\"},{\"internalType\":\"uint256[]\",\"name\":\"startIndexes\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"addresspayable\",\"name\":\"beneficiary\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"partner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"feePercent\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"permit\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes16\",\"name\":\"uuid\",\"type\":\"bytes16\"}],\"internalType\":\"structUtils.SimpleData\",\"name\":\"_data\",\"type\":\"tuple\"}],\"name\":\"spFlow1SimpleSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"_fork\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_initCode\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_path\",\"type\":\"address[]\"}],\"name\":\"spFlow1Uniswap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_destinationAddressForBTC\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"fromToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"toToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"fromAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"toAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expectedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"callees\",\"type\":\"address[]\"},{\"internalType\":\"bytes\",\"name\":\"exchangeData\",\"type\":\"bytes\"},{\"internalType\":\"uint256[]\",\"name\":\"startIndexes\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"addresspayable\",\"name\":\"beneficiary\",\"type\":\"address\"},{\"internalType\":\"addresspayable\",\"name\":\"partner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"feePercent\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"permit\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes16\",\"name\":\"uuid\",\"type\":\"bytes16\"}],\"internalType\":\"structUtils.SimpleData\",\"name\":\"_data\",\"type\":\"tuple\"}],\"name\":\"spFlow2SimpleSwap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_destinationAddressForBTC\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"_fork\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_factory\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_initCode\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_path\",\"type\":\"address[]\"}],\"name\":\"spFlow2Uniswap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"receivedAmount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spGetPendingSwaps\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"internalType\":\"structSwapContract.spPendingTx[]\",\"name\":\"data\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"spPendingTXs\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"SwapID\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"DestAddr\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"RefundAddr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"AmountWBTC\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"Timestamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sw\",\"outputs\":[{\"internalType\":\"contractISwapRewards\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"tokens\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tssThreshold\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wETH\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"whitelist\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_lpToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_btct\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sbBTCPool\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swapRewards\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_buybackAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_initBTCFloat\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_initWBTCFloat\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawal\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"BurnLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardLPTsForNodes\",\"type\":\"uint256\"}],\"name\":\"DistributeFees\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfFloat\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOfLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"depositFees\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"txid\",\"type\":\"bytes32\"}],\"name\":\"IssueLPTokensForFloat\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feesToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewards\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rewardsLPTTotal\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"currentPriceLP\",\"type\":\"uint256\"}],\"name\":\"RewardsCollection\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Swap\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"BTCT_ADDR\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"activeNodeCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"buybackAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"buybackRewardsRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"address[]\",\"name\":\"_nodes\",\"type\":\"address[]\"},{\"internalType\":\"bool[]\",\"name\":\"_isRemoved\",\"type\":\"bool[]\"},{\"internalType\":\"uint8\",\"name\":\"_churnedInCount\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"_tssThreshold\",\"type\":\"uint8\"}],\"name\":\"churn\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"churnedInCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_incomingAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"_spenders\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_swapAmounts\",\"type\":\"uint256[]\"}],\"name\":\"collectSwapFeesForBTC\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getActiveNodes\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceLP\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"nowPrice\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenA\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenB\",\"type\":\"address\"}],\"name\":\"getFloatReserve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"reserveA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"reserveB\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"isNodeStake\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"isTxUsed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lpToken\",\"outputs\":[{\"internalType\":\"contractIBurnableToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"bytes32[]\",\"name\":\"_addressesAndAmounts\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"multiTransferERC20TightlyPacked\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nodeRewardsRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfFloat\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordIncomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_addressesAndAmountOfLPtoken\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordOutcomingFloat\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minerFee\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_txid\",\"type\":\"bytes32\"}],\"name\":\"recordUTXOSweepMinerFee\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sbBTCPool\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_destToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_totalSwapped\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_rewardsAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"_redeemedFloatTxIds\",\"type\":\"bytes32[]\"}],\"name\":\"singleTransferERC20\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sw\",\"outputs\":[{\"internalType\":\"contractISwapRewards\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tssThreshold\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_sbBTCPool\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_buybackAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_withdrawalFeeBPS\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_nodeRewardsRatio\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_buybackRewardsRatio\",\"type\":\"uint256\"}],\"name\":\"updateParams\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"whitelist\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawalFeeBPS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // SwapContractABI is the input ABI used to generate the binding from.
@@ -269,12 +241,43 @@ func (_SwapContract *SwapContractCallerSession) ActiveNodeCount() (uint8, error)
 	return _SwapContract.Contract.ActiveNodeCount(&_SwapContract.CallOpts)
 }
 
-// BalanceOf is a free data retrieval call binding the contract method 0xf7888aec.
+// BuybackAddress is a free data retrieval call binding the contract method 0xcc2fbd66.
 //
-// Solidity: function balanceOf(address _token, address _user) view returns(uint256)
-func (_SwapContract *SwapContractCaller) BalanceOf(opts *bind.CallOpts, _token common.Address, _user common.Address) (*big.Int, error) {
+// Solidity: function buybackAddress() view returns(address)
+func (_SwapContract *SwapContractCaller) BuybackAddress(opts *bind.CallOpts) (common.Address, error) {
 	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "balanceOf", _token, _user)
+	err := _SwapContract.contract.Call(opts, &out, "buybackAddress")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// BuybackAddress is a free data retrieval call binding the contract method 0xcc2fbd66.
+//
+// Solidity: function buybackAddress() view returns(address)
+func (_SwapContract *SwapContractSession) BuybackAddress() (common.Address, error) {
+	return _SwapContract.Contract.BuybackAddress(&_SwapContract.CallOpts)
+}
+
+// BuybackAddress is a free data retrieval call binding the contract method 0xcc2fbd66.
+//
+// Solidity: function buybackAddress() view returns(address)
+func (_SwapContract *SwapContractCallerSession) BuybackAddress() (common.Address, error) {
+	return _SwapContract.Contract.BuybackAddress(&_SwapContract.CallOpts)
+}
+
+// BuybackRewardsRatio is a free data retrieval call binding the contract method 0x0b513f1d.
+//
+// Solidity: function buybackRewardsRatio() view returns(uint256)
+func (_SwapContract *SwapContractCaller) BuybackRewardsRatio(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _SwapContract.contract.Call(opts, &out, "buybackRewardsRatio")
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -286,18 +289,18 @@ func (_SwapContract *SwapContractCaller) BalanceOf(opts *bind.CallOpts, _token c
 
 }
 
-// BalanceOf is a free data retrieval call binding the contract method 0xf7888aec.
+// BuybackRewardsRatio is a free data retrieval call binding the contract method 0x0b513f1d.
 //
-// Solidity: function balanceOf(address _token, address _user) view returns(uint256)
-func (_SwapContract *SwapContractSession) BalanceOf(_token common.Address, _user common.Address) (*big.Int, error) {
-	return _SwapContract.Contract.BalanceOf(&_SwapContract.CallOpts, _token, _user)
+// Solidity: function buybackRewardsRatio() view returns(uint256)
+func (_SwapContract *SwapContractSession) BuybackRewardsRatio() (*big.Int, error) {
+	return _SwapContract.Contract.BuybackRewardsRatio(&_SwapContract.CallOpts)
 }
 
-// BalanceOf is a free data retrieval call binding the contract method 0xf7888aec.
+// BuybackRewardsRatio is a free data retrieval call binding the contract method 0x0b513f1d.
 //
-// Solidity: function balanceOf(address _token, address _user) view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) BalanceOf(_token common.Address, _user common.Address) (*big.Int, error) {
-	return _SwapContract.Contract.BalanceOf(&_SwapContract.CallOpts, _token, _user)
+// Solidity: function buybackRewardsRatio() view returns(uint256)
+func (_SwapContract *SwapContractCallerSession) BuybackRewardsRatio() (*big.Int, error) {
+	return _SwapContract.Contract.BuybackRewardsRatio(&_SwapContract.CallOpts)
 }
 
 // ChurnedInCount is a free data retrieval call binding the contract method 0x0089356f.
@@ -438,37 +441,6 @@ func (_SwapContract *SwapContractCallerSession) GetFloatReserve(_tokenA common.A
 	return _SwapContract.Contract.GetFloatReserve(&_SwapContract.CallOpts, _tokenA, _tokenB)
 }
 
-// Ip is a free data retrieval call binding the contract method 0xd023420d.
-//
-// Solidity: function ip() view returns(address)
-func (_SwapContract *SwapContractCaller) Ip(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "ip")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// Ip is a free data retrieval call binding the contract method 0xd023420d.
-//
-// Solidity: function ip() view returns(address)
-func (_SwapContract *SwapContractSession) Ip() (common.Address, error) {
-	return _SwapContract.Contract.Ip(&_SwapContract.CallOpts)
-}
-
-// Ip is a free data retrieval call binding the contract method 0xd023420d.
-//
-// Solidity: function ip() view returns(address)
-func (_SwapContract *SwapContractCallerSession) Ip() (common.Address, error) {
-	return _SwapContract.Contract.Ip(&_SwapContract.CallOpts)
-}
-
 // IsNodeStake is a free data retrieval call binding the contract method 0xa742329d.
 //
 // Solidity: function isNodeStake(address _user) view returns(bool)
@@ -531,37 +503,6 @@ func (_SwapContract *SwapContractCallerSession) IsTxUsed(_txid [32]byte) (bool, 
 	return _SwapContract.Contract.IsTxUsed(&_SwapContract.CallOpts, _txid)
 }
 
-// LimitBTCForSPFlow2 is a free data retrieval call binding the contract method 0xa827278b.
-//
-// Solidity: function limitBTCForSPFlow2() view returns(uint256)
-func (_SwapContract *SwapContractCaller) LimitBTCForSPFlow2(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "limitBTCForSPFlow2")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// LimitBTCForSPFlow2 is a free data retrieval call binding the contract method 0xa827278b.
-//
-// Solidity: function limitBTCForSPFlow2() view returns(uint256)
-func (_SwapContract *SwapContractSession) LimitBTCForSPFlow2() (*big.Int, error) {
-	return _SwapContract.Contract.LimitBTCForSPFlow2(&_SwapContract.CallOpts)
-}
-
-// LimitBTCForSPFlow2 is a free data retrieval call binding the contract method 0xa827278b.
-//
-// Solidity: function limitBTCForSPFlow2() view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) LimitBTCForSPFlow2() (*big.Int, error) {
-	return _SwapContract.Contract.LimitBTCForSPFlow2(&_SwapContract.CallOpts)
-}
-
 // LpToken is a free data retrieval call binding the contract method 0x5fcbd285.
 //
 // Solidity: function lpToken() view returns(address)
@@ -593,12 +534,12 @@ func (_SwapContract *SwapContractCallerSession) LpToken() (common.Address, error
 	return _SwapContract.Contract.LpToken(&_SwapContract.CallOpts)
 }
 
-// OldestActiveIndex is a free data retrieval call binding the contract method 0x1bb06930.
+// NodeRewardsRatio is a free data retrieval call binding the contract method 0x0b68134d.
 //
-// Solidity: function oldestActiveIndex() view returns(uint256)
-func (_SwapContract *SwapContractCaller) OldestActiveIndex(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function nodeRewardsRatio() view returns(uint256)
+func (_SwapContract *SwapContractCaller) NodeRewardsRatio(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "oldestActiveIndex")
+	err := _SwapContract.contract.Call(opts, &out, "nodeRewardsRatio")
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -610,18 +551,18 @@ func (_SwapContract *SwapContractCaller) OldestActiveIndex(opts *bind.CallOpts) 
 
 }
 
-// OldestActiveIndex is a free data retrieval call binding the contract method 0x1bb06930.
+// NodeRewardsRatio is a free data retrieval call binding the contract method 0x0b68134d.
 //
-// Solidity: function oldestActiveIndex() view returns(uint256)
-func (_SwapContract *SwapContractSession) OldestActiveIndex() (*big.Int, error) {
-	return _SwapContract.Contract.OldestActiveIndex(&_SwapContract.CallOpts)
+// Solidity: function nodeRewardsRatio() view returns(uint256)
+func (_SwapContract *SwapContractSession) NodeRewardsRatio() (*big.Int, error) {
+	return _SwapContract.Contract.NodeRewardsRatio(&_SwapContract.CallOpts)
 }
 
-// OldestActiveIndex is a free data retrieval call binding the contract method 0x1bb06930.
+// NodeRewardsRatio is a free data retrieval call binding the contract method 0x0b68134d.
 //
-// Solidity: function oldestActiveIndex() view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) OldestActiveIndex() (*big.Int, error) {
-	return _SwapContract.Contract.OldestActiveIndex(&_SwapContract.CallOpts)
+// Solidity: function nodeRewardsRatio() view returns(uint256)
+func (_SwapContract *SwapContractCallerSession) NodeRewardsRatio() (*big.Int, error) {
+	return _SwapContract.Contract.NodeRewardsRatio(&_SwapContract.CallOpts)
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
@@ -655,37 +596,6 @@ func (_SwapContract *SwapContractCallerSession) Owner() (common.Address, error) 
 	return _SwapContract.Contract.Owner(&_SwapContract.CallOpts)
 }
 
-// ParaswapAddress is a free data retrieval call binding the contract method 0xf10d7c35.
-//
-// Solidity: function paraswapAddress() view returns(address)
-func (_SwapContract *SwapContractCaller) ParaswapAddress(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "paraswapAddress")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// ParaswapAddress is a free data retrieval call binding the contract method 0xf10d7c35.
-//
-// Solidity: function paraswapAddress() view returns(address)
-func (_SwapContract *SwapContractSession) ParaswapAddress() (common.Address, error) {
-	return _SwapContract.Contract.ParaswapAddress(&_SwapContract.CallOpts)
-}
-
-// ParaswapAddress is a free data retrieval call binding the contract method 0xf10d7c35.
-//
-// Solidity: function paraswapAddress() view returns(address)
-func (_SwapContract *SwapContractCallerSession) ParaswapAddress() (common.Address, error) {
-	return _SwapContract.Contract.ParaswapAddress(&_SwapContract.CallOpts)
-}
-
 // SbBTCPool is a free data retrieval call binding the contract method 0x0085aea1.
 //
 // Solidity: function sbBTCPool() view returns(address)
@@ -715,97 +625,6 @@ func (_SwapContract *SwapContractSession) SbBTCPool() (common.Address, error) {
 // Solidity: function sbBTCPool() view returns(address)
 func (_SwapContract *SwapContractCallerSession) SbBTCPool() (common.Address, error) {
 	return _SwapContract.Contract.SbBTCPool(&_SwapContract.CallOpts)
-}
-
-// SpGetPendingSwaps is a free data retrieval call binding the contract method 0x20199e99.
-//
-// Solidity: function spGetPendingSwaps() view returns((bytes32,string,address,uint256,uint256)[] data)
-func (_SwapContract *SwapContractCaller) SpGetPendingSwaps(opts *bind.CallOpts) ([]SwapContractspPendingTx, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "spGetPendingSwaps")
-
-	if err != nil {
-		return *new([]SwapContractspPendingTx), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new([]SwapContractspPendingTx)).(*[]SwapContractspPendingTx)
-
-	return out0, err
-
-}
-
-// SpGetPendingSwaps is a free data retrieval call binding the contract method 0x20199e99.
-//
-// Solidity: function spGetPendingSwaps() view returns((bytes32,string,address,uint256,uint256)[] data)
-func (_SwapContract *SwapContractSession) SpGetPendingSwaps() ([]SwapContractspPendingTx, error) {
-	return _SwapContract.Contract.SpGetPendingSwaps(&_SwapContract.CallOpts)
-}
-
-// SpGetPendingSwaps is a free data retrieval call binding the contract method 0x20199e99.
-//
-// Solidity: function spGetPendingSwaps() view returns((bytes32,string,address,uint256,uint256)[] data)
-func (_SwapContract *SwapContractCallerSession) SpGetPendingSwaps() ([]SwapContractspPendingTx, error) {
-	return _SwapContract.Contract.SpGetPendingSwaps(&_SwapContract.CallOpts)
-}
-
-// SpPendingTXs is a free data retrieval call binding the contract method 0x1ab7e937.
-//
-// Solidity: function spPendingTXs(uint256 ) view returns(bytes32 SwapID, string DestAddr, address RefundAddr, uint256 AmountWBTC, uint256 Timestamp)
-func (_SwapContract *SwapContractCaller) SpPendingTXs(opts *bind.CallOpts, arg0 *big.Int) (struct {
-	SwapID     [32]byte
-	DestAddr   string
-	RefundAddr common.Address
-	AmountWBTC *big.Int
-	Timestamp  *big.Int
-}, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "spPendingTXs", arg0)
-
-	outstruct := new(struct {
-		SwapID     [32]byte
-		DestAddr   string
-		RefundAddr common.Address
-		AmountWBTC *big.Int
-		Timestamp  *big.Int
-	})
-	if err != nil {
-		return *outstruct, err
-	}
-
-	outstruct.SwapID = *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	outstruct.DestAddr = *abi.ConvertType(out[1], new(string)).(*string)
-	outstruct.RefundAddr = *abi.ConvertType(out[2], new(common.Address)).(*common.Address)
-	outstruct.AmountWBTC = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
-	outstruct.Timestamp = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
-
-	return *outstruct, err
-
-}
-
-// SpPendingTXs is a free data retrieval call binding the contract method 0x1ab7e937.
-//
-// Solidity: function spPendingTXs(uint256 ) view returns(bytes32 SwapID, string DestAddr, address RefundAddr, uint256 AmountWBTC, uint256 Timestamp)
-func (_SwapContract *SwapContractSession) SpPendingTXs(arg0 *big.Int) (struct {
-	SwapID     [32]byte
-	DestAddr   string
-	RefundAddr common.Address
-	AmountWBTC *big.Int
-	Timestamp  *big.Int
-}, error) {
-	return _SwapContract.Contract.SpPendingTXs(&_SwapContract.CallOpts, arg0)
-}
-
-// SpPendingTXs is a free data retrieval call binding the contract method 0x1ab7e937.
-//
-// Solidity: function spPendingTXs(uint256 ) view returns(bytes32 SwapID, string DestAddr, address RefundAddr, uint256 AmountWBTC, uint256 Timestamp)
-func (_SwapContract *SwapContractCallerSession) SpPendingTXs(arg0 *big.Int) (struct {
-	SwapID     [32]byte
-	DestAddr   string
-	RefundAddr common.Address
-	AmountWBTC *big.Int
-	Timestamp  *big.Int
-}, error) {
-	return _SwapContract.Contract.SpPendingTXs(&_SwapContract.CallOpts, arg0)
 }
 
 // Sw is a free data retrieval call binding the contract method 0x00e5cee4.
@@ -839,68 +658,6 @@ func (_SwapContract *SwapContractCallerSession) Sw() (common.Address, error) {
 	return _SwapContract.Contract.Sw(&_SwapContract.CallOpts)
 }
 
-// SwapCount is a free data retrieval call binding the contract method 0x2eff0d9e.
-//
-// Solidity: function swapCount() view returns(uint256)
-func (_SwapContract *SwapContractCaller) SwapCount(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "swapCount")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// SwapCount is a free data retrieval call binding the contract method 0x2eff0d9e.
-//
-// Solidity: function swapCount() view returns(uint256)
-func (_SwapContract *SwapContractSession) SwapCount() (*big.Int, error) {
-	return _SwapContract.Contract.SwapCount(&_SwapContract.CallOpts)
-}
-
-// SwapCount is a free data retrieval call binding the contract method 0x2eff0d9e.
-//
-// Solidity: function swapCount() view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) SwapCount() (*big.Int, error) {
-	return _SwapContract.Contract.SwapCount(&_SwapContract.CallOpts)
-}
-
-// Tokens is a free data retrieval call binding the contract method 0x508493bc.
-//
-// Solidity: function tokens(address , address ) view returns(uint256)
-func (_SwapContract *SwapContractCaller) Tokens(opts *bind.CallOpts, arg0 common.Address, arg1 common.Address) (*big.Int, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "tokens", arg0, arg1)
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// Tokens is a free data retrieval call binding the contract method 0x508493bc.
-//
-// Solidity: function tokens(address , address ) view returns(uint256)
-func (_SwapContract *SwapContractSession) Tokens(arg0 common.Address, arg1 common.Address) (*big.Int, error) {
-	return _SwapContract.Contract.Tokens(&_SwapContract.CallOpts, arg0, arg1)
-}
-
-// Tokens is a free data retrieval call binding the contract method 0x508493bc.
-//
-// Solidity: function tokens(address , address ) view returns(uint256)
-func (_SwapContract *SwapContractCallerSession) Tokens(arg0 common.Address, arg1 common.Address) (*big.Int, error) {
-	return _SwapContract.Contract.Tokens(&_SwapContract.CallOpts, arg0, arg1)
-}
-
 // TssThreshold is a free data retrieval call binding the contract method 0x12d1441e.
 //
 // Solidity: function tssThreshold() view returns(uint8)
@@ -930,37 +687,6 @@ func (_SwapContract *SwapContractSession) TssThreshold() (uint8, error) {
 // Solidity: function tssThreshold() view returns(uint8)
 func (_SwapContract *SwapContractCallerSession) TssThreshold() (uint8, error) {
 	return _SwapContract.Contract.TssThreshold(&_SwapContract.CallOpts)
-}
-
-// WETH is a free data retrieval call binding the contract method 0xf2428621.
-//
-// Solidity: function wETH() view returns(address)
-func (_SwapContract *SwapContractCaller) WETH(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _SwapContract.contract.Call(opts, &out, "wETH")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// WETH is a free data retrieval call binding the contract method 0xf2428621.
-//
-// Solidity: function wETH() view returns(address)
-func (_SwapContract *SwapContractSession) WETH() (common.Address, error) {
-	return _SwapContract.Contract.WETH(&_SwapContract.CallOpts)
-}
-
-// WETH is a free data retrieval call binding the contract method 0xf2428621.
-//
-// Solidity: function wETH() view returns(address)
-func (_SwapContract *SwapContractCallerSession) WETH() (common.Address, error) {
-	return _SwapContract.Contract.WETH(&_SwapContract.CallOpts)
 }
 
 // Whitelist is a free data retrieval call binding the contract method 0x9b19251a.
@@ -994,6 +720,37 @@ func (_SwapContract *SwapContractCallerSession) Whitelist(arg0 common.Address) (
 	return _SwapContract.Contract.Whitelist(&_SwapContract.CallOpts, arg0)
 }
 
+// WithdrawalFeeBPS is a free data retrieval call binding the contract method 0xb6268e5d.
+//
+// Solidity: function withdrawalFeeBPS() view returns(uint256)
+func (_SwapContract *SwapContractCaller) WithdrawalFeeBPS(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _SwapContract.contract.Call(opts, &out, "withdrawalFeeBPS")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// WithdrawalFeeBPS is a free data retrieval call binding the contract method 0xb6268e5d.
+//
+// Solidity: function withdrawalFeeBPS() view returns(uint256)
+func (_SwapContract *SwapContractSession) WithdrawalFeeBPS() (*big.Int, error) {
+	return _SwapContract.Contract.WithdrawalFeeBPS(&_SwapContract.CallOpts)
+}
+
+// WithdrawalFeeBPS is a free data retrieval call binding the contract method 0xb6268e5d.
+//
+// Solidity: function withdrawalFeeBPS() view returns(uint256)
+func (_SwapContract *SwapContractCallerSession) WithdrawalFeeBPS() (*big.Int, error) {
+	return _SwapContract.Contract.WithdrawalFeeBPS(&_SwapContract.CallOpts)
+}
+
 // Churn is a paid mutator transaction binding the contract method 0x6845a025.
 //
 // Solidity: function churn(address _newOwner, address[] _nodes, bool[] _isRemoved, uint8 _churnedInCount, uint8 _tssThreshold) returns(bool)
@@ -1015,46 +772,25 @@ func (_SwapContract *SwapContractTransactorSession) Churn(_newOwner common.Addre
 	return _SwapContract.Contract.Churn(&_SwapContract.TransactOpts, _newOwner, _nodes, _isRemoved, _churnedInCount, _tssThreshold)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0xdcc5f0c8.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x2adf9f87.
 //
-// Solidity: function collectSwapFeesForBTC(uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _swapAmounts, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
-func (_SwapContract *SwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _swapAmounts []*big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _incomingAmount, _minerFee, _rewardsAmount, _spenders, _swapAmounts, _isUpdatelimitBTCForSPFlow2)
+// Solidity: function collectSwapFeesForBTC(uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _swapAmounts) returns(bool)
+func (_SwapContract *SwapContractTransactor) CollectSwapFeesForBTC(opts *bind.TransactOpts, _incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _swapAmounts []*big.Int) (*types.Transaction, error) {
+	return _SwapContract.contract.Transact(opts, "collectSwapFeesForBTC", _incomingAmount, _minerFee, _rewardsAmount, _spenders, _swapAmounts)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0xdcc5f0c8.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x2adf9f87.
 //
-// Solidity: function collectSwapFeesForBTC(uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _swapAmounts, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
-func (_SwapContract *SwapContractSession) CollectSwapFeesForBTC(_incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _swapAmounts []*big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
-	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _swapAmounts, _isUpdatelimitBTCForSPFlow2)
+// Solidity: function collectSwapFeesForBTC(uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _swapAmounts) returns(bool)
+func (_SwapContract *SwapContractSession) CollectSwapFeesForBTC(_incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _swapAmounts []*big.Int) (*types.Transaction, error) {
+	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _swapAmounts)
 }
 
-// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0xdcc5f0c8.
+// CollectSwapFeesForBTC is a paid mutator transaction binding the contract method 0x2adf9f87.
 //
-// Solidity: function collectSwapFeesForBTC(uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _swapAmounts, bool _isUpdatelimitBTCForSPFlow2) returns(bool)
-func (_SwapContract *SwapContractTransactorSession) CollectSwapFeesForBTC(_incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _swapAmounts []*big.Int, _isUpdatelimitBTCForSPFlow2 bool) (*types.Transaction, error) {
-	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _swapAmounts, _isUpdatelimitBTCForSPFlow2)
-}
-
-// MultiRecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xbf62dcc8.
-//
-// Solidity: function multiRecordSkyPoolsTX(bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
-func (_SwapContract *SwapContractTransactor) MultiRecordSkyPoolsTX(opts *bind.TransactOpts, _addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "multiRecordSkyPoolsTX", _addressesAndAmounts, _totalSwapped, _rewardsAmount, _usedTxIds)
-}
-
-// MultiRecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xbf62dcc8.
-//
-// Solidity: function multiRecordSkyPoolsTX(bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
-func (_SwapContract *SwapContractSession) MultiRecordSkyPoolsTX(_addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
-	return _SwapContract.Contract.MultiRecordSkyPoolsTX(&_SwapContract.TransactOpts, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _usedTxIds)
-}
-
-// MultiRecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xbf62dcc8.
-//
-// Solidity: function multiRecordSkyPoolsTX(bytes32[] _addressesAndAmounts, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
-func (_SwapContract *SwapContractTransactorSession) MultiRecordSkyPoolsTX(_addressesAndAmounts [][32]byte, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
-	return _SwapContract.Contract.MultiRecordSkyPoolsTX(&_SwapContract.TransactOpts, _addressesAndAmounts, _totalSwapped, _rewardsAmount, _usedTxIds)
+// Solidity: function collectSwapFeesForBTC(uint256 _incomingAmount, uint256 _minerFee, uint256 _rewardsAmount, address[] _spenders, uint256[] _swapAmounts) returns(bool)
+func (_SwapContract *SwapContractTransactorSession) CollectSwapFeesForBTC(_incomingAmount *big.Int, _minerFee *big.Int, _rewardsAmount *big.Int, _spenders []common.Address, _swapAmounts []*big.Int) (*types.Transaction, error) {
+	return _SwapContract.Contract.CollectSwapFeesForBTC(&_SwapContract.TransactOpts, _incomingAmount, _minerFee, _rewardsAmount, _spenders, _swapAmounts)
 }
 
 // MultiTransferERC20TightlyPacked is a paid mutator transaction binding the contract method 0xad289e76.
@@ -1120,27 +856,6 @@ func (_SwapContract *SwapContractTransactorSession) RecordOutcomingFloat(_token 
 	return _SwapContract.Contract.RecordOutcomingFloat(&_SwapContract.TransactOpts, _token, _addressesAndAmountOfLPtoken, _minerFee, _txid)
 }
 
-// RecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xb345a358.
-//
-// Solidity: function recordSkyPoolsTX(address _to, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
-func (_SwapContract *SwapContractTransactor) RecordSkyPoolsTX(opts *bind.TransactOpts, _to common.Address, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "recordSkyPoolsTX", _to, _totalSwapped, _rewardsAmount, _usedTxIds)
-}
-
-// RecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xb345a358.
-//
-// Solidity: function recordSkyPoolsTX(address _to, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
-func (_SwapContract *SwapContractSession) RecordSkyPoolsTX(_to common.Address, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
-	return _SwapContract.Contract.RecordSkyPoolsTX(&_SwapContract.TransactOpts, _to, _totalSwapped, _rewardsAmount, _usedTxIds)
-}
-
-// RecordSkyPoolsTX is a paid mutator transaction binding the contract method 0xb345a358.
-//
-// Solidity: function recordSkyPoolsTX(address _to, uint256 _totalSwapped, uint256 _rewardsAmount, bytes32[] _usedTxIds) returns(bool)
-func (_SwapContract *SwapContractTransactorSession) RecordSkyPoolsTX(_to common.Address, _totalSwapped *big.Int, _rewardsAmount *big.Int, _usedTxIds [][32]byte) (*types.Transaction, error) {
-	return _SwapContract.Contract.RecordSkyPoolsTX(&_SwapContract.TransactOpts, _to, _totalSwapped, _rewardsAmount, _usedTxIds)
-}
-
 // RecordUTXOSweepMinerFee is a paid mutator transaction binding the contract method 0xc810a539.
 //
 // Solidity: function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid) returns(bool)
@@ -1160,48 +875,6 @@ func (_SwapContract *SwapContractSession) RecordUTXOSweepMinerFee(_minerFee *big
 // Solidity: function recordUTXOSweepMinerFee(uint256 _minerFee, bytes32 _txid) returns(bool)
 func (_SwapContract *SwapContractTransactorSession) RecordUTXOSweepMinerFee(_minerFee *big.Int, _txid [32]byte) (*types.Transaction, error) {
 	return _SwapContract.Contract.RecordUTXOSweepMinerFee(&_SwapContract.TransactOpts, _minerFee, _txid)
-}
-
-// RedeemERC20Token is a paid mutator transaction binding the contract method 0x4db75485.
-//
-// Solidity: function redeemERC20Token(address _token, uint256 _amount) returns()
-func (_SwapContract *SwapContractTransactor) RedeemERC20Token(opts *bind.TransactOpts, _token common.Address, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "redeemERC20Token", _token, _amount)
-}
-
-// RedeemERC20Token is a paid mutator transaction binding the contract method 0x4db75485.
-//
-// Solidity: function redeemERC20Token(address _token, uint256 _amount) returns()
-func (_SwapContract *SwapContractSession) RedeemERC20Token(_token common.Address, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.RedeemERC20Token(&_SwapContract.TransactOpts, _token, _amount)
-}
-
-// RedeemERC20Token is a paid mutator transaction binding the contract method 0x4db75485.
-//
-// Solidity: function redeemERC20Token(address _token, uint256 _amount) returns()
-func (_SwapContract *SwapContractTransactorSession) RedeemERC20Token(_token common.Address, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.RedeemERC20Token(&_SwapContract.TransactOpts, _token, _amount)
-}
-
-// RedeemEther is a paid mutator transaction binding the contract method 0x8535490f.
-//
-// Solidity: function redeemEther(uint256 _amount) returns()
-func (_SwapContract *SwapContractTransactor) RedeemEther(opts *bind.TransactOpts, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "redeemEther", _amount)
-}
-
-// RedeemEther is a paid mutator transaction binding the contract method 0x8535490f.
-//
-// Solidity: function redeemEther(uint256 _amount) returns()
-func (_SwapContract *SwapContractSession) RedeemEther(_amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.RedeemEther(&_SwapContract.TransactOpts, _amount)
-}
-
-// RedeemEther is a paid mutator transaction binding the contract method 0x8535490f.
-//
-// Solidity: function redeemEther(uint256 _amount) returns()
-func (_SwapContract *SwapContractTransactorSession) RedeemEther(_amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.RedeemEther(&_SwapContract.TransactOpts, _amount)
 }
 
 // RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
@@ -1246,132 +919,6 @@ func (_SwapContract *SwapContractTransactorSession) SingleTransferERC20(_destTok
 	return _SwapContract.Contract.SingleTransferERC20(&_SwapContract.TransactOpts, _destToken, _to, _amount, _totalSwapped, _rewardsAmount, _redeemedFloatTxIds)
 }
 
-// SpCleanUpOldTXs is a paid mutator transaction binding the contract method 0xb9ae0adc.
-//
-// Solidity: function spCleanUpOldTXs() returns()
-func (_SwapContract *SwapContractTransactor) SpCleanUpOldTXs(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "spCleanUpOldTXs")
-}
-
-// SpCleanUpOldTXs is a paid mutator transaction binding the contract method 0xb9ae0adc.
-//
-// Solidity: function spCleanUpOldTXs() returns()
-func (_SwapContract *SwapContractSession) SpCleanUpOldTXs() (*types.Transaction, error) {
-	return _SwapContract.Contract.SpCleanUpOldTXs(&_SwapContract.TransactOpts)
-}
-
-// SpCleanUpOldTXs is a paid mutator transaction binding the contract method 0xb9ae0adc.
-//
-// Solidity: function spCleanUpOldTXs() returns()
-func (_SwapContract *SwapContractTransactorSession) SpCleanUpOldTXs() (*types.Transaction, error) {
-	return _SwapContract.Contract.SpCleanUpOldTXs(&_SwapContract.TransactOpts)
-}
-
-// SpDeposit is a paid mutator transaction binding the contract method 0xca0707e7.
-//
-// Solidity: function spDeposit(address _token, uint256 _amount) payable returns()
-func (_SwapContract *SwapContractTransactor) SpDeposit(opts *bind.TransactOpts, _token common.Address, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "spDeposit", _token, _amount)
-}
-
-// SpDeposit is a paid mutator transaction binding the contract method 0xca0707e7.
-//
-// Solidity: function spDeposit(address _token, uint256 _amount) payable returns()
-func (_SwapContract *SwapContractSession) SpDeposit(_token common.Address, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpDeposit(&_SwapContract.TransactOpts, _token, _amount)
-}
-
-// SpDeposit is a paid mutator transaction binding the contract method 0xca0707e7.
-//
-// Solidity: function spDeposit(address _token, uint256 _amount) payable returns()
-func (_SwapContract *SwapContractTransactorSession) SpDeposit(_token common.Address, _amount *big.Int) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpDeposit(&_SwapContract.TransactOpts, _token, _amount)
-}
-
-// SpFlow1SimpleSwap is a paid mutator transaction binding the contract method 0x511834c3.
-//
-// Solidity: function spFlow1SimpleSwap((address,address,uint256,uint256,uint256,address[],bytes,uint256[],uint256[],address,address,uint256,bytes,uint256,bytes16) _data) returns()
-func (_SwapContract *SwapContractTransactor) SpFlow1SimpleSwap(opts *bind.TransactOpts, _data UtilsSimpleData) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "spFlow1SimpleSwap", _data)
-}
-
-// SpFlow1SimpleSwap is a paid mutator transaction binding the contract method 0x511834c3.
-//
-// Solidity: function spFlow1SimpleSwap((address,address,uint256,uint256,uint256,address[],bytes,uint256[],uint256[],address,address,uint256,bytes,uint256,bytes16) _data) returns()
-func (_SwapContract *SwapContractSession) SpFlow1SimpleSwap(_data UtilsSimpleData) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow1SimpleSwap(&_SwapContract.TransactOpts, _data)
-}
-
-// SpFlow1SimpleSwap is a paid mutator transaction binding the contract method 0x511834c3.
-//
-// Solidity: function spFlow1SimpleSwap((address,address,uint256,uint256,uint256,address[],bytes,uint256[],uint256[],address,address,uint256,bytes,uint256,bytes16) _data) returns()
-func (_SwapContract *SwapContractTransactorSession) SpFlow1SimpleSwap(_data UtilsSimpleData) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow1SimpleSwap(&_SwapContract.TransactOpts, _data)
-}
-
-// SpFlow1Uniswap is a paid mutator transaction binding the contract method 0x130b7a63.
-//
-// Solidity: function spFlow1Uniswap(bool _fork, address _factory, bytes32 _initCode, uint256 _amountIn, uint256 _amountOutMin, address[] _path) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractTransactor) SpFlow1Uniswap(opts *bind.TransactOpts, _fork bool, _factory common.Address, _initCode [32]byte, _amountIn *big.Int, _amountOutMin *big.Int, _path []common.Address) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "spFlow1Uniswap", _fork, _factory, _initCode, _amountIn, _amountOutMin, _path)
-}
-
-// SpFlow1Uniswap is a paid mutator transaction binding the contract method 0x130b7a63.
-//
-// Solidity: function spFlow1Uniswap(bool _fork, address _factory, bytes32 _initCode, uint256 _amountIn, uint256 _amountOutMin, address[] _path) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractSession) SpFlow1Uniswap(_fork bool, _factory common.Address, _initCode [32]byte, _amountIn *big.Int, _amountOutMin *big.Int, _path []common.Address) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow1Uniswap(&_SwapContract.TransactOpts, _fork, _factory, _initCode, _amountIn, _amountOutMin, _path)
-}
-
-// SpFlow1Uniswap is a paid mutator transaction binding the contract method 0x130b7a63.
-//
-// Solidity: function spFlow1Uniswap(bool _fork, address _factory, bytes32 _initCode, uint256 _amountIn, uint256 _amountOutMin, address[] _path) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractTransactorSession) SpFlow1Uniswap(_fork bool, _factory common.Address, _initCode [32]byte, _amountIn *big.Int, _amountOutMin *big.Int, _path []common.Address) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow1Uniswap(&_SwapContract.TransactOpts, _fork, _factory, _initCode, _amountIn, _amountOutMin, _path)
-}
-
-// SpFlow2SimpleSwap is a paid mutator transaction binding the contract method 0xb4014fe8.
-//
-// Solidity: function spFlow2SimpleSwap(string _destinationAddressForBTC, (address,address,uint256,uint256,uint256,address[],bytes,uint256[],uint256[],address,address,uint256,bytes,uint256,bytes16) _data) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractTransactor) SpFlow2SimpleSwap(opts *bind.TransactOpts, _destinationAddressForBTC string, _data UtilsSimpleData) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "spFlow2SimpleSwap", _destinationAddressForBTC, _data)
-}
-
-// SpFlow2SimpleSwap is a paid mutator transaction binding the contract method 0xb4014fe8.
-//
-// Solidity: function spFlow2SimpleSwap(string _destinationAddressForBTC, (address,address,uint256,uint256,uint256,address[],bytes,uint256[],uint256[],address,address,uint256,bytes,uint256,bytes16) _data) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractSession) SpFlow2SimpleSwap(_destinationAddressForBTC string, _data UtilsSimpleData) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow2SimpleSwap(&_SwapContract.TransactOpts, _destinationAddressForBTC, _data)
-}
-
-// SpFlow2SimpleSwap is a paid mutator transaction binding the contract method 0xb4014fe8.
-//
-// Solidity: function spFlow2SimpleSwap(string _destinationAddressForBTC, (address,address,uint256,uint256,uint256,address[],bytes,uint256[],uint256[],address,address,uint256,bytes,uint256,bytes16) _data) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractTransactorSession) SpFlow2SimpleSwap(_destinationAddressForBTC string, _data UtilsSimpleData) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow2SimpleSwap(&_SwapContract.TransactOpts, _destinationAddressForBTC, _data)
-}
-
-// SpFlow2Uniswap is a paid mutator transaction binding the contract method 0xd38c7bb1.
-//
-// Solidity: function spFlow2Uniswap(string _destinationAddressForBTC, bool _fork, address _factory, bytes32 _initCode, uint256 _amountIn, uint256 _amountOutMin, address[] _path) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractTransactor) SpFlow2Uniswap(opts *bind.TransactOpts, _destinationAddressForBTC string, _fork bool, _factory common.Address, _initCode [32]byte, _amountIn *big.Int, _amountOutMin *big.Int, _path []common.Address) (*types.Transaction, error) {
-	return _SwapContract.contract.Transact(opts, "spFlow2Uniswap", _destinationAddressForBTC, _fork, _factory, _initCode, _amountIn, _amountOutMin, _path)
-}
-
-// SpFlow2Uniswap is a paid mutator transaction binding the contract method 0xd38c7bb1.
-//
-// Solidity: function spFlow2Uniswap(string _destinationAddressForBTC, bool _fork, address _factory, bytes32 _initCode, uint256 _amountIn, uint256 _amountOutMin, address[] _path) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractSession) SpFlow2Uniswap(_destinationAddressForBTC string, _fork bool, _factory common.Address, _initCode [32]byte, _amountIn *big.Int, _amountOutMin *big.Int, _path []common.Address) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow2Uniswap(&_SwapContract.TransactOpts, _destinationAddressForBTC, _fork, _factory, _initCode, _amountIn, _amountOutMin, _path)
-}
-
-// SpFlow2Uniswap is a paid mutator transaction binding the contract method 0xd38c7bb1.
-//
-// Solidity: function spFlow2Uniswap(string _destinationAddressForBTC, bool _fork, address _factory, bytes32 _initCode, uint256 _amountIn, uint256 _amountOutMin, address[] _path) returns(uint256 receivedAmount)
-func (_SwapContract *SwapContractTransactorSession) SpFlow2Uniswap(_destinationAddressForBTC string, _fork bool, _factory common.Address, _initCode [32]byte, _amountIn *big.Int, _amountOutMin *big.Int, _path []common.Address) (*types.Transaction, error) {
-	return _SwapContract.Contract.SpFlow2Uniswap(&_SwapContract.TransactOpts, _destinationAddressForBTC, _fork, _factory, _initCode, _amountIn, _amountOutMin, _path)
-}
-
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
 // Solidity: function transferOwnership(address newOwner) returns()
@@ -1393,25 +940,46 @@ func (_SwapContract *SwapContractTransactorSession) TransferOwnership(newOwner c
 	return _SwapContract.Contract.TransferOwnership(&_SwapContract.TransactOpts, newOwner)
 }
 
-// Receive is a paid mutator transaction binding the contract receive function.
+// UpdateParams is a paid mutator transaction binding the contract method 0xe880afd4.
 //
-// Solidity: receive() payable returns()
-func (_SwapContract *SwapContractTransactor) Receive(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _SwapContract.contract.RawTransact(opts, nil) // calldata is disallowed for receive function
+// Solidity: function updateParams(address _sbBTCPool, address _buybackAddress, uint256 _withdrawalFeeBPS, uint256 _nodeRewardsRatio, uint256 _buybackRewardsRatio) returns(bool)
+func (_SwapContract *SwapContractTransactor) UpdateParams(opts *bind.TransactOpts, _sbBTCPool common.Address, _buybackAddress common.Address, _withdrawalFeeBPS *big.Int, _nodeRewardsRatio *big.Int, _buybackRewardsRatio *big.Int) (*types.Transaction, error) {
+	return _SwapContract.contract.Transact(opts, "updateParams", _sbBTCPool, _buybackAddress, _withdrawalFeeBPS, _nodeRewardsRatio, _buybackRewardsRatio)
 }
 
-// Receive is a paid mutator transaction binding the contract receive function.
+// UpdateParams is a paid mutator transaction binding the contract method 0xe880afd4.
 //
-// Solidity: receive() payable returns()
-func (_SwapContract *SwapContractSession) Receive() (*types.Transaction, error) {
-	return _SwapContract.Contract.Receive(&_SwapContract.TransactOpts)
+// Solidity: function updateParams(address _sbBTCPool, address _buybackAddress, uint256 _withdrawalFeeBPS, uint256 _nodeRewardsRatio, uint256 _buybackRewardsRatio) returns(bool)
+func (_SwapContract *SwapContractSession) UpdateParams(_sbBTCPool common.Address, _buybackAddress common.Address, _withdrawalFeeBPS *big.Int, _nodeRewardsRatio *big.Int, _buybackRewardsRatio *big.Int) (*types.Transaction, error) {
+	return _SwapContract.Contract.UpdateParams(&_SwapContract.TransactOpts, _sbBTCPool, _buybackAddress, _withdrawalFeeBPS, _nodeRewardsRatio, _buybackRewardsRatio)
 }
 
-// Receive is a paid mutator transaction binding the contract receive function.
+// UpdateParams is a paid mutator transaction binding the contract method 0xe880afd4.
 //
-// Solidity: receive() payable returns()
-func (_SwapContract *SwapContractTransactorSession) Receive() (*types.Transaction, error) {
-	return _SwapContract.Contract.Receive(&_SwapContract.TransactOpts)
+// Solidity: function updateParams(address _sbBTCPool, address _buybackAddress, uint256 _withdrawalFeeBPS, uint256 _nodeRewardsRatio, uint256 _buybackRewardsRatio) returns(bool)
+func (_SwapContract *SwapContractTransactorSession) UpdateParams(_sbBTCPool common.Address, _buybackAddress common.Address, _withdrawalFeeBPS *big.Int, _nodeRewardsRatio *big.Int, _buybackRewardsRatio *big.Int) (*types.Transaction, error) {
+	return _SwapContract.Contract.UpdateParams(&_SwapContract.TransactOpts, _sbBTCPool, _buybackAddress, _withdrawalFeeBPS, _nodeRewardsRatio, _buybackRewardsRatio)
+}
+
+// Fallback is a paid mutator transaction binding the contract fallback function.
+//
+// Solidity: fallback() returns()
+func (_SwapContract *SwapContractTransactor) Fallback(opts *bind.TransactOpts, calldata []byte) (*types.Transaction, error) {
+	return _SwapContract.contract.RawTransact(opts, calldata)
+}
+
+// Fallback is a paid mutator transaction binding the contract fallback function.
+//
+// Solidity: fallback() returns()
+func (_SwapContract *SwapContractSession) Fallback(calldata []byte) (*types.Transaction, error) {
+	return _SwapContract.Contract.Fallback(&_SwapContract.TransactOpts, calldata)
+}
+
+// Fallback is a paid mutator transaction binding the contract fallback function.
+//
+// Solidity: fallback() returns()
+func (_SwapContract *SwapContractTransactorSession) Fallback(calldata []byte) (*types.Transaction, error) {
+	return _SwapContract.Contract.Fallback(&_SwapContract.TransactOpts, calldata)
 }
 
 // SwapContractBurnLPTokensForFloatIterator is returned from FilterBurnLPTokensForFloat and is used to iterate over the raw logs and unpacked data for BurnLPTokensForFloat events raised by the SwapContract contract.
@@ -1553,9 +1121,9 @@ func (_SwapContract *SwapContractFilterer) ParseBurnLPTokensForFloat(log types.L
 	return event, nil
 }
 
-// SwapContractDepositIterator is returned from FilterDeposit and is used to iterate over the raw logs and unpacked data for Deposit events raised by the SwapContract contract.
-type SwapContractDepositIterator struct {
-	Event *SwapContractDeposit // Event containing the contract specifics and raw log
+// SwapContractDistributeFeesIterator is returned from FilterDistributeFees and is used to iterate over the raw logs and unpacked data for DistributeFees events raised by the SwapContract contract.
+type SwapContractDistributeFeesIterator struct {
+	Event *SwapContractDistributeFees // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -1569,7 +1137,7 @@ type SwapContractDepositIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *SwapContractDepositIterator) Next() bool {
+func (it *SwapContractDistributeFeesIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -1578,7 +1146,7 @@ func (it *SwapContractDepositIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(SwapContractDeposit)
+			it.Event = new(SwapContractDistributeFees)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -1593,7 +1161,7 @@ func (it *SwapContractDepositIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(SwapContractDeposit)
+		it.Event = new(SwapContractDistributeFees)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -1609,179 +1177,41 @@ func (it *SwapContractDepositIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *SwapContractDepositIterator) Error() error {
+func (it *SwapContractDistributeFeesIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *SwapContractDepositIterator) Close() error {
+func (it *SwapContractDistributeFeesIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// SwapContractDeposit represents a Deposit event raised by the SwapContract contract.
-type SwapContractDeposit struct {
-	Token     common.Address
-	User      common.Address
-	Amount    *big.Int
-	Balance   *big.Int
-	Timestamp *big.Int
-	Raw       types.Log // Blockchain specific contextual infos
-}
-
-// FilterDeposit is a free log retrieval operation binding the contract event 0x4e2ca0515ed1aef1395f66b5303bb5d6f1bf9d61a353fa53f73f8ac9973fa9f6.
-//
-// Solidity: event Deposit(address token, address user, uint256 amount, uint256 balance, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) FilterDeposit(opts *bind.FilterOpts) (*SwapContractDepositIterator, error) {
-
-	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "Deposit")
-	if err != nil {
-		return nil, err
-	}
-	return &SwapContractDepositIterator{contract: _SwapContract.contract, event: "Deposit", logs: logs, sub: sub}, nil
-}
-
-// WatchDeposit is a free log subscription operation binding the contract event 0x4e2ca0515ed1aef1395f66b5303bb5d6f1bf9d61a353fa53f73f8ac9973fa9f6.
-//
-// Solidity: event Deposit(address token, address user, uint256 amount, uint256 balance, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) WatchDeposit(opts *bind.WatchOpts, sink chan<- *SwapContractDeposit) (event.Subscription, error) {
-
-	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "Deposit")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(SwapContractDeposit)
-				if err := _SwapContract.contract.UnpackLog(event, "Deposit", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseDeposit is a log parse operation binding the contract event 0x4e2ca0515ed1aef1395f66b5303bb5d6f1bf9d61a353fa53f73f8ac9973fa9f6.
-//
-// Solidity: event Deposit(address token, address user, uint256 amount, uint256 balance, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) ParseDeposit(log types.Log) (*SwapContractDeposit, error) {
-	event := new(SwapContractDeposit)
-	if err := _SwapContract.contract.UnpackLog(event, "Deposit", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// SwapContractDistributeNodeRewardsIterator is returned from FilterDistributeNodeRewards and is used to iterate over the raw logs and unpacked data for DistributeNodeRewards events raised by the SwapContract contract.
-type SwapContractDistributeNodeRewardsIterator struct {
-	Event *SwapContractDistributeNodeRewards // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *SwapContractDistributeNodeRewardsIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(SwapContractDistributeNodeRewards)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(SwapContractDistributeNodeRewards)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *SwapContractDistributeNodeRewardsIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *SwapContractDistributeNodeRewardsIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// SwapContractDistributeNodeRewards represents a DistributeNodeRewards event raised by the SwapContract contract.
-type SwapContractDistributeNodeRewards struct {
+// SwapContractDistributeFees represents a DistributeFees event raised by the SwapContract contract.
+type SwapContractDistributeFees struct {
 	RewardLPTsForNodes *big.Int
 	Raw                types.Log // Blockchain specific contextual infos
 }
 
-// FilterDistributeNodeRewards is a free log retrieval operation binding the contract event 0x86dd6ae252e62228b47b3c1a12762cbf634952b2d29319b04f4f72fb153bcbdd.
+// FilterDistributeFees is a free log retrieval operation binding the contract event 0x98247f7bfe9bc0dd2082599235b06718b8222bf674552bd10b2c055051159bd2.
 //
-// Solidity: event DistributeNodeRewards(uint256 rewardLPTsForNodes)
-func (_SwapContract *SwapContractFilterer) FilterDistributeNodeRewards(opts *bind.FilterOpts) (*SwapContractDistributeNodeRewardsIterator, error) {
+// Solidity: event DistributeFees(uint256 rewardLPTsForNodes)
+func (_SwapContract *SwapContractFilterer) FilterDistributeFees(opts *bind.FilterOpts) (*SwapContractDistributeFeesIterator, error) {
 
-	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "DistributeNodeRewards")
+	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "DistributeFees")
 	if err != nil {
 		return nil, err
 	}
-	return &SwapContractDistributeNodeRewardsIterator{contract: _SwapContract.contract, event: "DistributeNodeRewards", logs: logs, sub: sub}, nil
+	return &SwapContractDistributeFeesIterator{contract: _SwapContract.contract, event: "DistributeFees", logs: logs, sub: sub}, nil
 }
 
-// WatchDistributeNodeRewards is a free log subscription operation binding the contract event 0x86dd6ae252e62228b47b3c1a12762cbf634952b2d29319b04f4f72fb153bcbdd.
+// WatchDistributeFees is a free log subscription operation binding the contract event 0x98247f7bfe9bc0dd2082599235b06718b8222bf674552bd10b2c055051159bd2.
 //
-// Solidity: event DistributeNodeRewards(uint256 rewardLPTsForNodes)
-func (_SwapContract *SwapContractFilterer) WatchDistributeNodeRewards(opts *bind.WatchOpts, sink chan<- *SwapContractDistributeNodeRewards) (event.Subscription, error) {
+// Solidity: event DistributeFees(uint256 rewardLPTsForNodes)
+func (_SwapContract *SwapContractFilterer) WatchDistributeFees(opts *bind.WatchOpts, sink chan<- *SwapContractDistributeFees) (event.Subscription, error) {
 
-	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "DistributeNodeRewards")
+	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "DistributeFees")
 	if err != nil {
 		return nil, err
 	}
@@ -1791,8 +1221,8 @@ func (_SwapContract *SwapContractFilterer) WatchDistributeNodeRewards(opts *bind
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(SwapContractDistributeNodeRewards)
-				if err := _SwapContract.contract.UnpackLog(event, "DistributeNodeRewards", log); err != nil {
+				event := new(SwapContractDistributeFees)
+				if err := _SwapContract.contract.UnpackLog(event, "DistributeFees", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -1813,12 +1243,12 @@ func (_SwapContract *SwapContractFilterer) WatchDistributeNodeRewards(opts *bind
 	}), nil
 }
 
-// ParseDistributeNodeRewards is a log parse operation binding the contract event 0x86dd6ae252e62228b47b3c1a12762cbf634952b2d29319b04f4f72fb153bcbdd.
+// ParseDistributeFees is a log parse operation binding the contract event 0x98247f7bfe9bc0dd2082599235b06718b8222bf674552bd10b2c055051159bd2.
 //
-// Solidity: event DistributeNodeRewards(uint256 rewardLPTsForNodes)
-func (_SwapContract *SwapContractFilterer) ParseDistributeNodeRewards(log types.Log) (*SwapContractDistributeNodeRewards, error) {
-	event := new(SwapContractDistributeNodeRewards)
-	if err := _SwapContract.contract.UnpackLog(event, "DistributeNodeRewards", log); err != nil {
+// Solidity: event DistributeFees(uint256 rewardLPTsForNodes)
+func (_SwapContract *SwapContractFilterer) ParseDistributeFees(log types.Log) (*SwapContractDistributeFees, error) {
+	event := new(SwapContractDistributeFees)
+	if err := _SwapContract.contract.UnpackLog(event, "DistributeFees", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -2186,16 +1616,16 @@ func (it *SwapContractRewardsCollectionIterator) Close() error {
 
 // SwapContractRewardsCollection represents a RewardsCollection event raised by the SwapContract contract.
 type SwapContractRewardsCollection struct {
-	FeesToken             common.Address
-	Rewards               *big.Int
-	AmountLPTokensForNode *big.Int
-	CurrentPriceLP        *big.Int
-	Raw                   types.Log // Blockchain specific contextual infos
+	FeesToken       common.Address
+	Rewards         *big.Int
+	RewardsLPTTotal *big.Int
+	CurrentPriceLP  *big.Int
+	Raw             types.Log // Blockchain specific contextual infos
 }
 
 // FilterRewardsCollection is a free log retrieval operation binding the contract event 0xe3debe835f6848edc082b32a1d729781d3bfcd7e14422d80bcaa6794d3816b2f.
 //
-// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 amountLPTokensForNode, uint256 currentPriceLP)
+// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 rewardsLPTTotal, uint256 currentPriceLP)
 func (_SwapContract *SwapContractFilterer) FilterRewardsCollection(opts *bind.FilterOpts) (*SwapContractRewardsCollectionIterator, error) {
 
 	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "RewardsCollection")
@@ -2207,7 +1637,7 @@ func (_SwapContract *SwapContractFilterer) FilterRewardsCollection(opts *bind.Fi
 
 // WatchRewardsCollection is a free log subscription operation binding the contract event 0xe3debe835f6848edc082b32a1d729781d3bfcd7e14422d80bcaa6794d3816b2f.
 //
-// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 amountLPTokensForNode, uint256 currentPriceLP)
+// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 rewardsLPTTotal, uint256 currentPriceLP)
 func (_SwapContract *SwapContractFilterer) WatchRewardsCollection(opts *bind.WatchOpts, sink chan<- *SwapContractRewardsCollection) (event.Subscription, error) {
 
 	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "RewardsCollection")
@@ -2244,7 +1674,7 @@ func (_SwapContract *SwapContractFilterer) WatchRewardsCollection(opts *bind.Wat
 
 // ParseRewardsCollection is a log parse operation binding the contract event 0xe3debe835f6848edc082b32a1d729781d3bfcd7e14422d80bcaa6794d3816b2f.
 //
-// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 amountLPTokensForNode, uint256 currentPriceLP)
+// Solidity: event RewardsCollection(address feesToken, uint256 rewards, uint256 rewardsLPTTotal, uint256 currentPriceLP)
 func (_SwapContract *SwapContractFilterer) ParseRewardsCollection(log types.Log) (*SwapContractRewardsCollection, error) {
 	event := new(SwapContractRewardsCollection)
 	if err := _SwapContract.contract.UnpackLog(event, "RewardsCollection", log); err != nil {
@@ -2384,282 +1814,6 @@ func (_SwapContract *SwapContractFilterer) WatchSwap(opts *bind.WatchOpts, sink 
 func (_SwapContract *SwapContractFilterer) ParseSwap(log types.Log) (*SwapContractSwap, error) {
 	event := new(SwapContractSwap)
 	if err := _SwapContract.contract.UnpackLog(event, "Swap", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// SwapContractSwapTokensToBTCIterator is returned from FilterSwapTokensToBTC and is used to iterate over the raw logs and unpacked data for SwapTokensToBTC events raised by the SwapContract contract.
-type SwapContractSwapTokensToBTCIterator struct {
-	Event *SwapContractSwapTokensToBTC // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *SwapContractSwapTokensToBTCIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(SwapContractSwapTokensToBTC)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(SwapContractSwapTokensToBTC)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *SwapContractSwapTokensToBTCIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *SwapContractSwapTokensToBTCIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// SwapContractSwapTokensToBTC represents a SwapTokensToBTC event raised by the SwapContract contract.
-type SwapContractSwapTokensToBTC struct {
-	SwapID     [32]byte
-	DestAddr   string
-	RefundAddr common.Address
-	AmountWBTC *big.Int
-	Timestamp  *big.Int
-	Raw        types.Log // Blockchain specific contextual infos
-}
-
-// FilterSwapTokensToBTC is a free log retrieval operation binding the contract event 0xaaa4c278970337923c885845b00985ecf5082317e2f9abf72a27b4d35255d672.
-//
-// Solidity: event SwapTokensToBTC(bytes32 SwapID, string DestAddr, address RefundAddr, uint256 AmountWBTC, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) FilterSwapTokensToBTC(opts *bind.FilterOpts) (*SwapContractSwapTokensToBTCIterator, error) {
-
-	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "SwapTokensToBTC")
-	if err != nil {
-		return nil, err
-	}
-	return &SwapContractSwapTokensToBTCIterator{contract: _SwapContract.contract, event: "SwapTokensToBTC", logs: logs, sub: sub}, nil
-}
-
-// WatchSwapTokensToBTC is a free log subscription operation binding the contract event 0xaaa4c278970337923c885845b00985ecf5082317e2f9abf72a27b4d35255d672.
-//
-// Solidity: event SwapTokensToBTC(bytes32 SwapID, string DestAddr, address RefundAddr, uint256 AmountWBTC, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) WatchSwapTokensToBTC(opts *bind.WatchOpts, sink chan<- *SwapContractSwapTokensToBTC) (event.Subscription, error) {
-
-	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "SwapTokensToBTC")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(SwapContractSwapTokensToBTC)
-				if err := _SwapContract.contract.UnpackLog(event, "SwapTokensToBTC", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSwapTokensToBTC is a log parse operation binding the contract event 0xaaa4c278970337923c885845b00985ecf5082317e2f9abf72a27b4d35255d672.
-//
-// Solidity: event SwapTokensToBTC(bytes32 SwapID, string DestAddr, address RefundAddr, uint256 AmountWBTC, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) ParseSwapTokensToBTC(log types.Log) (*SwapContractSwapTokensToBTC, error) {
-	event := new(SwapContractSwapTokensToBTC)
-	if err := _SwapContract.contract.UnpackLog(event, "SwapTokensToBTC", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// SwapContractWithdrawIterator is returned from FilterWithdraw and is used to iterate over the raw logs and unpacked data for Withdraw events raised by the SwapContract contract.
-type SwapContractWithdrawIterator struct {
-	Event *SwapContractWithdraw // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *SwapContractWithdrawIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(SwapContractWithdraw)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(SwapContractWithdraw)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *SwapContractWithdrawIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *SwapContractWithdrawIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// SwapContractWithdraw represents a Withdraw event raised by the SwapContract contract.
-type SwapContractWithdraw struct {
-	Token     common.Address
-	User      common.Address
-	Amount    *big.Int
-	Balance   *big.Int
-	Timestamp *big.Int
-	Raw       types.Log // Blockchain specific contextual infos
-}
-
-// FilterWithdraw is a free log retrieval operation binding the contract event 0xebff2602b3f468259e1e99f613fed6691f3a6526effe6ef3e768ba7ae7a36c4f.
-//
-// Solidity: event Withdraw(address token, address user, uint256 amount, uint256 balance, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) FilterWithdraw(opts *bind.FilterOpts) (*SwapContractWithdrawIterator, error) {
-
-	logs, sub, err := _SwapContract.contract.FilterLogs(opts, "Withdraw")
-	if err != nil {
-		return nil, err
-	}
-	return &SwapContractWithdrawIterator{contract: _SwapContract.contract, event: "Withdraw", logs: logs, sub: sub}, nil
-}
-
-// WatchWithdraw is a free log subscription operation binding the contract event 0xebff2602b3f468259e1e99f613fed6691f3a6526effe6ef3e768ba7ae7a36c4f.
-//
-// Solidity: event Withdraw(address token, address user, uint256 amount, uint256 balance, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) WatchWithdraw(opts *bind.WatchOpts, sink chan<- *SwapContractWithdraw) (event.Subscription, error) {
-
-	logs, sub, err := _SwapContract.contract.WatchLogs(opts, "Withdraw")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(SwapContractWithdraw)
-				if err := _SwapContract.contract.UnpackLog(event, "Withdraw", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseWithdraw is a log parse operation binding the contract event 0xebff2602b3f468259e1e99f613fed6691f3a6526effe6ef3e768ba7ae7a36c4f.
-//
-// Solidity: event Withdraw(address token, address user, uint256 amount, uint256 balance, uint256 Timestamp)
-func (_SwapContract *SwapContractFilterer) ParseWithdraw(log types.Log) (*SwapContractWithdraw, error) {
-	event := new(SwapContractWithdraw)
-	if err := _SwapContract.contract.UnpackLog(event, "Withdraw", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
