@@ -18,8 +18,8 @@ async function main() {
     //BTCT_ADDR = "0xaD6D458402F60fD3Bd25163575031ACDce07538D"//address for DAI as there is no liquidity for BTCt on Ropsten
     const BTCT_ADDR = "0x67855AC8e0E429518dA2255fD5c0667b6CD82ba6"
     const sbBTCPool = "0xf5329508Fdb96A1aada673dB6572109a228edB7e"
-    const dao = "0xad2CD8327BFE0E8C059EA5f789d064ba4C261BDb"
     const swapRewards = "0x53E79243D27DCd5E1070b4B71FDC42F8944a7848"
+    const dao = "0xad2CD8327BFE0E8C059EA5f789d064ba4C261BDb"
 
     console.log("Deploying contracts with the account:", deployer.address);
 
