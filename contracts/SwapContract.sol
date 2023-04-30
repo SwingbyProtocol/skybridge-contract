@@ -21,11 +21,11 @@ contract SwapContract is ISwapContract, Ownable {
     address public immutable BTCT_ADDR;
     uint256 private immutable convertScale;
     uint256 private immutable lpDivisor;
+    address public buybackAddress;
+    address public sbBTCPool;
     uint256 public withdrawalFeeBPS;
     uint256 public nodeRewardsRatio;
     uint256 public buybackRewardsRatio;
-    address public buybackAddress;
-    address public sbBTCPool;
 
     mapping(address => uint256) private floatAmountOf;
     mapping(bytes32 => bool) private used; //used TX
@@ -104,7 +104,7 @@ contract SwapContract is ISwapContract, Ownable {
         floatAmountOf[address(0)] = _initBTCFloat;
         floatAmountOf[BTCT_ADDR] = _initWBTCFloat;
         buybackAddress = _buybackAddress;
-        withdrawalFeeBPS = 30;
+        withdrawalFeeBPS = 20;
         nodeRewardsRatio = 66;
         buybackRewardsRatio = 24;
     }
@@ -319,6 +319,27 @@ contract SwapContract is ISwapContract, Ownable {
         require(activeNodeCount <= 100, "Stored node size should be <= 100");
         churnedInCount = _churnedInCount;
         tssThreshold = _tssThreshold;
+        return true;
+    }
+
+    /// @dev updateParams changes contract params.
+    /// @param _sbBTCPool The address of new sbBTCPool.
+    /// @param _buybackAddress The address of new buyback.
+    /// @param _withdrawalFeeBPS The number of next withdarw fees.
+    /// @param _nodeRewardsRatio The number of next node rewards ratio.
+    /// @param _buybackRewardsRatio The number of next buyback rewards ratio.
+    function updateParams(
+        address _sbBTCPool,
+        address _buybackAddress,
+        uint256 _withdrawalFeeBPS,
+        uint256 _nodeRewardsRatio,
+        uint256 _buybackRewardsRatio
+    ) external override onlyOwner returns (bool) {
+        sbBTCPool = _sbBTCPool;
+        buybackAddress = _buybackAddress;
+        withdrawalFeeBPS = _withdrawalFeeBPS;
+        nodeRewardsRatio = _nodeRewardsRatio;
+        buybackRewardsRatio = _buybackRewardsRatio;
         return true;
     }
 

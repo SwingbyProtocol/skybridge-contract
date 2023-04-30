@@ -60,6 +60,14 @@ interface ISwapContract {
         uint8 _tssThreshold
     ) external returns (bool);
 
+    function updateParams(
+        address _sbBTCPool,
+        address _buybackAddress,
+        uint256 _withdrawalFeeBPS,
+        uint256 _nodeRewardsRatio,
+        uint256 _buybackRewardsRatio
+    ) external returns (bool);
+
     function isTxUsed(bytes32 _txid) external view returns (bool);
 
     function getCurrentPriceLP() external view returns (uint256);
