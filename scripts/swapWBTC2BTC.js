@@ -32,14 +32,12 @@ async function main() {
     let spenders = [to]
     let amounts = [incomingAmount]
 
-    let btct = await swap.BTCT_ADDR()
-    const tx = await swap.singleTransferERC20(
-        btct,
-        to,
+    const tx = await swap.collectSwapFeesForBTC(
         swapAmount,
-        swapAmount,
+        minerFees,
         swapFees,
-        [],
+        spenders,
+        amounts,
     )
     console.log(tx.hash);
 }
