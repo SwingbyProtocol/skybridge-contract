@@ -168,7 +168,7 @@ export default [
   {
     "inputs": [
       {
-        "internalType": "contract IBurnableToken",
+        "internalType": "contract LPToken",
         "name": "target",
         "type": "address"
       },
@@ -282,6 +282,30 @@ export default [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "mintFrom",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "mintable",
     "outputs": [
@@ -309,6 +333,19 @@ export default [
   },
   {
     "inputs": [],
+    "name": "old",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "owner",
     "outputs": [
       {
@@ -323,6 +360,19 @@ export default [
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_old",
+        "type": "address"
+      }
+    ],
+    "name": "setOld",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

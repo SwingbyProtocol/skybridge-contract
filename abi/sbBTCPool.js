@@ -187,24 +187,6 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_swap",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_barn",
-        "type": "address"
-      }
-    ],
-    "name": "setup",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "swapContract",
     "outputs": [
