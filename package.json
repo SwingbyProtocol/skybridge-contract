@@ -42,7 +42,9 @@
     "sol2uml": "^1.1.6",
     "truffle-contract-size": "^2.0.1",
     "truffle-hdwallet-provider-privkey": "^0.0.4",
-    "truffle-plugin-verify": "^0.5.15"
+    "truffle-plugin-verify": "^0.5.15",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
