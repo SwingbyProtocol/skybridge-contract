@@ -18,6 +18,13 @@ $ truffle migrate --network {development/goerli}
 ```
 $ TSS={The TSS wallet address} truffle exec scripts/moveSCOwner.js --network {development/goerli} 
 ```
+## Deployment Order
+1. Deploy sbBTCPool nodeRewards contracts
+2. Deploy LP token and swap contract (initial liquidiy setup if need)
+3. Initialize sbBTCPool and nodeRewards
+4. Mint LPT to users (if need)
+5. Set old LPT token for convert -- they can convert to new token with burning old token.
+6. Transferring owner of new LPT to swap contract
 
 ## Build contract
 ```
