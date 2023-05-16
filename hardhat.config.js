@@ -15,7 +15,14 @@ require('@nomiclabs/hardhat-etherscan');
 
 //This requires a private key rather than a memonic, this is a private key to a throw away account so this can compile, but it should be stored in a local secret.json file
 //It could then be accessed below using secret.key 
-const mnemonic = process.env.KEY || "4d777ee25c2bb753c12597e8f35a2eedb90ece9bc5682f335e0e2c2fdc8d5674"
+// const mnemonic = process.env.KEY || "4d777ee25c2bb753c12597e8f35a2eedb90ece9bc5682f335e0e2c2fdc8d5674"
+const accountInfo = {
+  mnemonic: process.env.MNEMONIC,
+  path: "m/44'/60'/0'/0",
+  initialIndex: 1,
+  count: 20,
+  passphrase: "",
+}
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -52,7 +59,7 @@ module.exports = {
     },
     goerli: {
       url: "https://goerli.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts: [mnemonic],
+      accounts: accountInfo,
       network_id: 5,       // Ropsten's id
       gas: "auto",        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -63,17 +70,18 @@ module.exports = {
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts: [mnemonic],
+      accounts: accountInfo,
       network_id: 1,       // Ropsten's id
-      gas: 3000000,        // Ropsten has a lower block limit than mainnet
+      gas: "auto",        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
-      gasPrice: 93000000000
+      gasPrice: "auto",
+      maxPriorityFeePerGas: 1000000000,
     },
     bsc_testnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts: [mnemonic],
+      accounts: accountInfo,
       network_id: 97,       // Ropsten's id
       gas: 7500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -83,7 +91,7 @@ module.exports = {
     },
     bsc_mainnet: {
       url: "https://mainnet.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
-      accounts: [mnemonic],
+      accounts: accountInfo,
       network_id: 56,       // Ropsten's id
       gas: 3000000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
