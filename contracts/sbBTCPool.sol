@@ -35,7 +35,7 @@ contract sbBTCPool is Ownable {
     }
 
     // update all node rewards.
-    function updateAll(uint256 _timestamp) public {
+    function updateAll(uint256 _timestamp) public onlyOwner {
         updateStakes(_timestamp);
         // Getting rewards
         ackFunds();
@@ -47,7 +47,7 @@ contract sbBTCPool is Ownable {
     }
 
     // check all active nodes to calculate current stakes.
-    function updateStakes(uint256 _timestamp) public {
+    function updateStakes(uint256 _timestamp) internal {
         address[] memory nodes = swapContract.getActiveNodes();
         uint256 newTotalNodeStaked;
         for (uint256 i = 0; i < nodes.length; i++) {
