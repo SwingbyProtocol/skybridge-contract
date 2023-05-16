@@ -226,22 +226,28 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_timestamp",
+        "type": "uint256"
+      }
+    ],
     "name": "updateAll",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "updateNodes",
-    "outputs": [
+    "inputs": [
       {
-        "internalType": "bool",
-        "name": "isStaker",
-        "type": "bool"
+        "internalType": "uint256",
+        "name": "_timestamp",
+        "type": "uint256"
       }
     ],
+    "name": "updateStakes",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

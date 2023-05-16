@@ -35,41 +35,25 @@ contract sbBTCPool is Ownable {
     }
 
     // update all node rewards.
-    function updateAll() public {
-        address[] memory nodes = swapContract.getActiveNodes();
-        uint256 newTotalNodeStaked;
-        for (uint256 i = 0; i < nodes.length; i++) {
-            newTotalNodeStaked = newTotalNodeStaked.add(
-                barn.balanceOf(nodes[i])
-            );
-            if (userMultiplier[nodes[i]] == 0) {
-                userMultiplier[nodes[i]] = currentMultiplier;
-            }
-        }
-        // only change when stakers had actions.
-        if (totalNodeStaked != newTotalNodeStaked) {
-            totalNodeStaked = newTotalNodeStaked;
-        }
-        // Update new currentMultiplier
+    function updateAll(uint256 _timestamp) public {
+        updateStakes(_timestamp);
+        // Getting rewards
         ackFunds();
+        // Update all distribution.
+        address[] memory nodes = swapContract.getActiveNodes();
         for (uint256 i = 0; i < nodes.length; i++) {
-            uint256 reward = _userPendingReward(nodes[i]);
-            owed[nodes[i]] = owed[nodes[i]].add(reward);
-            userMultiplier[nodes[i]] = currentMultiplier;
+            _updateOwed(nodes[i], _timestamp);
         }
     }
 
     // check all active nodes to calculate current stakes.
-    function updateNodes() public returns (bool isStaker) {
+    function updateStakes(uint256 _timestamp) public {
         address[] memory nodes = swapContract.getActiveNodes();
         uint256 newTotalNodeStaked;
         for (uint256 i = 0; i < nodes.length; i++) {
             newTotalNodeStaked = newTotalNodeStaked.add(
-                barn.balanceOf(nodes[i])
+                barn.balanceAtTs(nodes[i], _timestamp)
             );
-            if (msg.sender == nodes[i]) {
-                isStaker = true;
-            }
             if (userMultiplier[nodes[i]] == 0) {
                 userMultiplier[nodes[i]] = currentMultiplier;
             }
@@ -87,9 +71,13 @@ contract sbBTCPool is Ownable {
 
     // claim calculates the currently owed reward and transfers the funds to the user
     function claim() public returns (uint256) {
-        require(updateNodes(), "caller is not node");
+        require(swapContract.isNodeStake(msg.sender), "caller is not node");
 
-        _calculateOwed(msg.sender);
+        updateStakes(block.timestamp);
+
+        ackFunds();
+
+        _updateOwed(msg.sender, block.timestamp);
 
         uint256 amount = owed[msg.sender];
         require(amount > 0, "nothing to claim");
@@ -135,22 +123,22 @@ contract sbBTCPool is Ownable {
         swapContract = ISwapContract(address(0));
     }
 
-    // _calculateOwed calculates and updates the total amount that is owed to an user and updates the user's multiplier
+    // _updateOwed calculates and updates the total amount that is owed to an user and updates the user's multiplier
     // to the current value
     // it automatically attempts to pull the token from the source and acknowledge the funds
-    function _calculateOwed(address user) internal {
-        ackFunds();
-
-        uint256 reward = _userPendingReward(user);
-
+    function _updateOwed(address user, uint256 timestamp) internal {
+        uint256 reward = _userPendingReward(user, timestamp);
         owed[user] = owed[user].add(reward);
         userMultiplier[user] = currentMultiplier;
     }
 
     // _userPendingReward calculates the reward that should be based on the current multiplier / anything that's not included in the `owed[user]` value
     // it does not represent the entire reward that's due to the user unless added on top of `owed[user]`
-    function _userPendingReward(address user) internal view returns (uint256) {
+    function _userPendingReward(
+        address user,
+        uint256 timestamp
+    ) internal view returns (uint256) {
         uint256 multiplier = currentMultiplier.sub(userMultiplier[user]);
-        return barn.balanceOf(user).mul(multiplier).div(divisor);
+        return barn.balanceAtTs(user, timestamp).mul(multiplier).div(divisor);
     }
 }
