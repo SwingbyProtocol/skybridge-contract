@@ -12,57 +12,51 @@ BN = require('bn.js')
  * There are still some errors with the above
  */
 async function main() {
-    [sender, receiver, dao, ...addrs] = await ethers.getSigners();
-    console.log(sender.address)
+    [...addrs] = await ethers.getSigners();
+    //console.log(addrs.map((s) => s.address))
     const swapContrat = '0x9e6BA6e811665849f03f56C1f22a8894AEbb3993'
-    const sbBTC_Pool = '0xec2946aD323f0879269910cbBB5420E8CD578a30'
+    const sbBTC_Pool = '0xD60126017fDf906668Cfe5327c566C65e7f061bA'
+    const barnContract = '0x009cc14ce70b2E667984C2276490d56ae3234c43'
     const SwapContractFactory = await ethers.getContractFactory("SwapContract");
     const sbBTCFactory = await ethers.getContractFactory("sbBTCPool");
+    const barnFactory = await ethers.getContractFactory("LPToken");
     const swap = await SwapContractFactory.attach(swapContrat);
-    const sbBTCP = sbBTCFactory.attach(sbBTC_Pool)
+    const sbBTCP = await sbBTCFactory.attach(sbBTC_Pool)
+    const barn = await barnFactory.attach(barnContract)
 
-    //let nodes = await swap.getActiveNodes()
-
-    array = []
+    nodes = []
     var skipped = []
-
-    array.push(sbBTCP.connect(sender).callStatic.claim())
-    array.push(sbBTCP.connect(receiver).callStatic.claim())
-    array.push(sbBTCP.connect(dao).callStatic.claim())
 
     //console.log(addrs)
 
     for (i = 0; i < 10; i++) {
-        array.push(sbBTCP.connect(addrs[i]).callStatic.claim())
+        nodes.push({
+            address: addrs[i].address,
+            claim: sbBTCP.connect(addrs[i]).callStatic.claim(),
+            barn: barn.balanceOf(addrs[i].address)
+        })
     }
     var sum = 0;
-    const result = await Promise.allSettled(array)
-    var nodeList = []
-    var skipped = []
-    result.forEach((s, i) => {
-        var address = ""
-        switch (i) {
-            case 0: address = sender.address;
-                break;
-            case 1: address = receiver.address
-                break
-            case 2: address = dao.address
-                break;
-            default: address = addrs[i-3].address
-        }
+    const claimed = await Promise.allSettled(nodes.map((s) => s.claim))
+    const barnBalance = await Promise.allSettled(nodes.map((s) => s.barn))
+    const nodeList = []
+    claimed.forEach((s, i) => {
         if (s.status == "fulfilled") {
-            nodeList.push({ address: address, amount: (s.value / 1e8) })
+            nodeList.push({ address: nodes[i].address, amount: (s.value / 1e8), barnBalance: barnBalance[i].value / 1e18 })
             sum += s.value / 1e8
         } else {
-            skipped.push(address)
+            skipped.push(nodes[i].address)
         }
     })
     const sorted = nodeList.sort(function (a, b) {
         return b.amount - a.amount
     })
-    console.log("sum -------------------------------------- ", sum, "time:", new Date(), "contract", sbBTCP.address,)
-    sorted.forEach((s) => console.log(`address: ${s.address} amount: ${s.amount.toFixed(8)}`))
-    //console.log("skipped: ", skipped)
+    console.log("sum -------------------------------------- ", sum, "time:", new Date(), "contract:", sbBTCP.address)
+
+    sorted.forEach(async (s) => {
+        console.log(`address: ${s.address} amount: ${s.amount.toFixed(8)}, bal: ${s.barnBalance.toFixed(8)}`)
+    })
+    console.log("skipped: ", skipped)
 }
 main()
     .then(() => process.exit(0))
