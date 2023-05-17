@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test_and_audit:
+  build:
     docker:
       - image: circleci/python:3.8-node
     steps:
