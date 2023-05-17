@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "npm run compile && rm -rf abigenBindings && truffle run abigen && npm run test",
-    "test": "npm run lint && truffle test",
+    "test": "npx hardhat test ./test/testSwapContract.js",
     "lint": "eslint --fix . --ext .js",
     "compile": "truffle compile",
     "gen-go": "node scripts/generateGoBindings.js"

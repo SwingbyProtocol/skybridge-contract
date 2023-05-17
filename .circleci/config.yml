@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test_and_audit:
     docker:
       - image: circleci/python:3.8-node
     steps:
@@ -18,6 +18,10 @@ jobs:
           command: |
             node --version
             npm install
+      - run:
+          name: test
+          command: |
+            npm run test
       - run:
           name: Analyze with MythX
           command: |
