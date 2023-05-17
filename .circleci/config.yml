@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.8-node
     steps:
       - checkout
       - run:
@@ -13,6 +13,11 @@ jobs:
           command: |
             . venv/bin/activate
             pip install mythx-cli
+      - run:
+          name: npm install
+          command: |
+            node --version
+            npm install
       - run:
           name: Analyze with MythX
           command: |
