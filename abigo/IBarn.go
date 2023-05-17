@@ -30,7 +30,7 @@ var (
 
 // IBarnMetaData contains all meta data concerning the IBarn contract.
 var IBarnMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"balanceAtTs\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // IBarnABI is the input ABI used to generate the binding from.
@@ -177,6 +177,37 @@ func (_IBarn *IBarnTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Tran
 // Transact invokes the (paid) contract method with params as input values.
 func (_IBarn *IBarnTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
 	return _IBarn.Contract.contract.Transact(opts, method, params...)
+}
+
+// BalanceAtTs is a free data retrieval call binding the contract method 0x417edd4d.
+//
+// Solidity: function balanceAtTs(address user, uint256 timestamp) view returns(uint256)
+func (_IBarn *IBarnCaller) BalanceAtTs(opts *bind.CallOpts, user common.Address, timestamp *big.Int) (*big.Int, error) {
+	var out []interface{}
+	err := _IBarn.contract.Call(opts, &out, "balanceAtTs", user, timestamp)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// BalanceAtTs is a free data retrieval call binding the contract method 0x417edd4d.
+//
+// Solidity: function balanceAtTs(address user, uint256 timestamp) view returns(uint256)
+func (_IBarn *IBarnSession) BalanceAtTs(user common.Address, timestamp *big.Int) (*big.Int, error) {
+	return _IBarn.Contract.BalanceAtTs(&_IBarn.CallOpts, user, timestamp)
+}
+
+// BalanceAtTs is a free data retrieval call binding the contract method 0x417edd4d.
+//
+// Solidity: function balanceAtTs(address user, uint256 timestamp) view returns(uint256)
+func (_IBarn *IBarnCallerSession) BalanceAtTs(user common.Address, timestamp *big.Int) (*big.Int, error) {
+	return _IBarn.Contract.BalanceAtTs(&_IBarn.CallOpts, user, timestamp)
 }
 
 // BalanceOf is a free data retrieval call binding the contract method 0x70a08231.

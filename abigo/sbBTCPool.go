@@ -30,7 +30,7 @@ var (
 
 // SbBTCPoolMetaData contains all meta data concerning the SbBTCPool contract.
 var SbBTCPoolMetaData = &bind.MetaData{
-	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Claim\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"ackFunds\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"balanceBefore\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"barn\",\"outputs\":[{\"internalType\":\"contractIBarn\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"claim\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentMultiplier\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"emergencyWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"owed\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_node\",\"type\":\"address\"}],\"name\":\"resetUnstakedNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardToken\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_barn\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"}],\"name\":\"setBarnAndSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_barn\",\"type\":\"address\"}],\"name\":\"setup\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapContract\",\"outputs\":[{\"internalType\":\"contractISwapContract\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalNodeStaked\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"updateAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"updateNodes\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"isStaker\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"userMultiplier\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Claim\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"ackFunds\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"balanceBefore\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"barn\",\"outputs\":[{\"internalType\":\"contractIBarn\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"claim\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentMultiplier\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"emergencyWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"owed\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_node\",\"type\":\"address\"}],\"name\":\"resetUnstakedNode\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rewardToken\",\"outputs\":[{\"internalType\":\"contractIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_barn\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swap\",\"type\":\"address\"}],\"name\":\"setBarnAndSwap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"swapContract\",\"outputs\":[{\"internalType\":\"contractISwapContract\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalNodeStaked\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"}],\"name\":\"updateAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"userMultiplier\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // SbBTCPoolABI is the input ABI used to generate the binding from.
@@ -584,27 +584,6 @@ func (_SbBTCPool *SbBTCPoolTransactorSession) SetBarnAndSwap(_barn common.Addres
 	return _SbBTCPool.Contract.SetBarnAndSwap(&_SbBTCPool.TransactOpts, _barn, _swap)
 }
 
-// Setup is a paid mutator transaction binding the contract method 0x2d34ba79.
-//
-// Solidity: function setup(address _swap, address _barn) returns()
-func (_SbBTCPool *SbBTCPoolTransactor) Setup(opts *bind.TransactOpts, _swap common.Address, _barn common.Address) (*types.Transaction, error) {
-	return _SbBTCPool.contract.Transact(opts, "setup", _swap, _barn)
-}
-
-// Setup is a paid mutator transaction binding the contract method 0x2d34ba79.
-//
-// Solidity: function setup(address _swap, address _barn) returns()
-func (_SbBTCPool *SbBTCPoolSession) Setup(_swap common.Address, _barn common.Address) (*types.Transaction, error) {
-	return _SbBTCPool.Contract.Setup(&_SbBTCPool.TransactOpts, _swap, _barn)
-}
-
-// Setup is a paid mutator transaction binding the contract method 0x2d34ba79.
-//
-// Solidity: function setup(address _swap, address _barn) returns()
-func (_SbBTCPool *SbBTCPoolTransactorSession) Setup(_swap common.Address, _barn common.Address) (*types.Transaction, error) {
-	return _SbBTCPool.Contract.Setup(&_SbBTCPool.TransactOpts, _swap, _barn)
-}
-
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
 // Solidity: function transferOwnership(address newOwner) returns()
@@ -626,46 +605,25 @@ func (_SbBTCPool *SbBTCPoolTransactorSession) TransferOwnership(newOwner common.
 	return _SbBTCPool.Contract.TransferOwnership(&_SbBTCPool.TransactOpts, newOwner)
 }
 
-// UpdateAll is a paid mutator transaction binding the contract method 0x53d78693.
+// UpdateAll is a paid mutator transaction binding the contract method 0xa616f345.
 //
-// Solidity: function updateAll() returns()
-func (_SbBTCPool *SbBTCPoolTransactor) UpdateAll(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _SbBTCPool.contract.Transact(opts, "updateAll")
+// Solidity: function updateAll(uint256 _timestamp) returns()
+func (_SbBTCPool *SbBTCPoolTransactor) UpdateAll(opts *bind.TransactOpts, _timestamp *big.Int) (*types.Transaction, error) {
+	return _SbBTCPool.contract.Transact(opts, "updateAll", _timestamp)
 }
 
-// UpdateAll is a paid mutator transaction binding the contract method 0x53d78693.
+// UpdateAll is a paid mutator transaction binding the contract method 0xa616f345.
 //
-// Solidity: function updateAll() returns()
-func (_SbBTCPool *SbBTCPoolSession) UpdateAll() (*types.Transaction, error) {
-	return _SbBTCPool.Contract.UpdateAll(&_SbBTCPool.TransactOpts)
+// Solidity: function updateAll(uint256 _timestamp) returns()
+func (_SbBTCPool *SbBTCPoolSession) UpdateAll(_timestamp *big.Int) (*types.Transaction, error) {
+	return _SbBTCPool.Contract.UpdateAll(&_SbBTCPool.TransactOpts, _timestamp)
 }
 
-// UpdateAll is a paid mutator transaction binding the contract method 0x53d78693.
+// UpdateAll is a paid mutator transaction binding the contract method 0xa616f345.
 //
-// Solidity: function updateAll() returns()
-func (_SbBTCPool *SbBTCPoolTransactorSession) UpdateAll() (*types.Transaction, error) {
-	return _SbBTCPool.Contract.UpdateAll(&_SbBTCPool.TransactOpts)
-}
-
-// UpdateNodes is a paid mutator transaction binding the contract method 0xa96adec2.
-//
-// Solidity: function updateNodes() returns(bool isStaker)
-func (_SbBTCPool *SbBTCPoolTransactor) UpdateNodes(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _SbBTCPool.contract.Transact(opts, "updateNodes")
-}
-
-// UpdateNodes is a paid mutator transaction binding the contract method 0xa96adec2.
-//
-// Solidity: function updateNodes() returns(bool isStaker)
-func (_SbBTCPool *SbBTCPoolSession) UpdateNodes() (*types.Transaction, error) {
-	return _SbBTCPool.Contract.UpdateNodes(&_SbBTCPool.TransactOpts)
-}
-
-// UpdateNodes is a paid mutator transaction binding the contract method 0xa96adec2.
-//
-// Solidity: function updateNodes() returns(bool isStaker)
-func (_SbBTCPool *SbBTCPoolTransactorSession) UpdateNodes() (*types.Transaction, error) {
-	return _SbBTCPool.Contract.UpdateNodes(&_SbBTCPool.TransactOpts)
+// Solidity: function updateAll(uint256 _timestamp) returns()
+func (_SbBTCPool *SbBTCPoolTransactorSession) UpdateAll(_timestamp *big.Int) (*types.Transaction, error) {
+	return _SbBTCPool.Contract.UpdateAll(&_SbBTCPool.TransactOpts, _timestamp)
 }
 
 // SbBTCPoolClaimIterator is returned from FilterClaim and is used to iterate over the raw logs and unpacked data for Claim events raised by the SbBTCPool contract.
