@@ -17,4 +17,4 @@ jobs:
           name: Analyze with MythX
           command: |
             . venv/bin/activate
-            mythx --ci --yes analyze --solc-version 0.8.19 contracts/
+            mythx --ci --yes analyze --solc-version 0.8.19 --remap-import @openzeppelin/=<pwd>/node_modules/@openzeppelin/ contracts/
