@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: Setup virtual environment
+          command: python -m virtualenv venv
+      - run:
+          name: Install MythX CLI
+          command: |
+            . venv/bin/activate
+            pip install mythx-cli
+      - run:
+          name: Analyze with MythX
+          command: |
+            . venv/bin/activate
+            mythx --ci --yes analyze --solc-version 0.8.19 contracts/
