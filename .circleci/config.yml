@@ -6,6 +6,37 @@ jobs:
     steps:
       - checkout
       - run:
+          name: npm install
+          command: |
+            node --version
+            npm install
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  test:
+    docker:
+      - image: circleci/python:3.8-node
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: test
+          command: |
+            npm run test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  audit:
+    docker:
+      - image: circleci/python:3.8-node
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
           name: Setup virtual environment
           command: python -m virtualenv venv
       - run:
@@ -14,16 +45,19 @@ jobs:
             . venv/bin/activate
             pip install mythx-cli
       - run:
-          name: npm install
-          command: |
-            node --version
-            npm install
-      - run:
-          name: test
-          command: |
-            npm run test
-      - run:
           name: Analyze with MythX
           command: |
             . venv/bin/activate
             mythx --ci --yes analyze --solc-version 0.8.19 --remap-import @openzeppelin/=$(pwd)/node_modules/@openzeppelin/ contracts/
+
+workflows:
+  version: 2
+  build_test_audit:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - audit:
+          requires:
+            - test
