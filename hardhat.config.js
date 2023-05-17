@@ -1,16 +1,12 @@
 
 //npx hardhat run scripts/deploy.js --network <network-name>
 //run the tests: npx hardhat test
-
-
-
-require("@nomiclabs/hardhat-waffle");
 //Plugins to let hardhat use web3 and truffle libraries 
 require("@nomiclabs/hardhat-web3");
-require("@nomiclabs/hardhat-truffle5");
 require("hardhat-watcher");
 require('@symblox/hardhat-abi-gen');
 require('@nomiclabs/hardhat-etherscan');
+require("@nomiclabs/hardhat-waffle");
 //const mnemonic = process.env.SEED
 
 //This requires a private key rather than a memonic, this is a private key to a throw away account so this can compile, but it should be stored in a local secret.json file
@@ -109,21 +105,6 @@ module.exports = {
   // Set default mocha options here, use special reporters etc.
   mocha: {
     timeout: 100000
-  },
-
-  // Configure your compilers
-  compilers: {
-    solc: {
-      version: "0.8.9",    // Fetch exact version from solc-bin (default: truffle's version)
-      // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      settings: {          // See the solidity docs for advice about optimization and evmVersion
-        optimizer: {
-          enabled: true,
-          runs: 200
-        },
-        //  evmVersion: "byzantium"
-      }
-    },
   },
 
   etherscan: {
