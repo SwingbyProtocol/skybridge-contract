@@ -21,7 +21,7 @@ const accountInfo = {
 }
 
 module.exports = {
-  defaultNetwork: "hardhat",
+  //defaultNetwork: "hardhat",
   watcher: {
     compilation: { //npx hardhat watch compilation -- auto compile on change
       tasks: ["compile"],
@@ -43,15 +43,19 @@ module.exports = {
   networks: {
     development: {
       url: "http://127.0.0.1:8545",
-      gas: 5500000,
-      gasPrice: 8000000000
+      accounts: accountInfo,
+      confirmations: 2,
+      skipDryRun: true, 
+      gas: "auto",
+      gasPrice: "auto",
+      maxPriorityFeePerGas: 1000000000,
     },
     hardhat: {
       //run tests on fork of mainnet 
-      forking: {
-        url: "https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5",
-        blockNumber: 17322134        //13220045 //previous testing block
-      }
+      // forking: {
+      //   url: "https://eth-mainnet.alchemyapi.io/v2/YfblHzLI_PlnIA0pxphS90J3yaA3dDi5",
+      //   blockNumber: 17322134        //13220045 //previous testing block
+      // }
     },
     goerli: {
       url: "https://goerli.infura.io/v3/f35c2a4f3d0941a38a3edb62ed10c847",
