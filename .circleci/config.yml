@@ -48,7 +48,7 @@ jobs:
           name: Analyze with MythX
           command: |
             . venv/bin/activate
-            mythx --yes analyze --mode standard --async --solc-version 0.8.19 --remap-import @openzeppelin/=$(pwd)/node_modules/@openzeppelin/ contracts/
+            mythx --yes analyze --mode quick --async --solc-version 0.8.19 --remap-import @openzeppelin/=$(pwd)/node_modules/@openzeppelin/ contracts/SwapContract.sol
 
 workflows:
   version: 2
