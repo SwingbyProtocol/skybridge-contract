@@ -68,8 +68,6 @@ contract SwapContract is ISwapContract, Ownable {
         bytes32 txid
     );
 
-    event DistributeFees(uint256 rewardLPTsForNodes);
-
     modifier priceCheck() {
         uint256 beforePrice = getCurrentPriceLP();
         _;

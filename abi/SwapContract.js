@@ -88,19 +88,6 @@ export default [
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "rewardLPTsForNodes",
-        "type": "uint256"
-      }
-    ],
-    "name": "DistributeFees",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "to",
         "type": "address"
